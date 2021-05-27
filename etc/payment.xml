@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @copyright   Copyright © 2021 Avarda. All rights reserved.
+ * @package     avarda_checkout3
+ */
+-->
+<payment xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Payment:etc/payment.xsd">
+    <groups>
+        <group id="avarda_checkout3">
+            <label>Avarda CheckoutV3</label>
+        </group>
+    </groups>
+    <methods>
+        <method name="avarda_checkout3_checkout">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="avarda_checkout3_invoice">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="avarda_checkout3_loan">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="avarda_checkout3_card">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="avarda_checkout3_direct_payment">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="avarda_checkout3_part_payment">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="avarda_checkout3_swish">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="avarda_checkout3_high_amount_loan">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="avarda_checkout3_paypal">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="avarda_checkout3_pay_on_delivery">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="avarda_checkout3_b2b_invoice">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="avarda_checkout3_direct_invoice">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="avarda_checkout3_masterpass">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="avarda_checkout3_mobile_pay">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="avarda_checkout3_vipps">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="avarda_checkout3_zero_amount">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+    </methods>
+</payment>
+

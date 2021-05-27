@@ -1,0 +1,40 @@
+<?php
+/**
+ * @copyright Copyright © 2021 Avarda. All rights reserved.
+ * @package   Avarda_Checkout3
+ */
+/** @var $block \Avarda\Checkout3\Block\Checkout */
+$purchaseId = $block->getPurchaseId();
+$jwtToken = $block->getJwtToken($purchaseId);
+?>
+<div id="avarda-checkout-iframe"></div>
+<script>
+    var CHECKOUT3_JS_BUNDLE = '<?= $block->getCheckOutClientScriptPath(); ?>';
+    (function(e,t,n,a,s,c,o,i,r){e[a]=e[a]||function(){(e[a].q=e[a].q||[
+    ]).push(arguments)};e[a].i=s;i=t.createElement(n);i.async=1
+    ;i.src=o+"?v="+c+"&ts="+1*new Date;r=t.getElementsByTagName(n)[0]
+    ;r.parentNode.insertBefore(i,r)})(window,document,"script",
+        "avardaCheckoutInit","avardaCheckout","1.0.0",CHECKOUT3_JS_BUNDLE
+    );
+</script>
+<script>
+    let options = {
+        rootElementId: "avarda-checkout-iframe",
+        purchaseId: "<?= $purchaseId ?>",
+        purchaseJwt: "<?= $jwtToken ?>",
+        redirectUrl: '<?= $block->getSaveOrderUrl() . $purchaseId ?>',
+        completedPurchaseCallback: function (avardaCheckoutInstance) {
+            avardaCheckoutInstance.unmount();
+            window.location.href = "<?= $this->getSaveOrderUrl()  . $purchaseId ?>";
+        },
+        beforeSubmitCallback: function (data, avardaCheckoutInstance) {
+            avardaCheckoutInstance.beforeSubmitContinue();
+        },
+        sessionTimedOutCallback: function (avardaCheckoutInstance) {
+            avardaCheckoutInstance.unmount();
+            options.purchaseId = undefined;
+        },
+        styles: "<?= '[]' ?>"
+    };
+    avardaCheckoutInit(options);
+</script>

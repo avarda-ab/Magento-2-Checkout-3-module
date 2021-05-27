@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @copyright   Copyright © 2021 Avarda. All rights reserved.
+ * @package     Avarda_Checkout3
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="checkout" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="Avarda\Checkout3\Block\Checkout"
+                 name="checkout.process"
+                 template="Avarda_Checkout3::process.phtml"
+                 cacheable="false" />
+        </referenceContainer>
+    </body>
+</page>

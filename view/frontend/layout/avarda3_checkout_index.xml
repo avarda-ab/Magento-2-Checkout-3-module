@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @copyright   Copyright © 2021 Avarda. All rights reserved.
+ * @package     Avarda_Checkout3
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="checkout" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="checkout_index_index"/>
+    <head>
+        <css src="Avarda_Checkout3::css/avarda.css" rel="stylesheet" type="text/css" />
+        <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no" />
+    </head>
+    <body>
+        <referenceBlock name="page.main.title" remove="true"/>
+        <referenceContainer name="columns.top">
+            <container name="checkout.messages" htmlTag="div" htmlClass="page messages">
+                <block class="Magento\Framework\View\Element\Template" name="ajax.message.placeholder" template="Magento_Theme::html/messages.phtml"/>
+                <block class="Magento\Framework\View\Element\Messages" name="messages" as="messages" template="Magento_Theme::messages.phtml"/>
+            </container>
+        </referenceContainer>
+        <referenceBlock class="Avarda\Checkout3\Block\Checkout" name="checkout.root" template="Avarda_Checkout3::onepage.phtml">
+            <arguments>
+                <argument name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="checkout" xsi:type="array">
+                            <item name="children" xsi:type="array">
+                                <item name="authentication" xsi:type="array">
+                                    <item name="config" xsi:type="array">
+                                        <item name="componentDisabled" xsi:type="boolean">true</item>
+                                    </item>
+                                </item>
+                                <item name="steps" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <!-- Disable default steps -->
+                                        <item name="shipping-step" xsi:type="array">
+                                            <item name="config" xsi:type="array">
+                                                <item name="componentDisabled" xsi:type="boolean">true</item>
+                                            </item>
+                                        </item>
+                                        <item name="billing-step" xsi:type="array">
+                                            <item name="config" xsi:type="array">
+                                                <item name="componentDisabled" xsi:type="boolean">true</item>
+                                            </item>
+                                        </item>
+                                        <!-- Create custom checkout steps -->
+                                        <!-- Shipping step -->
+                                        <item name="avarda-shipping" xsi:type="array">
+                                            <item name="component" xsi:type="string">Avarda_Checkout3/js/view/shipping-method</item>
+                                            <item name="provider" xsi:type="string">checkoutProvider</item>
+                                            <item name="displayArea" xsi:type="string">summary</item>
+                                            <item name="sortOrder" xsi:type="string">2</item>
+                                            <item name="children" xsi:type="array">
+                                                <item name="price" xsi:type="array">
+                                                    <item name="component" xsi:type="string">Magento_Tax/js/view/checkout/shipping_method/price</item>
+                                                    <item name="displayArea" xsi:type="string">price</item>
+                                                </item>
+                                                <item name="step-config" xsi:type="array">
+                                                    <item name="component" xsi:type="string">uiComponent</item>
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="shipping-rates-validation" xsi:type="array">
+                                                            <item name="children" xsi:type="array">
+                                                                <!--Step configuration components-->
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+
+                                                <item name="shippingAdditional" xsi:type="array">
+                                                    <item name="component" xsi:type="string">uiComponent</item>
+                                                    <item name="displayArea" xsi:type="string">shippingAdditional</item>
+                                                </item>
+
+                                                <item name="before-shipping-method-form" xsi:type="array">
+                                                    <item name="component" xsi:type="string">uiComponent</item>
+                                                    <item name="displayArea" xsi:type="string">before-shipping-method-form</item>
+                                                    <item name="children" xsi:type="array">
+                                                        <!-- address-list-additional-addresses -->
+                                                    </item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                        <!-- Payment step (iframe) -->
+                                        <item name="avarda_checkout3" xsi:type="array">
+                                            <item name="component" xsi:type="string">Avarda_Checkout3/js/view/checkout-view</item>
+                                            <item name="sortOrder" xsi:type="string">3</item>
+                                            <item name="displayArea" xsi:type="string">custom-checkout-avarda</item>
+                                        </item>
+                                    </item>
+                                </item>
+                                <item name="sidebar" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <item name="summary" xsi:type="array">
+                                            <item name="sortOrder" xsi:type="string">10</item>
+                                        </item>
+                                        <item name="avarda_sidebar" xsi:type="array">
+                                            <item name="component" xsi:type="string">Avarda_Checkout3/js/view/sidebar</item>
+                                            <item name="displayArea" xsi:type="string">summary</item>
+                                            <item name="sortOrder" xsi:type="string">20</item>
+                                            <item name="children" xsi:type="array">
+                                                <item name="discount" xsi:type="array">
+                                                    <item name="component" xsi:type="string">Magento_SalesRule/js/view/payment/discount</item>
+                                                    <item name="displayArea" xsi:type="string">avarda-summary</item>
+                                                    <item name="sortOrder" xsi:type="string">0</item>
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="errors" xsi:type="array">
+                                                            <item name="sortOrder" xsi:type="string">0</item>
+                                                            <item name="component" xsi:type="string">Magento_SalesRule/js/view/payment/discount-messages</item>
+                                                            <item name="displayArea" xsi:type="string">messages</item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </arguments>
+        </referenceBlock>
+        <referenceContainer name="page.messages" remove="true"/>
+    </body>
+</page>

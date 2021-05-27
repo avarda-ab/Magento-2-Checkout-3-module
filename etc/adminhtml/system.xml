@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @copyright   Copyright © 2021 Avarda. All rights reserved.
+ * @package     Avarda_Checkout3
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="avarda_checkout3_section" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Avarda Checkout V3</label>
+                <comment><![CDATA[<div class="avarda-checkout-logo"></div><div class="avarda-checkout-text">Next-generation payment and checkout solutions for online retailers in the nordics.<br/></div>]]></comment>
+                <fieldset_css>complex avarda_checkout3_section</fieldset_css>
+                <frontend_model>Magento\Paypal\Block\Adminhtml\System\Config\Fieldset\Payment</frontend_model>
+                <group id="api" translate="label comment" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Avarda Checkout Configuration</label>
+                    <field id="active" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Enable Avarda Checkout</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/avarda_checkout3_checkout/active</config_path>
+                    </field>
+                    <field id="test_mode" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Test Mode (Stage)</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/avarda_checkout3_checkout/test_mode</config_path>
+                    </field>
+                    <field id="client_id" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Client ID</label>
+                        <config_path>payment/avarda_checkout3_checkout/client_id</config_path>
+                    </field>
+                    <field id="client_secret" translate="label" type="obscure" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Client Secret</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                        <config_path>payment/avarda_checkout3_checkout/client_secret</config_path>
+                    </field>
+                    <field id="onepage_redirect_active" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Redirect Onepage to Avarda Checkout</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/avarda_checkout3_checkout/onepage_redirect_active</config_path>
+                    </field>
+                    <field id="title" translate="label" type="text" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Title</label>
+                        <config_path>payment/avarda_checkout3_checkout/title</config_path>
+                    </field>
+                    <field id="instructions" translate="label" type="textarea" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Instructions</label>
+                        <config_path>payment/avarda_checkout3_checkout/instructions</config_path>
+                    </field>
+                    <field id="custom_css" translate="label" type="textarea" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Custom Css</label>
+                        <config_path>avarda_checkout3/api/custom_css</config_path>
+                        <comment><![CDATA[<a target="_blank" rel="noopener" href="https://docs.avarda.com/checkout-3/more-features/custom-css-styles/">See documentation here</a>, add each config as one row for example:
+                    <pre class="code-example">buttons.primary.base.backgroundColor='#fff'
+buttons.primary.fontSize='15'</pre>]]></comment>
+                    </field>
+                    <field id="debug" sortOrder="70" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Debug Logging</label>
+                        <config_path>payment/avarda_checkout3_checkout/debug</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
+                        <comment>Should not be enabled in production. Sensitive information is logged.</comment>
+                    </field>
+                </group>
+                <group id="titles" translate="label comment" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Avarda Method Titles</label>
+                    <!-- Payment titles which shows up in emails and order view -->
+                    <field id="avarda_checkout3_invoice_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Invoice Title</label>
+                        <config_path>payment/avarda_checkout3_invoice/title</config_path>
+                    </field>
+                    <field id="avarda_checkout3_loan_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Loan Title</label>
+                        <config_path>payment/avarda_checkout3_loan/title</config_path>
+                    </field>
+                    <field id="avarda_checkout3_card_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Card Title</label>
+                        <config_path>payment/avarda_checkout3_card/title</config_path>
+                    </field>
+                    <field id="avarda_checkout3_direct_payment_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>DirectPayment Title</label>
+                        <config_path>payment/avarda_checkout3_direct_payment/title</config_path>
+                    </field>
+                    <field id="avarda_checkout3_part_payment_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>PartPayment Title</label>
+                        <config_path>payment/avarda_checkout3_part_payment/title</config_path>
+                    </field>
+                    <field id="avarda_checkout3_swish_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Swish Title</label>
+                        <config_path>payment/avarda_checkout3_swish/title</config_path>
+                    </field>
+                    <field id="avarda_checkout3_high_amount_loan_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>HighAmountLoan Title</label>
+                        <config_path>payment/avarda_checkout3_high_amount_loan/title</config_path>
+                    </field>
+                    <field id="avarda_checkout3_paypal_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Paypal Title</label>
+                        <config_path>payment/avarda_checkout3_paypal/title</config_path>
+                    </field>
+                    <field id="avarda_checkout3_pay_on_delivery_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>PayOnDelivery Title</label>
+                        <config_path>payment/avarda_checkout3_pay_on_delivery/title</config_path>
+                    </field>
+                    <field id="avarda_checkout3_b2b_invoice_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>B2bInvoice Title</label>
+                        <config_path>payment/avarda_checkout3_b2b_invoice/title</config_path>
+                    </field>
+                    <field id="avarda_checkout3_direct_invoice_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>DirectInvoice Title</label>
+                        <config_path>payment/avarda_checkout3_direct_invoice/title</config_path>
+                    </field>
+                    <field id="avarda_checkout3_masterpass_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Masterpass Title</label>
+                        <config_path>payment/avarda_checkout3_masterpass/title</config_path>
+                    </field>
+                    <field id="avarda_checkout3_mobile_pay_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>MobilePay Title</label>
+                        <config_path>payment/avarda_checkout3_mobile_pay/title</config_path>
+                    </field>
+                    <field id="avarda_checkout3_vipps_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Vipps Title</label>
+                        <config_path>payment/avarda_checkout3_vipps/title</config_path>
+                    </field>
+                    <field id="avarda_checkout3_zero_amount_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>ZeroAmount Title</label>
+                        <config_path>payment/avarda_checkout3_zero_amount/title</config_path>
+                    </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

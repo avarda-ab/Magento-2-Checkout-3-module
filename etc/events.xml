@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @copyright   Copyright © 2021 Avarda. All rights reserved.
+ * @package     Avarda_Checkout3
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="order_cancel_after">
+        <observer name="avarda_checkout3_sales_order_cancel_after" instance="Avarda\Checkout3\Observer\OrderCancelObserver" />
+    </event>
+    <event name="admin_system_config_changed_section_payment">
+        <observer name="avarda_checkout3_remove_flags" instance="Avarda\Checkout3\Observer\ConfigSaveObserver" />
+    </event>
+</config>
