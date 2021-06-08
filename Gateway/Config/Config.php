@@ -158,7 +158,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     public function getNotificationUrl()
     {
-        return $this->url->getBaseUrl(UrlInterface::URL_TYPE_WEB) . '/V1/avarda3/orderComplete';
+        return $this->url->getBaseUrl(UrlInterface::URL_TYPE_WEB) . 'rest/V1/avarda3/orderComplete';
     }
 
     public function getCustomCss()

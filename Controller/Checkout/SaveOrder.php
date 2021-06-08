@@ -20,12 +20,6 @@ use Psr\Log\LoggerInterface;
 
 class SaveOrder extends AbstractCheckout
 {
-    /** @var \Magento\Checkout\Model\Session */
-    protected $checkoutSession;
-
-    /** @var Session */
-    protected $customerSession;
-
     /** @var QuotePaymentManagementInterface */
     protected $quotePaymentManagement;
 
@@ -36,14 +30,10 @@ class SaveOrder extends AbstractCheckout
         Context $context,
         LoggerInterface $logger,
         Config $config,
-        \Magento\Checkout\Model\Session $checkoutSession,
-        Session $customerSession,
         QuotePaymentManagementInterface $quotePaymentManagement,
         AvardaOrderRepositoryInterface $avardaOrderRepository
     ) {
         parent::__construct($context, $logger, $config);
-        $this->checkoutSession = $checkoutSession;
-        $this->customerSession = $customerSession;
         $this->quotePaymentManagement = $quotePaymentManagement;
         $this->avardaOrderRepository = $avardaOrderRepository;
     }
