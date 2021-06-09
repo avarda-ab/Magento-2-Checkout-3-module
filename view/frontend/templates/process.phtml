@@ -22,7 +22,7 @@ $jwtToken = $block->getJwtToken($purchaseId);
         rootElementId: "avarda-checkout-iframe",
         purchaseId: "<?= $purchaseId ?>",
         purchaseJwt: "<?= $jwtToken ?>",
-        redirectUrl: '',
+        redirectUrl: '<?= $block->getCallbackUrl() . $purchaseId ?>',
         completedPurchaseCallback: function (avardaCheckoutInstance) {
             avardaCheckoutInstance.unmount();
             window.location.href = "<?= $this->getSaveOrderUrl()  . $purchaseId ?>";
