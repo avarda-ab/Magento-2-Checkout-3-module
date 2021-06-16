@@ -50,31 +50,38 @@ class GetPaymentStatusHandler implements HandlerInterface
         $entityId = $order->getId();
         $quote = $this->quoteRepository->get($entityId);
 
-        $telephone = $response['b2C']['userInputs']['phone'];
-        $email = $response['b2C']['userInputs']['email'];
+        $mode = $response['mode'] == 'B2B' ? 'b2B' : 'b2C';
+
+        $telephone = $response[$mode]['userInputs']['phone'];
+        $email = $response[$mode]['userInputs']['email'];
         $quote->setCustomerEmail($email);
 
         $billingAddress = $this->addressFactory->create();
         $billingAddress->setTelephone($telephone);
         $billingAddress->setEmail($email);
-        $billingAddress->setFirstname($response['b2C']['invoicingAddress']['firstName']);
-        $billingAddress->setLastname($response['b2C']['invoicingAddress']['lastName']);
-        $billingAddress->setStreet($response['b2C']['invoicingAddress']['address1']);
-        $billingAddress->setPostcode($response['b2C']['invoicingAddress']['zip']);
-        $billingAddress->setCity($response['b2C']['invoicingAddress']['city']);
-        $billingAddress->setCountryId($response['b2C']['invoicingAddress']['country']);
+        if ($mode == 'b2C') {
+            $billingAddress->setFirstname($response[$mode]['invoicingAddress']['firstName']);
+            $billingAddress->setLastname($response[$mode]['invoicingAddress']['lastName']);
+        } else {
+            $billingAddress->setFirstname($response[$mode]['invoicingAddress']['name']);
+            $billingAddress->setLastname($response[$mode]['invoicingAddress']['name']);
+        }
+        $billingAddress->setStreet($response[$mode]['invoicingAddress']['address1']);
+        $billingAddress->setPostcode($response[$mode]['invoicingAddress']['zip']);
+        $billingAddress->setCity($response[$mode]['invoicingAddress']['city']);
+        $billingAddress->setCountryId($response[$mode]['invoicingAddress']['country']);
         $quote->setBillingAddress($billingAddress);
 
-        if ($response['b2C']['deliveryAddress']['firstName']) {
+        if ($response[$mode]['deliveryAddress']['firstName']) {
             $shippingAddress = $this->addressFactory->create();
             $shippingAddress->setTelephone($telephone);
             $shippingAddress->setEmail($email);
-            $shippingAddress->setFirstname($response['b2C']['deliveryAddress']['firstName']);
-            $shippingAddress->setLastname($response['b2C']['deliveryAddress']['lastName']);
-            $shippingAddress->setStreet($response['b2C']['deliveryAddress']['address1']);
-            $shippingAddress->setPostcode($response['b2C']['deliveryAddress']['zip']);
-            $shippingAddress->setCity($response['b2C']['deliveryAddress']['city']);
-            $shippingAddress->setCountryId($response['b2C']['deliveryAddress']['country']);
+            $shippingAddress->setFirstname($response[$mode]['deliveryAddress']['firstName']);
+            $shippingAddress->setLastname($response[$mode]['deliveryAddress']['lastName']);
+            $shippingAddress->setStreet($response[$mode]['deliveryAddress']['address1']);
+            $shippingAddress->setPostcode($response[$mode]['deliveryAddress']['zip']);
+            $shippingAddress->setCity($response[$mode]['deliveryAddress']['city']);
+            $shippingAddress->setCountryId($response[$mode]['deliveryAddress']['country']);
             $quote->setShippingAddress($shippingAddress);
         } else {
             $quote->setShippingAddress($billingAddress);
@@ -89,7 +96,7 @@ class GetPaymentStatusHandler implements HandlerInterface
         // Set payment state
         $quote->getPayment()->setAdditionalInformation(
             PaymentData::STATE,
-            $response['b2C']['step']['current']
+            $response[$mode]['step']['current']
         );
     }
 }
