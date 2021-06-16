@@ -123,8 +123,8 @@ class Index extends AbstractCheckout
             // pass
         }
         // Remove payment method if it's not avarda payment already
-        if ($paymentCode != '' && strpos($paymentCode, 'avarda') === false) {
-            $quote->getPayment()->setMethod('avarda_checkout3')->save();
+        if ($paymentCode != '' && strpos($paymentCode, 'avarda_checkout3') === false) {
+            $quote->getPayment()->setMethod('avarda_checkout3_checkout')->save();
         }
 
         if ($needsSave) {
