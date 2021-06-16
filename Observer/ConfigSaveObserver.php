@@ -23,7 +23,7 @@ class ConfigSaveObserver implements ObserverInterface
     public function execute(Observer $observer)
     {
         $paths = $observer->getEvent()->getData('changed_paths');
-        $changed = ['avarda_checkout3/api/test_mode', 'avarda_checkout3/api/client_secret', 'avarda_checkout3/api/client_id'];
+        $changed = ['payment/avarda_checkout3_checkout/test_mode', 'payment/avarda_checkout3_checkout/client_secret', 'payment/avarda_checkout3_checkout/client_id'];
         $hasChanged = false;
         foreach ($changed as $item) {
             if (in_array($item, $paths)) {
