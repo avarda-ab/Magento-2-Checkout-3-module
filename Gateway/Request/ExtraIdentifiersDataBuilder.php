@@ -16,8 +16,10 @@ class ExtraIdentifiersDataBuilder implements BuilderInterface
         $order = $paymentDO->getOrder();
 
         return [
-            "orderReference" => $order->getOrderIncrementId(),
-            "posId" => 0
+            "extraIdentifiers" => [
+                "orderReference" => $order->getOrderIncrementId(),
+                "posId" => 0
+            ]
         ];
     }
 }
