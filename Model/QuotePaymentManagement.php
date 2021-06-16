@@ -5,12 +5,25 @@
  */
 namespace Avarda\Checkout3\Model;
 
+use Avarda\Checkout3\Api\Data\PaymentDetailsInterface;
+use Avarda\Checkout3\Api\Data\PaymentQueueInterfaceFactory;
+use Avarda\Checkout3\Api\ItemManagementInterface;
+use Avarda\Checkout3\Api\ItemStorageInterface;
+use Avarda\Checkout3\Api\PaymentQueueRepositoryInterface;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
+use Avarda\Checkout3\Helper\PaymentData;
+use Avarda\Checkout3\Helper\PurchaseState;
+use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\PaymentException;
+use Magento\Payment\Gateway\Command\CommandPoolInterface;
+use Magento\Payment\Gateway\Data\PaymentDataObjectFactoryInterface;
 use Magento\Payment\Model\InfoInterface;
 use Magento\Quote\Api\CartManagementInterface;
+use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\CartInterface;
+use Magento\Quote\Model\Quote;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 
 /**
  * QuotePaymentManagement
@@ -24,14 +37,14 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     /**
      * Required for GET /avarda3-items.
      *
-     * @var \Avarda\Checkout3\Api\ItemManagementInterface $itemManagement
+     * @var ItemManagementInterface $itemManagement
      */
     protected $itemManagement;
 
     /**
      * Required for populating requests with item data.
      *
-     * @var \Avarda\Checkout3\Api\ItemStorageInterface $itemStorage
+     * @var ItemStorageInterface $itemStorage
      */
     protected $itemStorage;
 
@@ -39,35 +52,35 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
      * Helper for reading payment info instances, e.g. getting purchase ID
      * from quote payment.
      *
-     * @var \Avarda\Checkout3\Helper\PaymentData
+     * @var PaymentData
      */
     protected $paymentDataHelper;
 
     /**
      * Helper to determine Avarda's purchase state.
      *
-     * @var \Avarda\Checkout3\Helper\PurchaseState
+     * @var PurchaseState
      */
     protected $purchaseStateHelper;
 
     /**
      * Command pool for API requests to Avarda.
      *
-     * @var \Magento\Payment\Gateway\Command\CommandPoolInterface
+     * @var CommandPoolInterface
      */
     protected $commandPool;
 
     /**
      * Required for executing API requests from command pool.
      *
-     * @var \Magento\Payment\Gateway\Data\PaymentDataObjectFactoryInterface
+     * @var PaymentDataObjectFactoryInterface
      */
     protected $paymentDataObjectFactory;
 
     /**
      * Repository to load quote from database.
      *
-     * @var \Magento\Quote\Api\CartRepositoryInterface
+     * @var CartRepositoryInterface
      */
     protected $quoteRepository;
 
@@ -75,21 +88,21 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
      * Repository for Avarda's payment queue which links Avarda's purchase ID to
      * Magento's quote ID.
      *
-     * @var \Avarda\Checkout3\Api\PaymentQueueRepositoryInterface
+     * @var PaymentQueueRepositoryInterface
      */
     protected $paymentQueueRepository;
 
     /**
      * Required to operate with payment queue repository.
      *
-     * @var \Avarda\Checkout3\Api\Data\PaymentQueueInterfaceFactory
+     * @var PaymentQueueInterfaceFactory
      */
     protected $paymentQueueFactory;
 
     /**
      * Required for placing order in Magento.
      *
-     * @var \Magento\Quote\Api\CartManagementInterface
+     * @var CartManagementInterface
      */
     protected $cartManagement;
 
@@ -100,24 +113,24 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
      */
     protected $quote;
 
-    /** @var \Magento\Sales\Model\Order\Email\Sender\OrderSender */
+    /** @var OrderSender */
     protected $orderSender;
 
     /** @var OrderRepositoryInterface */
     protected $orderRepository;
 
     public function __construct(
-        \Avarda\Checkout3\Api\ItemManagementInterface $itemManagement,
-        \Avarda\Checkout3\Api\ItemStorageInterface $itemStorage,
-        \Avarda\Checkout3\Helper\PaymentData $paymentDataHelper,
-        \Avarda\Checkout3\Helper\PurchaseState $purchaseStateHelper,
-        \Magento\Payment\Gateway\Command\CommandPoolInterface $commandPool,
-        \Magento\Payment\Gateway\Data\PaymentDataObjectFactoryInterface $paymentDataObjectFactory,
-        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
-        \Avarda\Checkout3\Api\PaymentQueueRepositoryInterface $paymentQueueRepository,
-        \Avarda\Checkout3\Api\Data\PaymentQueueInterfaceFactory $paymentQueueFactory,
-        \Magento\Quote\Api\CartManagementInterface $cartManagement,
-        \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender,
+        ItemManagementInterface $itemManagement,
+        ItemStorageInterface $itemStorage,
+        PaymentData $paymentDataHelper,
+        PurchaseState $purchaseStateHelper,
+        CommandPoolInterface $commandPool,
+        PaymentDataObjectFactoryInterface $paymentDataObjectFactory,
+        CartRepositoryInterface $quoteRepository,
+        PaymentQueueRepositoryInterface $paymentQueueRepository,
+        PaymentQueueInterfaceFactory $paymentQueueFactory,
+        CartManagementInterface $cartManagement,
+        OrderSender $orderSender,
         OrderRepositoryInterface $orderRepository
     ) {
         $this->itemManagement = $itemManagement;
@@ -144,7 +157,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
             $quote->getPayment()
         );
 
-        if (!$purchaseData) {
+        if (!$purchaseData || (isset($purchaseData['renew']) && $purchaseData['renew'])) {
             /** We have to manually collect totals to populate the item storage */
             $quote->collectTotals();
             $purchaseData = $this->initializePurchase($quote);
@@ -156,7 +169,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     /**
      * {@inheritdoc}
      *
-     * @param CartInterface|\Magento\Quote\Model\Quote $quote
+     * @param CartInterface|Quote $quote
      */
     public function initializePurchase(CartInterface $quote)
     {
@@ -179,7 +192,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         $paymentQueue->setQuoteId($quote->getId());
         try {
             $this->paymentQueueRepository->save($paymentQueue);
-        } catch (\Magento\Framework\Exception\AlreadyExistsException $e) {
+        } catch (AlreadyExistsException $e) {
             // Simple fix to not fail on already exists error
         }
 
@@ -275,9 +288,12 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
 
         $payment = $this->getQuote($paymentQueue->getQuoteId())->getPayment();
         if ($this->paymentDataHelper->getPurchaseData($payment)['purchaseId'] !== $purchaseId) {
-            throw new PaymentException(__('Purchase ID "%purchase_id" is outdated', [
-                'purchase_id' => $purchaseId
-            ]));
+            // sometimes initialization is done multiple times and sometimes wrong one is left for quote payment
+            // when customer is going to pay and so the validation fails. This is mostly fixed, but just to make sure this is left here
+            $purchaseData = $payment->getAdditionalInformation(PaymentDetailsInterface::PURCHASE_DATA);
+            $purchaseData['purchaseId'] = $purchaseId;
+            $payment->setAdditionalInformation(PaymentDetailsInterface::PURCHASE_DATA, $purchaseData);
+            $payment->save();
         }
 
         return $paymentQueue->getQuoteId();
@@ -286,8 +302,8 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     /**
      * Execute command for request to Avarda API based on quote.
      *
-     * @param string $commandCode
-     * @param CartInterface|\Magento\Quote\Model\Quote $quote
+     * @param string              $commandCode
+     * @param CartInterface|Quote $quote
      * @return void
      */
     protected function executeCommand($commandCode, CartInterface $quote)
@@ -309,12 +325,12 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
      * Get quote by cart/quote ID
      *
      * @param int $cartId
-     * @return CartInterface|\Magento\Quote\Model\Quote
+     * @return CartInterface|Quote
      */
     protected function getQuote($cartId)
     {
         if (!isset($this->quote) || $this->quote->getId() !== $cartId) {
-            /** @var CartInterface|\Magento\Quote\Model\Quote $quote */
+            /** @var CartInterface|Quote $quote */
             $this->quote = $this->quoteRepository->get($cartId);
         }
 
@@ -324,9 +340,9 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     /**
      * Check if quote has a valid Avarda payment.
      *
-     * @param CartInterface|\Magento\Quote\Model\Quote $quote
-     * @throws PaymentException
+     * @param CartInterface|Quote $quote
      * @return void
+     *@throws PaymentException
      */
     protected function isAvardaPayment(CartInterface $quote)
     {
