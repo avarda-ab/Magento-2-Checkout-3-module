@@ -4,7 +4,7 @@ Module adds Avarda Checkout v3 solutions as payment method and separate Checkout
 
 ## Module Installation
 
-1. `composer require avarda/checkoutv3`  
+1. `composer require avarda/checkout3`  
 2. `bin/magento module:enable Avarda_Checkout3`  
 3. `bin/magento setup:upgrade`
 
