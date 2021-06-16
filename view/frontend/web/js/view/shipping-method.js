@@ -42,6 +42,9 @@ define([
         defaults: {
             template: 'Avarda_Checkout3/shipping-method'
         },
+        initializing: false,
+        initializeTimeout: false,
+
         initialize: function () {
             let self = this;
             this._super();
@@ -71,7 +74,12 @@ define([
              */
             quote.totals.subscribe(function () {
                 if (quote.shippingMethod() || quote.isVirtual()) {
-                    self.initializeIframe();
+                    // Avoid duplicate and same time initialization, which can cause
+                    // problems on backend if run too simultaneously
+                    clearTimeout(self.initializeTimeout);
+                    self.initializeTimeout = setTimeout(function(){
+                        self.initializeIframe();
+                    }, 350);
                 }
             });
         },
@@ -139,6 +147,12 @@ define([
          */
         initializeIframe: function() {
             let self = this;
+            if (self.initializing) {
+                return;
+            }
+
+            fullScreenLoader.startLoader();
+            self.initializing = true;
             let serviceUrl = '';
 
             if (customer.isLoggedIn()) {
@@ -149,7 +163,6 @@ define([
                 });
             }
 
-            fullScreenLoader.startLoader();
             storage.get(
                 serviceUrl, true
             ).done(function (response) {
@@ -176,9 +189,11 @@ define([
                     avardaCheckout.refreshForm();
                 }
                 fullScreenLoader.stopLoader();
+                self.initializing = false;
             }).fail(function (response) {
                 errorProcessor.process(response);
                 fullScreenLoader.stopLoader();
+                self.initializing = false;
             });
 
             return true;
