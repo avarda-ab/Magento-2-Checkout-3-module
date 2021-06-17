@@ -133,8 +133,8 @@ class CreditmemoCollectTotalsPrepareItems
      */
     protected function prepareShipment(CreditmemoInterface $subject)
     {
-        $shippingAmount = $subject->getShippingAmount();
-        if ($subject->getShippingAmount() > 0) {
+        $shippingAmount = $subject->getShippingInclTax();
+        if ($shippingAmount > 0) {
             $order = $subject->getOrder();
             $itemAdapter = $this->arrayDataItemAdapterFactory->create([
                 'data' => [
