@@ -241,7 +241,8 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
      */
     public function updatePaymentStatus($cartId)
     {
-        $this->isAvardaPayment($quote = $this->getQuote($cartId));
+        $quote = $this->getQuote($cartId);
+        $this->isAvardaPayment($quote);
         $this->executeCommand('avarda_get_payment_status', $quote);
     }
 
@@ -252,6 +253,11 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     {
         $quote = $this->getQuote($cartId);
         $this->isAvardaPayment($quote);
+
+        $state = $this->paymentDataHelper->getState($quote->getPayment());
+        if (!$this->purchaseStateHelper->isComplete($state)) {
+            throw new PaymentException(__('Status is not Completed'));
+        }
 
         /** Unfreeze cart before placing the order */
         $this->setQuoteIsActive($cartId, true);
@@ -342,7 +348,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
      *
      * @param CartInterface|Quote $quote
      * @return void
-     *@throws PaymentException
+     * @throws PaymentException
      */
     protected function isAvardaPayment(CartInterface $quote)
     {

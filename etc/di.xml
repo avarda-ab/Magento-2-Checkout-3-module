@@ -29,6 +29,9 @@
     <type name="Magento\Checkout\Controller\Index\Index">
         <plugin name="avarda_checkout3_redirect" type="Avarda\Checkout3\Plugin\Checkout\CheckoutIndex"/>
     </type>
+    <type name="Magento\Payment\Model\Checks\ZeroTotal">
+        <plugin name="avarda_checkout3_allow_zerototal" type="Avarda\Checkout3\Plugin\Checks\AvardaZeroTotal"/>
+    </type>
     <!-- END Avarda plugins -->
 
     <type name="Avarda\Checkout3\Gateway\Client\AvardaClient">

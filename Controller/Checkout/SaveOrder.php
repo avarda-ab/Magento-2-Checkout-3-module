@@ -9,6 +9,7 @@ use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Controller\AbstractCheckout;
 use Avarda\Checkout3\Gateway\Config\Config;
+use Avarda\Checkout3\Helper\PaymentData;
 use Exception;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Context;
@@ -16,6 +17,7 @@ use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\PaymentException;
+use Magento\Quote\Api\CartRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
 class SaveOrder extends AbstractCheckout
@@ -26,16 +28,26 @@ class SaveOrder extends AbstractCheckout
     /** @var AvardaOrderRepositoryInterface */
     protected $avardaOrderRepository;
 
+    /** @var CartRepositoryInterface */
+    protected $cartRepository;
+
+    /** @var PaymentData */
+    protected $paymentData;
+
     public function __construct(
         Context $context,
         LoggerInterface $logger,
         Config $config,
         QuotePaymentManagementInterface $quotePaymentManagement,
-        AvardaOrderRepositoryInterface $avardaOrderRepository
+        AvardaOrderRepositoryInterface $avardaOrderRepository,
+        CartRepositoryInterface $cartRepository,
+        PaymentData $paymentData
     ) {
         parent::__construct($context, $logger, $config);
         $this->quotePaymentManagement = $quotePaymentManagement;
         $this->avardaOrderRepository = $avardaOrderRepository;
+        $this->cartRepository = $cartRepository;
+        $this->paymentData = $paymentData;
     }
 
     /**
@@ -65,8 +77,12 @@ class SaveOrder extends AbstractCheckout
             }
 
             $quoteId = $this->quotePaymentManagement->getQuoteIdByPurchaseId($purchaseId);
+            $quote = $this->cartRepository->get($quoteId);
+            // make sure payment method is avarda
+            if (!$this->paymentData->isAvardaPayment($quote->getPayment())) {
+                $quote->getPayment()->setMethod('avarda_checkout3_checkout')->save();
+            }
             $this->quotePaymentManagement->updatePaymentStatus($quoteId);
-
             $this->quotePaymentManagement->placeOrder($quoteId);
 
             return $this->resultRedirectFactory->create()->setPath(

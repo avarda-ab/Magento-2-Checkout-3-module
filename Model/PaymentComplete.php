@@ -53,8 +53,6 @@ class PaymentComplete implements PaymentCompleteInterface
                 try {
                     $this->avardaOrderRepository->save($purchaseId);
                 } catch (AlreadyExistsException $alreadyExistsException) {
-                    $this->logger->warning("Order with purchase $purchaseId already saved");
-
                     return "Order already saved";
                 }
 
@@ -64,15 +62,8 @@ class PaymentComplete implements PaymentCompleteInterface
 
                 return "OK";
             } catch (PaymentException $e) {
-                $message = $e->getMessage();
                 $this->logger->error($e);
-            } catch (\Exception $e) {
-                // log stacktrace to get why saving fails
-                $this->logger->error($e, $e->getTrace());
-                $message = __('Failed to save Avarda order. Please try again later.');
             }
-
-            $this->logger->warning($message);
         } catch (NoSuchEntityException $noSuchEntityException) {
             // Order is already saved
         }

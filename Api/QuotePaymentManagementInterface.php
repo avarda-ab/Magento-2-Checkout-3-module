@@ -68,6 +68,7 @@ interface QuotePaymentManagementInterface
      * Prepare and save order to Magento.
      *
      * @param string $cartId
+     * @throws \Magento\Framework\Exception\PaymentException
      * @return void
      */
     public function placeOrder($cartId);
