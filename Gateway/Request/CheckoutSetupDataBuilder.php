@@ -41,7 +41,7 @@ class CheckoutSetupDataBuilder implements BuilderInterface
                 'mode'                      => 'B2C',
                 'completedNotificationUrl'  => $this->configHelper->getNotificationUrl(),
                 'differentDeliveryAddress'  => $this->showDeliveryAddress($order),
-                'enableB2BLink'             => true,
+                'enableB2BLink'             => $this->configHelper->getShowB2Blink(),
                 'enableCountrySelector'     => $this->configHelper->getCountrySelector(),
             ]
         ];

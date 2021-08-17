@@ -52,6 +52,11 @@
                         <config_path>avarda_checkout3/api/country_selector</config_path>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     </field>
+                    <field id="show_b2b_link" sortOrder="70" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Show B2B Link</label>
+                        <config_path>avarda_checkout3/api/show_b2b_link</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
                     <field id="custom_css" translate="label" type="textarea" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Custom Css</label>
                         <config_path>avarda_checkout3/api/custom_css</config_path>

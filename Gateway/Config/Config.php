@@ -25,9 +25,9 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     const KEY_TOKEN_FLAG = 'avarda_checkout3_api_token';
     const KEY_ONEPAGE_REDIRECT_ACTIVE = 'onepage_redirect_active';
-    const KEY_ORDER_STATUS = 'order_status';
     const KEY_CUSTOM_CSS = 'avarda_checkout3/api/custom_css';
     const KEY_COUNTRY_SELECTOR = 'avarda_checkout3/api/country_selector';
+    const KEY_SHOW_B2B_LINK = 'avarda_checkout3/api/show_b2b_link';
 
     const URL_TEST = 'https://avdonl-s-checkout.avarda.org/';
     const URL_PRODUCTION = 'https://avdonl-p-checkout.avarda.org/';
@@ -48,6 +48,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     /** @var StoreManagerInterface */
     protected $storeManager;
 
+    protected $storeCode = null;
+
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         EncryptorInterface $encryptor,
@@ -63,6 +65,40 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         $this->url = $url;
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
+    }
+
+    /**
+     * Can set which store scope to get configs from
+     * @param $storeCode
+     */
+    public function setStoreCode($storeCode)
+    {
+        $this->storeCode = $storeCode;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStoreCode()
+    {
+        if (!$this->storeCode) {
+            $this->storeCode = $this->storeManager->getStore()->getCode();
+        }
+        return $this->storeCode;
+    }
+
+    /**
+     * Get config value in storeCode scope
+     * @param $path
+     * @return mixed
+     */
+    public function getConfigValue($path)
+    {
+        return $this->scopeConfig->getValue(
+            $path,
+            ScopeInterface::SCOPE_STORE,
+            $this->getStoreCode()
+        );
     }
 
     /**
@@ -88,7 +124,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function getClientSecret()
     {
-        return $this->encryptor->decrypt($this->getValue(self::KEY_CLIENT_SECRET));
+        return $this->encryptor->decrypt($this->getValue(self::KEY_CLIENT_SECRET, $this->getStoreCode()));
     }
 
     /**
@@ -96,7 +132,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function getClientId()
     {
-        return $this->getValue(self::KEY_CLIENT_ID);
+        return $this->getValue(self::KEY_CLIENT_ID, $this->getStoreCode());
     }
 
     /**
@@ -116,14 +152,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function getTokenUrl()
     {
         return $this->getApiUrl() . self::TOKEN_PATH;
-    }
-
-    /**
-     * @return int
-     */
-    public function getOrderStatus()
-    {
-        return $this->getValue(self::KEY_ORDER_STATUS);
     }
 
     /**
@@ -159,11 +187,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         }
     }
 
-    public function getDefaultPayment()
-    {
-        return $this->getValue(self::KEY_ORDER_STATUS);
-    }
-
     /**
      * @return string
      */
@@ -177,11 +200,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function getCustomCss()
     {
-        return $this->scopeConfig->getValue(
-            self::KEY_CUSTOM_CSS,
-            ScopeInterface::SCOPE_STORE,
-            $this->storeManager->getStore()->getCode()
-        );
+        return $this->getConfigValue(self::KEY_CUSTOM_CSS);
     }
 
     /**
@@ -189,10 +208,14 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function getCountrySelector()
     {
-        return (bool)$this->scopeConfig->getValue(
-            self::KEY_COUNTRY_SELECTOR,
-            ScopeInterface::SCOPE_STORE,
-            $this->storeManager->getStore()->getCode()
-        );
+        return (bool)$this->getConfigValue(self::KEY_COUNTRY_SELECTOR);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getShowB2Blink()
+    {
+        return (bool)$this->getConfigValue(self::KEY_SHOW_B2B_LINK);
     }
 }
