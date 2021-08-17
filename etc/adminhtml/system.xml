@@ -49,7 +49,7 @@
                     </field>
                     <field id="country_selector" sortOrder="70" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Show Country Selector</label>
-                        <config_path>payment/avarda_checkout3_checkout/country_selector</config_path>
+                        <config_path>avarda_checkout3/api/country_selector</config_path>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     </field>
                     <field id="custom_css" translate="label" type="textarea" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">

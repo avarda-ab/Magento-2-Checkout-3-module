@@ -42,7 +42,7 @@ class CheckoutSetupDataBuilder implements BuilderInterface
                 'completedNotificationUrl'  => $this->configHelper->getNotificationUrl(),
                 'differentDeliveryAddress'  => $this->showDeliveryAddress($order),
                 'enableB2BLink'             => true,
-                'EnableCountrySelector'     => $this->configHelper->getCountrySelector(),
+                'enableCountrySelector'     => $this->configHelper->getCountrySelector(),
             ]
         ];
     }

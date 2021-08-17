@@ -35,10 +35,10 @@ class JsonConverter implements ConverterInterface
             );
         } elseif (isset($body['errorMessage'])) {
             throw new WebapiException(__($body['errorMessage']));
-        } elseif (isset($body['errors'])) {
+        } elseif (isset($body['Errors'])) {
             $errorMsg = '';
-            foreach ($body['errors'] as $error) {
-                $errorMsg .= __($error[0]) . ' ';
+            foreach ($body['Errors'] as $error) {
+                $errorMsg .= __($error['errorMessage']) . ' ';
             }
             throw new WebapiException(__($errorMsg));
         } elseif ($response->getStatusCode() == 400) {
