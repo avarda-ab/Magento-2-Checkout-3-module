@@ -10,6 +10,8 @@ use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\FlagManager;
 use Magento\Framework\Url;
 use Magento\Framework\UrlInterface;
+use Magento\Store\Model\ScopeInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Class Config
@@ -25,6 +27,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const KEY_ONEPAGE_REDIRECT_ACTIVE = 'onepage_redirect_active';
     const KEY_ORDER_STATUS = 'order_status';
     const KEY_CUSTOM_CSS = 'avarda_checkout3/api/custom_css';
+    const KEY_COUNTRY_SELECTOR = 'avarda_checkout3/api/country_selector';
 
     const URL_TEST = 'https://avdonl-s-checkout.avarda.org/';
     const URL_PRODUCTION = 'https://avdonl-p-checkout.avarda.org/';
@@ -42,11 +45,15 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     /** @var ScopeConfigInterface */
     protected $scopeConfig;
 
+    /** @var StoreManagerInterface */
+    protected $storeManager;
+
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         EncryptorInterface $encryptor,
         FlagManager $flagManager,
         Url $url,
+        StoreManagerInterface $storeManager,
         $methodCode = 'avarda_checkout3_checkout',
         $pathPattern = self::DEFAULT_PATH_PATTERN
     ) {
@@ -55,6 +62,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         $this->flagManager = $flagManager;
         $this->url = $url;
         $this->scopeConfig = $scopeConfig;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -156,13 +164,35 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         return $this->getValue(self::KEY_ORDER_STATUS);
     }
 
+    /**
+     * @return string
+     */
     public function getNotificationUrl()
     {
         return $this->url->getBaseUrl(UrlInterface::URL_TYPE_WEB) . 'rest/V1/avarda3/orderComplete';
     }
 
+    /**
+     * @return string
+     */
     public function getCustomCss()
     {
-        return $this->scopeConfig->getValue(self::KEY_CUSTOM_CSS);
+        return $this->scopeConfig->getValue(
+            self::KEY_CUSTOM_CSS,
+            ScopeInterface::SCOPE_STORE,
+            $this->storeManager->getStore()->getCode()
+        );
+    }
+
+    /**
+     * @return bool
+     */
+    public function getCountrySelector()
+    {
+        return (bool)$this->scopeConfig->getValue(
+            self::KEY_COUNTRY_SELECTOR,
+            ScopeInterface::SCOPE_STORE,
+            $this->storeManager->getStore()->getCode()
+        );
     }
 }

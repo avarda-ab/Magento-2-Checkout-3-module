@@ -47,9 +47,9 @@ class PaymentManagement implements PaymentManagementInterface
     /**
      * {@inheritdoc}
      */
-    public function getPurchaseData($cartId)
+    public function getPurchaseData($cartId, $renew = false)
     {
-        $purchaseData = $this->quotePaymentManagement->getPurchaseData($cartId);
+        $purchaseData = $this->quotePaymentManagement->getPurchaseData($cartId, $renew);
 
         /** @var PaymentDetailsInterface $paymentDetails */
         $paymentDetails = $this->paymentDetailsFactory->create();

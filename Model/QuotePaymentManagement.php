@@ -150,14 +150,14 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     /**
      * {@inheritdoc}
      */
-    public function getPurchaseData($cartId)
+    public function getPurchaseData($cartId, $renew = false)
     {
         $quote = $this->getQuote($cartId);
         $purchaseData = $this->paymentDataHelper->getPurchaseData(
             $quote->getPayment()
         );
 
-        if (!$purchaseData || (isset($purchaseData['renew']) && $purchaseData['renew'])) {
+        if (!$purchaseData || $renew || (isset($purchaseData['renew']) && $purchaseData['renew'])) {
             /** We have to manually collect totals to populate the item storage */
             $quote->collectTotals();
             $purchaseData = $this->initializePurchase($quote);

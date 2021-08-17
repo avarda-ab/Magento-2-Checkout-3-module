@@ -5,7 +5,10 @@
  */
 namespace Avarda\Checkout3\Api;
 
+use Avarda\Checkout3\Api\Data\ItemDetailsListInterface;
+use Magento\Framework\Exception\PaymentException;
 use Magento\Quote\Api\Data\CartInterface;
+use Magento\Quote\Model\Quote;
 
 /**
  * Interface for managing Avarda payment information
@@ -17,14 +20,15 @@ interface QuotePaymentManagementInterface
      * Get purchase ID for quote
      *
      * @param string $cartId
+     * @param bool   $renew
      * @return string
      */
-    public function getPurchaseData($cartId);
+    public function getPurchaseData($cartId, bool $renew = false);
 
     /**
      * Make Avarda InitializePurchase call and return purchase ID
      *
-     * @param CartInterface|\Magento\Quote\Model\Quote $quote
+     * @param CartInterface|Quote $quote
      * @return string
      */
     public function initializePurchase(CartInterface $quote);
@@ -33,14 +37,14 @@ interface QuotePaymentManagementInterface
      * Get quote items additional information not provided by Magento
      *
      * @param string $cartId
-     * @return \Avarda\Checkout3\Api\Data\ItemDetailsListInterface
+     * @return ItemDetailsListInterface
      */
     public function getItemDetailsList($cartId);
 
     /**
      * Make Avarda UpdateItems call and return purchase ID
      *
-     * @param CartInterface|\Magento\Quote\Model\Quote $quote
+     * @param CartInterface|Quote $quote
      * @return void
      */
     public function updateItems(CartInterface $quote);
@@ -68,7 +72,7 @@ interface QuotePaymentManagementInterface
      * Prepare and save order to Magento.
      *
      * @param string $cartId
-     * @throws \Magento\Framework\Exception\PaymentException
+     * @throws PaymentException
      * @return void
      */
     public function placeOrder($cartId);
@@ -77,7 +81,7 @@ interface QuotePaymentManagementInterface
      * Get quote ID by Avarda purchase ID
      *
      * @param string $purchaseId
-     * @throws \Magento\Framework\Exception\PaymentException
+     * @throws PaymentException
      * @return int
      */
     public function getQuoteIdByPurchaseId($purchaseId);

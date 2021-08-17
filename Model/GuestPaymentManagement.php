@@ -57,10 +57,11 @@ class GuestPaymentManagement implements GuestPaymentManagementInterface
     /**
      * {@inheritdoc}
      */
-    public function getPurchaseData($cartId)
+    public function getPurchaseData($cartId, $renew = false)
     {
         $purchaseData = $this->quotePaymentManagement->getPurchaseData(
-            $this->getQuoteId($cartId)
+            $this->getQuoteId($cartId),
+            $renew
         );
 
         /** @var PaymentDetailsInterface $paymentDetails */

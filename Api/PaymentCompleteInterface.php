@@ -6,16 +6,20 @@
 
 namespace Avarda\Checkout3\Api;
 
+use Avarda\Checkout3\Api\Data\ItemDetailsListInterface;
+use Magento\Framework\Exception\PaymentException;
+
 /**
  * Interface for managing Avarda order complete callback
+ *
  * @api
  */
 interface PaymentCompleteInterface
 {
     /**
-     * @throws \Magento\Framework\Exception\PaymentException
+     * @throws PaymentException
      * @param string $purchaseId the external purchaseId
-     * @return \Avarda\Checkout3\Api\Data\ItemDetailsListInterface
+     * @return ItemDetailsListInterface
      */
     public function execute($purchaseId);
 }

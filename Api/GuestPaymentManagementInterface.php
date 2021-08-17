@@ -5,8 +5,13 @@
  */
 namespace Avarda\Checkout3\Api;
 
+use Avarda\Checkout3\Api\Data\ItemDetailsListInterface;
+use Avarda\Checkout3\Api\Data\PaymentDetailsInterface;
+use Magento\Framework\Exception\PaymentException;
+
 /**
  * Interface for managing Avarda guest payment information
+ *
  * @api
  */
 interface GuestPaymentManagementInterface
@@ -15,17 +20,18 @@ interface GuestPaymentManagementInterface
      * Get purchase ID for Avarda payment
      *
      * @param string $cartId
-     * @throws \Magento\Framework\Exception\PaymentException
-     * @return \Avarda\Checkout3\Api\Data\PaymentDetailsInterface
+     * @param bool   $renew
+     * @return PaymentDetailsInterface
+     * @throws PaymentException
      */
-    public function getPurchaseData($cartId);
+    public function getPurchaseData($cartId, bool $renew = false);
 
     /**
      * Freeze the cart before redirected to payment. Return 200 status code if
      * everything is OK.
      *
      * @param string $cartId
-     * @throws \Magento\Framework\Exception\PaymentException
+     * @throws PaymentException
      * @return void
      */
     public function freezeCart($cartId);
@@ -34,8 +40,8 @@ interface GuestPaymentManagementInterface
      * Get quote items additional information not provided by Magento Webapi
      *
      * @param string $cartId
-     * @throws \Magento\Framework\Exception\PaymentException
-     * @return \Avarda\Checkout3\Api\Data\ItemDetailsListInterface
+     * @throws PaymentException
+     * @return ItemDetailsListInterface
      */
     public function getItemDetailsList($cartId);
 }
