@@ -183,7 +183,8 @@ class AvardaClient
      */
     private function getToken()
     {
-        $tokenValid = $this->flagManager->getFlagData('avarda_checkout3_token_valid');
+        $tokenValidFlag = 'avarda_checkout3_token_valid_' . $this->config->getStoreCode();
+        $tokenValid = $this->flagManager->getFlagData($tokenValidFlag);
         if (!$tokenValid || $tokenValid < time()) {
             $authUrl   = $this->config->getTokenUrl();
             $authParam = [
@@ -201,7 +202,7 @@ class AvardaClient
             } elseif (isset($responseArray['error_description'])) {
                 throw new ClientException(__('Authentication error, check avarda credentials'));
             } else {
-                $this->flagManager->saveFlag('avarda_checkout3_token_valid', strtotime($responseArray['tokenExpirationUtc']));
+                $this->flagManager->saveFlag($tokenValidFlag, strtotime($responseArray['tokenExpirationUtc']));
                 $this->config->saveNewToken($responseArray['token']);
             }
         }

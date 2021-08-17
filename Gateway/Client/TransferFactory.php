@@ -51,6 +51,7 @@ class TransferFactory implements TransferFactoryInterface
      */
     public function create(array $request)
     {
+        // @todo this is redundant headers will be set in AvardaClient
         $headers = [
             'Content-Type' => 'application/json',
             'Authorization' => $this->getAuthorization(),

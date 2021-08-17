@@ -167,7 +167,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function getToken()
     {
-        return $this->encryptor->decrypt($this->flagManager->getFlagData(self::KEY_TOKEN_FLAG));
+        return $this->encryptor->decrypt($this->flagManager->getFlagData(self::KEY_TOKEN_FLAG . $this->getStoreCode()));
     }
 
     /**
@@ -175,7 +175,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function saveNewToken($token)
     {
-        $this->flagManager->saveFlag(self::KEY_TOKEN_FLAG, $this->encryptor->encrypt($token));
+        $this->flagManager->saveFlag(self::KEY_TOKEN_FLAG . $this->getStoreCode(), $this->encryptor->encrypt($token));
     }
 
     public function getCheckoutJsUrl()
