@@ -17,9 +17,10 @@ interface QuotePaymentManagementInterface
      * Get purchase ID for quote
      *
      * @param string $cartId
+     * @param bool   $renew
      * @return string
      */
-    public function getPurchaseData($cartId);
+    public function getPurchaseData($cartId, bool $renew = false);
 
     /**
      * Make Avarda InitializePurchase call and return purchase ID

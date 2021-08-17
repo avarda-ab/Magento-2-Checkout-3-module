@@ -8,7 +8,7 @@
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
 
     <!-- Guest Avarda initialize payment -->
-    <route url="/V1/guest-carts/:cartId/avarda3-payment" method="GET">
+    <route url="/V1/guest-carts/:cartId/avarda3-payment/:renew" method="GET">
         <service class="Avarda\Checkout3\Api\GuestPaymentManagementInterface" method="getPurchaseData"/>
         <resources>
             <resource ref="anonymous" />
@@ -16,7 +16,7 @@
     </route>
 
     <!-- Avarda initialize payment -->
-    <route url="/V1/carts/mine/avarda3-payment" method="GET">
+    <route url="/V1/carts/mine/avarda3-payment/:renew" method="GET">
         <service class="Avarda\Checkout3\Api\PaymentManagementInterface" method="getPurchaseData"/>
         <resources>
             <resource ref="self" />

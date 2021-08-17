@@ -15,10 +15,11 @@ interface GuestPaymentManagementInterface
      * Get purchase ID for Avarda payment
      *
      * @param string $cartId
-     * @throws \Magento\Framework\Exception\PaymentException
+     * @param bool   $renew
      * @return \Avarda\Checkout3\Api\Data\PaymentDetailsInterface
+     *@throws \Magento\Framework\Exception\PaymentException
      */
-    public function getPurchaseData($cartId);
+    public function getPurchaseData($cartId, bool $renew = false);
 
     /**
      * Freeze the cart before redirected to payment. Return 200 status code if

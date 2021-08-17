@@ -137,7 +137,6 @@ define([
         sessionTimedOutCallback: function(avardaCheckoutInstance) {
             avardaCheckoutInstance.unmount();
             options.purchaseId = undefined;
-            this.initializeIframe();
         },
 
         /**
@@ -145,7 +144,7 @@ define([
          *
          * @returns {boolean}
          */
-        initializeIframe: function() {
+        initializeIframe: function(renew) {
             let self = this;
             if (self.initializing) {
                 return;
@@ -156,10 +155,13 @@ define([
             let serviceUrl = '';
 
             if (customer.isLoggedIn()) {
-                serviceUrl = urlBuilder.createUrl('/carts/mine/avarda3-payment', {});
+                serviceUrl = urlBuilder.createUrl('/carts/mine/avarda3-payment/:renew', {
+                    renew: renew
+                });
             } else {
-                serviceUrl = urlBuilder.createUrl('/guest-carts/:cartId/avarda3-payment', {
-                    cartId: quote.getQuoteId()
+                serviceUrl = urlBuilder.createUrl('/guest-carts/:cartId/avarda3-payment/:renew', {
+                    cartId: quote.getQuoteId(),
+                    renew: renew
                 });
             }
 
@@ -176,7 +178,10 @@ define([
                     options.redirectUrl = options.redirectUrlBase + response.purchase_data[0];
                     options.deliveryAddressChangedCallback = self.updateShippingAddressHook;
                     options.beforeSubmitCallback = self.beforeCompleteHook;
-                    options.sessionTimedOutCallback = self.sessionTimedOutCallback;
+                    options.sessionTimedOutCallback = function(avardaCheckoutInstance) {
+                        self.sessionTimedOutCallback(avardaCheckoutInstance);
+                        self.initializeIframe(1);
+                    };
                     options.completedPurchaseCallback = function (avardaCheckoutInstance) {
                         avardaCheckoutInstance.unmount();
                         window.location.href = options.saveOrderUrl + options.purchaseId;
