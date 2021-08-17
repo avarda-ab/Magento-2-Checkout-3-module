@@ -6,6 +6,10 @@
 namespace Avarda\Checkout3\Api;
 
 use Avarda\Checkout3\Api\Data\PaymentQueueInterface;
+use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\Api\SearchResultsInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 /**
  * Payment Queue CRUD interface.
@@ -18,7 +22,7 @@ interface PaymentQueueRepositoryInterface
      *
      * @param PaymentQueueInterface $paymentQueue
      * @return PaymentQueueInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function save(PaymentQueueInterface $paymentQueue);
 
@@ -27,8 +31,8 @@ interface PaymentQueueRepositoryInterface
      *
      * @param string $purchaseId
      * @return PaymentQueueInterface
-     * @throws \Magento\Framework\Exception\NoSuchEntityException If purchase ID doesn't exist.
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws NoSuchEntityException If purchase ID doesn't exist.
+     * @throws LocalizedException
      */
     public function get($purchaseId);
 
@@ -37,26 +41,26 @@ interface PaymentQueueRepositoryInterface
      *
      * @param int $queueId
      * @return PaymentQueueInterface
-     * @throws \Magento\Framework\Exception\NoSuchEntityException If purchase ID doesn't exist.
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws NoSuchEntityException If purchase ID doesn't exist.
+     * @throws LocalizedException
      */
     public function getById($queueId);
 
     /**
      * Retrieve payment queue items which match a specified criteria.
      *
-     * @param \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
-     * @return \Magento\Framework\Api\SearchResultsInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @param SearchCriteriaInterface $searchCriteria
+     * @return SearchResultsInterface
+     * @throws LocalizedException
      */
-    public function getList(\Magento\Framework\Api\SearchCriteriaInterface $searchCriteria);
+    public function getList(SearchCriteriaInterface $searchCriteria);
 
     /**
      * Delete payment queue item.
      *
      * @param PaymentQueueInterface $paymentQueue
      * @return bool true on success
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function delete(PaymentQueueInterface $paymentQueue);
 }

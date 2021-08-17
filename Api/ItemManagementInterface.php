@@ -5,8 +5,11 @@
  */
 namespace Avarda\Checkout3\Api;
 
+use Avarda\Checkout3\Api\Data\ItemDetailsListInterface;
+
 /**
  * Interface for managing Avarda item information
+ *
  * @api
  */
 interface ItemManagementInterface
@@ -14,7 +17,7 @@ interface ItemManagementInterface
     /**
      * Get quote items additional information not provided by Magento Webapi
      *
-     * @return \Avarda\Checkout3\Api\Data\ItemDetailsListInterface
+     * @return ItemDetailsListInterface
      */
     public function getItemDetailsList();
 }

@@ -19,14 +19,14 @@ interface ItemDetailsListInterface
     /**
      * Get quote items
      *
-     * @return \Avarda\Checkout3\Api\Data\ItemDetailsInterface[]
+     * @return ItemDetailsInterface[]
      */
     public function getItems();
 
     /**
      * Set quote items
      *
-     * @param \Avarda\Checkout3\Api\Data\ItemDetailsInterface[] $items
+     * @param ItemDetailsInterface[] $items
      * @return $this
      */
     public function setItems($items);
@@ -34,7 +34,7 @@ interface ItemDetailsListInterface
     /**
      * Set quote items
      *
-     * @param \Avarda\Checkout3\Api\Data\ItemDetailsInterface $item
+     * @param ItemDetailsInterface $item
      * @return $this
      */
     public function addItem(ItemDetailsInterface $item);

@@ -5,8 +5,13 @@
  */
 namespace Avarda\Checkout3\Api;
 
+use Avarda\Checkout3\Api\Data\ItemDetailsListInterface;
+use Avarda\Checkout3\Api\Data\PaymentDetailsInterface;
+use Magento\Framework\Exception\PaymentException;
+
 /**
  * Interface for managing Avarda payment information
+ *
  * @api
  */
 interface PaymentManagementInterface
@@ -16,8 +21,8 @@ interface PaymentManagementInterface
      *
      * @param int  $cartId
      * @param bool $renew
-     * @return \Avarda\Checkout3\Api\Data\PaymentDetailsInterface
-     *@throws \Magento\Framework\Exception\PaymentException
+     * @return PaymentDetailsInterface
+     * @throws PaymentException
      */
     public function getPurchaseData($cartId, bool $renew = false);
 
@@ -26,7 +31,7 @@ interface PaymentManagementInterface
      * everything is OK.
      *
      * @param int $cartId
-     * @throws \Magento\Framework\Exception\PaymentException
+     * @throws PaymentException
      * @return void
      */
     public function freezeCart($cartId);
@@ -35,8 +40,8 @@ interface PaymentManagementInterface
      * Get quote items additional information not provided by Magento Webapi
      *
      * @param string $cartId
-     * @throws \Magento\Framework\Exception\PaymentException
-     * @return \Avarda\Checkout3\Api\Data\ItemDetailsListInterface
+     * @throws PaymentException
+     * @return ItemDetailsListInterface
      */
     public function getItemDetailsList($cartId);
 }
