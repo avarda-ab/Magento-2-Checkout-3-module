@@ -44,7 +44,7 @@ class AvardaGatewayClient implements ClientInterface
         ];
         $client = $this->avardaClient->create();
 
-        $headers = $client->buildHeader();
+        $headers = $client->buildHeader($transferObject);
         $uri = $this->getUri($transferObject);
         $body = $this->getBody($transferObject);
 

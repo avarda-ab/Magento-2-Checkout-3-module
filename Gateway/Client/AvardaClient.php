@@ -11,6 +11,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use Laminas\Http\Request;
 use Magento\Framework\FlagManager;
 use Magento\Payment\Gateway\Http\ClientException;
+use Magento\Payment\Gateway\Http\TransferInterface;
 use Magento\Payment\Model\Method\Logger;
 use Psr\Http\Message\ResponseInterface;
 
@@ -149,10 +150,12 @@ class AvardaClient
     }
 
     /**
+     * @param TransferInterface $transferObject
      * @param bool $json
+     * @param bool $token
      * @return array
      */
-    public function buildHeader($json = true, $token = true): array
+    public function buildHeader($transferObject, $json = true, $token = true): array
     {
         $header = [
             'Date' => date('r')
@@ -164,7 +167,7 @@ class AvardaClient
         }
 
         if ($token) {
-            $header['Authorization'] = sprintf('Bearer %s', $this->getToken());
+            $header['Authorization'] = sprintf('Bearer %s', $this->getToken($transferObject));
         }
 
         return $header;
@@ -179,10 +182,16 @@ class AvardaClient
     }
 
     /**
+     * @param $transferObject TransferInterface
      * @return string
      */
-    private function getToken()
+    private function getToken($transferObject)
     {
+        // Set store id to get correctly scoped api keys
+        if (isset($transferObject->getBody()['additional']['storeId'])) {
+            $this->config->setStoreCode($transferObject->getBody()['additional']['storeId']);
+        }
+
         $tokenValidFlag = 'avarda_checkout3_token_valid_' . $this->config->getStoreCode();
         $tokenValid = $this->flagManager->getFlagData($tokenValidFlag);
         if (!$tokenValid || $tokenValid < time()) {
