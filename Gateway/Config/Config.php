@@ -77,7 +77,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     }
 
     /**
-     * @return string
+     * @return string|int
      */
     public function getStoreCode()
     {

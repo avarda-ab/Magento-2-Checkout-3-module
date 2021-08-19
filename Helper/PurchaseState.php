@@ -136,21 +136,6 @@ class PurchaseState
     }
 
     /**
-     * Check if payment is cancelled
-     *
-     * @param string $state
-     * @return bool
-     */
-    public function isCancelled($state)
-    {
-        return in_array(
-            $this->getState($state),
-            [self::TIMED_OUT],
-            true
-        );
-    }
-
-    /**
      * Check if payment is dead
      *
      * @param string $state
@@ -158,6 +143,6 @@ class PurchaseState
      */
     public function isDead($state)
     {
-        return $this->isCancelled($state) || $this->getState($state) == self::TIMED_OUT;
+        return in_array($this->getState($state), [self::TIMED_OUT, self::OUTDATED]);
     }
 }

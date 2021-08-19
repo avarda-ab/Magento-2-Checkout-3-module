@@ -30,7 +30,8 @@ class AdditionalDataBuilder implements BuilderInterface
 
         return [
             self::ADDITIONAL => [
-                'purchaseid' => $purchaseData['purchaseId'] ?? ''
+                'purchaseid' => $purchaseData['purchaseId'] ?? '',
+                'storeId' => $paymentDO->getOrder()->getStoreId()
             ]
         ];
     }
