@@ -97,6 +97,11 @@ class SaveOrder extends AbstractCheckout
             $message = __('Failed to save Avarda order. Please try again later.');
         }
 
+        if ($quote) {
+            $quote->setIsActive(false);
+            $quote->save();
+        }
+
         $this->messageManager->addErrorMessage($message);
         return $this->resultRedirectFactory->create()->setPath(
             'checkout/cart'

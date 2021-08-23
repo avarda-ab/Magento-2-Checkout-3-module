@@ -115,6 +115,7 @@
     <virtualType name="AvardaCheckout3InitializePaymentRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
+                <item name="additional" xsi:type="string">Avarda\Checkout3\Gateway\Request\AdditionalDataBuilder</item>
                 <item name="items" xsi:type="string">Avarda\Checkout3\Gateway\Request\ItemsDataBuilder</item>
                 <item name="checkoutSetup" xsi:type="string">Avarda\Checkout3\Gateway\Request\CheckoutSetupDataBuilder</item>
                 <item name="b2C" xsi:type="string">Avarda\Checkout3\Gateway\Request\B2cDataBuilder</item>
@@ -138,8 +139,8 @@
     <virtualType name="AvardaCheckout3UpdateItemsRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
-                <item name="items" xsi:type="string">Avarda\Checkout3\Gateway\Request\ItemsDataBuilder</item>
                 <item name="additional" xsi:type="string">Avarda\Checkout3\Gateway\Request\AdditionalDataBuilder</item>
+                <item name="items" xsi:type="string">Avarda\Checkout3\Gateway\Request\ItemsDataBuilder</item>
             </argument>
         </arguments>
     </virtualType>
@@ -204,11 +205,11 @@
     <virtualType name="AvardaCheckout3PurchaseOrderRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
+                <item name="additional" xsi:type="string">Avarda\Checkout3\Gateway\Request\AdditionalDataBuilder</item>
                 <item name="items" xsi:type="string">Avarda\Checkout3\Gateway\Request\ItemsDataBuilder</item>
                 <item name="order_reference" xsi:type="string">Avarda\Checkout3\Gateway\Request\OrderReferenceDataBuilder</item>
                 <item name="transaction_id" xsi:type="string">Avarda\Checkout3\Gateway\Request\TranIdDataBuilder</item>
                 <item name="pos_id" xsi:type="string">Avarda\Checkout3\Gateway\Request\PosIdDataBuilder</item>
-                <item name="additional" xsi:type="string">Avarda\Checkout3\Gateway\Request\AdditionalDataBuilder</item>
             </argument>
         </arguments>
     </virtualType>
@@ -228,12 +229,12 @@
     <virtualType name="AvardaCheckout3RefundRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
+                <item name="additional" xsi:type="string">Avarda\Checkout3\Gateway\Request\AdditionalDataBuilder</item>
                 <item name="items" xsi:type="string">Avarda\Checkout3\Gateway\Request\ItemsDataBuilder</item>
                 <item name="order_reference" xsi:type="string">Avarda\Checkout3\Gateway\Request\OrderReferenceDataBuilder</item>
                 <item name="transaction_id" xsi:type="string">Avarda\Checkout3\Gateway\Request\TranIdDataBuilder</item>
                 <item name="reason" xsi:type="string">Avarda\Checkout3\Gateway\Request\OrderCancelReasonBuilder</item>
                 <item name="pos_id" xsi:type="string">Avarda\Checkout3\Gateway\Request\PosIdDataBuilder</item>
-                <item name="additional" xsi:type="string">Avarda\Checkout3\Gateway\Request\AdditionalDataBuilder</item>
             </argument>
         </arguments>
     </virtualType>
@@ -253,8 +254,8 @@
     <virtualType name="AvardaCheckout3ReturnRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
-                <item name="reason" xsi:type="string">Avarda\Checkout3\Gateway\Request\OrderCancelReasonBuilder</item>
                 <item name="additional" xsi:type="string">Avarda\Checkout3\Gateway\Request\AdditionalDataBuilder</item>
+                <item name="reason" xsi:type="string">Avarda\Checkout3\Gateway\Request\OrderCancelReasonBuilder</item>
             </argument>
         </arguments>
     </virtualType>
