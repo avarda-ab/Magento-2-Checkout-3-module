@@ -12,7 +12,7 @@
                 <label>Avarda Checkout V3</label>
                 <comment><![CDATA[<div class="avarda-checkout-logo"></div><div class="avarda-checkout-text">Next-generation payment and checkout solutions for online retailers in the nordics.<br/></div>]]></comment>
                 <fieldset_css>complex avarda_checkout3_section</fieldset_css>
-                <frontend_model>Magento\Paypal\Block\Adminhtml\System\Config\Fieldset\Payment</frontend_model>
+                <frontend_model>Avarda\Checkout3\Block\Adminhtml\System\Config\Fieldset\Payment</frontend_model>
                 <group id="api" translate="label comment" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Avarda Checkout Configuration</label>
                     <field id="active" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
