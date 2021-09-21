@@ -12,27 +12,21 @@ use Magento\Config\Model\Config;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\View\Helper\Js;
-use Magento\Framework\View\Helper\SecureHtmlRenderer;
 
 class Payment extends Fieldset
 {
     /** @var Config */
     protected $_backendConfig;
 
-    /** @var SecureHtmlRenderer */
-    private $secureRenderer;
-
     public function __construct(
         Context $context,
         Session $authSession,
         Js $jsHelper,
         Config $backendConfig,
-        SecureHtmlRenderer $secureRenderer,
         array $data = []
     ) {
-        parent::__construct($context, $authSession, $jsHelper, $data, $secureRenderer);
+        parent::__construct($context, $authSession, $jsHelper, $data);
         $this->_backendConfig = $backendConfig;
-        $this->secureRenderer = $secureRenderer;
     }
 
     /**
@@ -58,17 +52,11 @@ class Payment extends Fieldset
 
         $htmlId = $element->getHtmlId();
         $html .= '<div class="button-container"><button type="button"' .
-            ' class="button action-configure" id="' . $htmlId . '-head" >' .
+            ' class="button action-configure" id="' . $htmlId . '-head"' .
+            ' onclick="avardaToggleSolution.call(this, \'' . $htmlId . "', '" . $this->getUrl('adminhtml/*/state') . '\'); return false;">' .
             '<span class="state-closed">' . __('Configure') . '</span>' .
             '<span class="state-opened">' . __('Close') . '</span>' .
         '</button>';
-
-        $html .= $this->secureRenderer->renderEventListenerAsTag(
-            'onclick',
-            "avardaToggleSolution.call(this, '" . $htmlId . "', '" . $this->getUrl('adminhtml/*/state') .
-            "');event.preventDefault();",
-            'button#' . $htmlId . '-head'
-        );
 
         $html .= '</div>';
         $html .= '<div class="heading"><strong>' . $element->getLegend() . '</strong>';
