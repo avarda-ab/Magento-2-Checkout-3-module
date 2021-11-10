@@ -60,18 +60,24 @@ define([
                 if (!quote.isVirtual() && self.getShowPostcode()) {
                     $("#checkout-step-shipping_method").hide();
                     $("#checkout-step-iframe").hide();
-                    self.email(quote.guestEmail || quote.shippingAddress().email);
+                    if (customer.isLoggedIn()) {
+                        self.email(customer.customerData.email);
+                        self.postalCode(quote.shippingAddress().postcode);
+                    } else {
+                        self.email(quote.guestEmail || quote.shippingAddress().email);
+                        self.postalCode(quote.shippingAddress().postcode);
+                    }
                     self.email.subscribe(function (latest) {
                         quote.guestEmail = latest;
+                        quote.shippingAddress().email = latest;
                     });
-                    self.postalCode(quote.shippingAddress().postcode)
                     self.postalCode.subscribe(function (latest) {
                         quote.shippingAddress().postcode = latest;
                     });
                 }
 
-                // If no shipping method is selected select the first one
                 if (!self.getShowPostcode()) {
+                    // If no shipping method is selected select the first one
                     if (!quote.shippingMethod()) {
                         let rates = shippingService.getShippingRates()();
                         if (rates.length > 0) {
@@ -123,9 +129,17 @@ define([
             }
         },
 
+        postCodeStep: function ()
+        {
+            $("#checkout-step-postalcode").show();
+            $("#checkout-step-shipping_method").hide();
+            $("#checkout-step-iframe").hide();
+        },
+
         postCodeNext: function ()
         {
             if ($("#postal_code_form").valid()) {
+                checkoutData.setShippingAddressFromData(quote.shippingAddress());
                 $("#checkout-step-postalcode").hide();
                 $("#checkout-step-shipping_method").show();
                 $("#checkout-step-iframe").show();
@@ -133,6 +147,8 @@ define([
                 let rates = shippingService.getShippingRates()();
                 if (rates.length > 0 && !quote.shippingMethod()) {
                     this.selectShippingMethod(rates[0])
+                } else {
+                    setShippingInformationAction();
                 }
             }
         },
@@ -202,6 +218,7 @@ define([
             if (self.initializing) {
                 return;
             }
+            renew = !!renew ? 1 : 0;
 
             fullScreenLoader.startLoader();
             self.initializing = true;
