@@ -48,12 +48,14 @@ class B2cDataBuilder implements BuilderInterface
         $order = $paymentDO->getOrder();
 
         return [
-            "customerToken" => $this->getCustomerToken(),
-            "invoicingAddress" => $this->getBillingAddress($order),
-            "deliveryAddress" => $this->getShippingAddress($order),
-            "userInputs" => [
-                "phone" => $order->getBillingAddress()->getTelephone(),
-                "email" => $order->getBillingAddress()->getEmail()
+            "b2C" => [
+                "customerToken" => $this->getCustomerToken(),
+                "invoicingAddress" => $this->getBillingAddress($order),
+                "deliveryAddress" => $this->getShippingAddress($order),
+                "userInputs" => [
+                    "phone" => $order->getBillingAddress()->getTelephone(),
+                    "email" => $order->getBillingAddress()->getEmail()
+                ]
             ]
         ];
     }
@@ -106,7 +108,7 @@ class B2cDataBuilder implements BuilderInterface
     protected function getCustomerToken()
     {
         if (!$this->customerSession->isLoggedIn()) {
-            return [];
+            return '';
         }
 
         $customerToken = $this->customerSession
@@ -114,9 +116,9 @@ class B2cDataBuilder implements BuilderInterface
             ->getCustomAttribute('avarda_customer_token');
 
         if ($customerToken === null || $customerToken->getValue() === null) {
-            return [];
+            return '';
         }
 
-        return '';
+        return $customerToken->getValue();
     }
 }
