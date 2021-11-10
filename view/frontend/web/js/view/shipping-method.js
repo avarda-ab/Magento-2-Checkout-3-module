@@ -45,6 +45,9 @@ define([
         initializing: false,
         initializeTimeout: false,
 
+        email: ko.observable(),
+        postalCode: ko.observable(),
+
         initialize: function () {
             let self = this;
             this._super();
@@ -54,15 +57,30 @@ define([
             }
 
             let initial = shippingService.isLoading.subscribe(function() {
+                if (!quote.isVirtual() && self.getShowPostcode()) {
+                    $("#checkout-step-shipping_method").hide();
+                    $("#checkout-step-iframe").hide();
+                    self.email(quote.guestEmail || quote.shippingAddress().email);
+                    self.email.subscribe(function (latest) {
+                        quote.guestEmail = latest;
+                    });
+                    self.postalCode(quote.shippingAddress().postcode)
+                    self.postalCode.subscribe(function (latest) {
+                        quote.shippingAddress().postcode = latest;
+                    });
+                }
+
                 // If no shipping method is selected select the first one
-                if (!quote.shippingMethod()) {
-                    let rates = shippingService.getShippingRates()();
-                    if (rates.length > 0) {
-                        self.selectShippingMethod(rates[0])
+                if (!self.getShowPostcode()) {
+                    if (!quote.shippingMethod()) {
+                        let rates = shippingService.getShippingRates()();
+                        if (rates.length > 0) {
+                            self.selectShippingMethod(rates[0])
+                        }
+                    } else {
+                        // This is needed when shippingMethod is already selected, but it might not be saved properly
+                        setShippingInformationAction();
                     }
-                } else {
-                    // This is needed when shippingMethod is already selected, but it might not be saved properly
-                    setShippingInformationAction();
                 }
                 // remove this subscription
                 initial.dispose();
@@ -82,6 +100,41 @@ define([
                     }, 350);
                 }
             });
+        },
+
+        getShowPostcode: function ()
+        {
+            return !!options.showPostcode;
+        },
+
+        getPostCodeTitle: function ()
+        {
+            if (this.getShowPostcode()) {
+                return $.mage.__("1. Zip/Postal Code and Email");
+            }
+        },
+
+        getShippingMethodTitle: function ()
+        {
+            if (this.getShowPostcode()) {
+                return $.mage.__("2. Shipping Methods");
+            } else {
+                return $.mage.__("1. Shipping Methods");
+            }
+        },
+
+        postCodeNext: function ()
+        {
+            if ($("#postal_code_form").valid()) {
+                $("#checkout-step-postalcode").hide();
+                $("#checkout-step-shipping_method").show();
+                $("#checkout-step-iframe").show();
+
+                let rates = shippingService.getShippingRates()();
+                if (rates.length > 0 && !quote.shippingMethod()) {
+                    this.selectShippingMethod(rates[0])
+                }
+            }
         },
 
         selectShippingMethod: function (shippingMethod) {

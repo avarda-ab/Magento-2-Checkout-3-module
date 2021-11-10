@@ -28,6 +28,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const KEY_CUSTOM_CSS = 'avarda_checkout3/api/custom_css';
     const KEY_COUNTRY_SELECTOR = 'avarda_checkout3/api/country_selector';
     const KEY_SHOW_B2B_LINK = 'avarda_checkout3/api/show_b2b_link';
+    const KEY_SHOW_POSTCODE = 'avarda_checkout3/api/show_postcode';
 
     const URL_TEST = 'https://avdonl-s-checkout.avarda.org/';
     const URL_PRODUCTION = 'https://avdonl-p-checkout.avarda.org/';
@@ -217,5 +218,13 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function getShowB2Blink()
     {
         return (bool)$this->getConfigValue(self::KEY_SHOW_B2B_LINK);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getShowPostcode()
+    {
+        return (bool)$this->getConfigValue(self::KEY_SHOW_POSTCODE);
     }
 }

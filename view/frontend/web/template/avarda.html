@@ -3,15 +3,8 @@
 @package   Avarda_Checkout3
 -->
 <li id="avarda_checkout">
-    <div class="step-title"
-         if="isVirtual()"
-         data-bind="i18n: '1. Select payment'"
-         data-role="title"></div>
-    <div class="step-title"
-         ifnot="isVirtual()"
-         data-bind="i18n: '2. Select payment'"
-         data-role="title"></div>
-    <div id="checkout-step-title" class="step-content" data-role="content">
+    <div class="step-title" text="getPaymentStepTitle()" data-role="title"></div>
+    <div id="checkout-step-iframe" class="step-content" data-role="content">
         <div id="avarda-checkout-iframe"></div>
     </div>
 </li>
