@@ -87,6 +87,7 @@
             <argument name="commands" xsi:type="array">
                 <item name="avarda_initialize_payment" xsi:type="string">AvardaCheckout3InitializePaymentCommand</item>
                 <item name="avarda_get_payment_status" xsi:type="string">AvardaCheckout3GetPaymentStatusCommand</item>
+                <item name="avarda_get_only_status" xsi:type="string">AvardaCheckout3GetOnlyPaymentCommand</item>
                 <item name="avarda_update_items" xsi:type="string">AvardaCheckout3UpdateItemsCommand</item>
                 <item name="avarda_get_jwt_token" xsi:type="string">AvardaCheckout3GetJwtTokenCommand</item>
                 <item name="capture" xsi:type="string">AvardaCheckout3PurchaseOrderCommand</item>
@@ -170,6 +171,15 @@
         <arguments>
             <argument name="method" xsi:type="string">GET</argument>
             <argument name="uri" xsi:type="string">api/partner/payments/{purchaseid}</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Get only payment status from avarda command -->
+    <virtualType name="AvardaCheckout3GetOnlyPaymentCommand" type="AvardaCheckout3Command">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">AvardaCheckout3GetPaymentStatusRequest</argument>
+            <argument name="transferFactory" xsi:type="object">AvardaCheckout3GetPaymentStatusTransferFactory</argument>
+            <argument name="handler" xsi:type="object">Avarda\Checkout3\Gateway\Response\GetOnlyStatusHandler</argument>
         </arguments>
     </virtualType>
 

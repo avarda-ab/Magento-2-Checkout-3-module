@@ -61,12 +61,20 @@ interface QuotePaymentManagementInterface
     public function setQuoteIsActive($cartId, $isActive);
 
     /**
-     * Update order (quote) from Avarda payment status.
+     * Update order (quote) from Avarda
      *
      * @param string $cartId
      * @return void
      */
     public function updatePaymentStatus($cartId);
+
+    /**
+     * Update order (quote) payment status from Avarda.
+     *
+     * @param string $quote
+     * @return void
+     */
+    public function updateOnlyPaymentStatus($quote);
 
     /**
      * Prepare and save order to Magento.
