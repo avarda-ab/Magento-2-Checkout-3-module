@@ -10,6 +10,7 @@ define([
     'Magento_Checkout/js/action/select-shipping-method',
     'Magento_Checkout/js/checkout-data',
     'Magento_Checkout/js/model/shipping-rate-service',
+    'Magento_Checkout/js/model/shipping-rate-registry',
     'Magento_Checkout/js/model/quote',
     'Magento_Checkout/js/model/url-builder',
     'mage/storage',
@@ -27,6 +28,7 @@ define([
     selectShippingMethodAction,
     checkoutData,
     shippingRateService,
+    shippingRateRegistry,
     quote,
     urlBuilder,
     storage,
@@ -157,6 +159,7 @@ define([
                 $("#checkout-step-shipping_method").show();
                 $("#checkout-step-iframe").show();
 
+                this.reloadShippingMethods();
                 let rates = shippingService.getShippingRates()();
                 if (rates.length > 0 && !quote.shippingMethod()) {
                     this.selectShippingMethod(rates[0])
@@ -164,6 +167,17 @@ define([
                     setShippingInformationAction();
                 }
             }
+        },
+
+        /**
+         * Reloads shipping methods from backend
+         */
+        reloadShippingMethods: function()
+        {
+            let address = quote.shippingAddress();
+            shippingRateRegistry.set(address.getKey(), null);
+            shippingRateRegistry.set(address.getCacheKey(), null);
+            quote.shippingAddress(address);
         },
 
         selectShippingMethod: function (shippingMethod) {
