@@ -47,6 +47,7 @@ define([
 
         email: ko.observable(),
         postalCode: ko.observable(),
+        forceRenew: false,
 
         initialize: function () {
             let self = this;
@@ -68,11 +69,23 @@ define([
                         self.postalCode(quote.shippingAddress().postcode);
                     }
                     self.email.subscribe(function (latest) {
+                        if (quote.shippingAddress().email != latest) {
+                            self.forceRenew = true;
+                        }
                         quote.guestEmail = latest;
                         quote.shippingAddress().email = latest;
+                        if (quote.billingAddress()) {
+                            quote.billingAddress().email = latest;
+                        }
                     });
                     self.postalCode.subscribe(function (latest) {
+                        if (quote.shippingAddress().postcode != latest) {
+                            self.forceRenew = true;
+                        }
                         quote.shippingAddress().postcode = latest;
+                        if (quote.billingAddress()) {
+                            quote.billingAddress().postcode = latest;
+                        }
                     });
                 }
 
@@ -219,6 +232,9 @@ define([
                 return;
             }
             renew = !!renew ? 1 : 0;
+            if (self.forceRenew) {
+                renew = 1;
+            }
 
             fullScreenLoader.startLoader();
             self.initializing = true;
