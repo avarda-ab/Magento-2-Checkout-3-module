@@ -251,6 +251,7 @@ define([
             }
             renew = !!renew ? 1 : 0;
             if (self.forceRenew) {
+                self.forceRenew = false;
                 renew = 1;
             }
 
