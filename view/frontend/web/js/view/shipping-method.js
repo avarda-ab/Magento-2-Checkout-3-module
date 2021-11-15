@@ -195,6 +195,10 @@ define([
          * @param avardaCheckoutInstance
          */
         updateShippingAddressHook: function (data, avardaCheckoutInstance) {
+            if (this.getShowPostcode()) {
+                this.postalCode(data.zip);
+                this.reloadShippingMethods();
+            }
             avardaCheckoutInstance.deliveryAddressChangedContinue();
         },
 
@@ -276,8 +280,12 @@ define([
                     options.purchaseId = response.purchase_data[0];
                     options.purchaseJwt = response.purchase_data[1];
                     options.redirectUrl = options.redirectUrlBase + response.purchase_data[0];
-                    options.deliveryAddressChangedCallback = self.updateShippingAddressHook;
-                    options.beforeSubmitCallback = self.beforeCompleteHook;
+                    options.deliveryAddressChangedCallback = function(data, avardaCheckoutInstance) {
+                        self.updateShippingAddressHook(data, avardaCheckoutInstance);
+                    };
+                    options.beforeSubmitCallback = function(data, avardaCheckoutInstance) {
+                        self.beforeCompleteHook(data, avardaCheckoutInstance);
+                    };
                     options.sessionTimedOutCallback = function(avardaCheckoutInstance) {
                         self.sessionTimedOutCallback(avardaCheckoutInstance);
                         self.initializeIframe(1);
