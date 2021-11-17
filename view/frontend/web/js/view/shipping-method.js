@@ -249,11 +249,8 @@ define([
             if (self.initializing) {
                 return;
             }
-            renew = !!renew ? 1 : 0;
-            if (self.forceRenew) {
-                renew = 1;
-                self.forceRenew = false;
-            }
+            let renewParam = (self.forceRenew || renew) ? 1 : 0;
+            self.forceRenew = false;
 
             fullScreenLoader.startLoader();
             self.initializing = true;
@@ -261,12 +258,12 @@ define([
 
             if (customer.isLoggedIn()) {
                 serviceUrl = urlBuilder.createUrl('/carts/mine/avarda3-payment/:renew', {
-                    renew: renew
+                    renew: renewParam
                 });
             } else {
                 serviceUrl = urlBuilder.createUrl('/guest-carts/:cartId/avarda3-payment/:renew', {
                     cartId: quote.getQuoteId(),
-                    renew: renew
+                    renew: renewParam
                 });
             }
 
