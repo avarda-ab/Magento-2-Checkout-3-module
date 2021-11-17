@@ -8,12 +8,37 @@
     data-bind="fadeVisible: visible(), blockLoader: isLoading"
     role="presentation">
     <div class="checkout-shipping-method">
-        <div class="step-title"
-             translate="'1. Shipping Methods'"
-             data-role="title"></div>
+        <form id="postal_code_form" if="getPostCodeTitle()">
+            <div class="step-title" text="getPostCodeTitle()" data-bind="click: postCodeStep" data-role="title"></div>
+            <br>
+            <div id="checkout-step-postalcode" class="step-content fieldset">
+                <div class="field _required">
+                    <label class="label" for="postal_code">
+                        <span data-bind="i18n: 'Zip/Postal Code'"></span>
+                    </label>
+                    <div class="control">
+                        <input class="input-text required-entry" data-bind="value: postalCode, valueUpdate: 'keyup'" type="text" name="postal_code" aria-required="true" id="postal_code">
+                    </div>
+                </div>
+                <div class="field _required">
+                    <label class="label" for="email">
+                        <span data-bind="i18n: 'Email'"></span>
+                    </label>
+                    <div class="control">
+                        <input class="input-text required-entry" data-bind="value: email, valueUpdate: 'keyup'" type="email" name="email" aria-required="true" id="email">
+                    </div>
+                </div>
+                <button class="action secondary checkout" type="submit" data-bind="click: postCodeNext">
+                    <span data-bind="i18n: 'Next'"></span>
+                </button>
+            </div>
+        </form>
+
+        <div class="step-title" text="getShippingMethodTitle()" data-role="title"></div>
 
         <each args="getRegion('before-shipping-method-form')" render=""/>
 
+        <br>
         <div id="checkout-step-shipping_method"
              class="step-content"
              data-role="content"
@@ -37,9 +62,7 @@
                     <span text="errorValidationMessage()" />
                 </div>
             </form>
-            <div class="no-quotes-block"
-                 ifnot="rates().length > 0"
-                 translate="'Sorry, no quotes are available for this order at this time'"></div>
+            <div class="no-quotes-block" ifnot="rates().length > 0" translate="'Sorry, no quotes are available for this order at this time'"></div>
         </div>
     </div>
 </li>

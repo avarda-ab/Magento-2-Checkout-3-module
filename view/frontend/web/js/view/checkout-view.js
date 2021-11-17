@@ -7,11 +7,13 @@ define([
     'uiComponent',
     'Magento_Checkout/js/model/step-navigator',
     'Magento_Checkout/js/model/quote',
+    'mage/translate',
 ], function (
     ko,
     Component,
     stepNavigator,
-    quote
+    quote,
+    $t
 ) {
     'use strict';
     return Component.extend({
@@ -23,6 +25,16 @@ define([
 
         initialize: function () {
             this._super();
+        },
+
+        getPaymentStepTitle: function () {
+            if (this.isVirtual()) {
+                return $t("1. Select payment");
+            } else if(options.showPostcode) {
+                return $t("3. Select payment");
+            } else {
+                return $t("2. Select payment");
+            }
         },
 
         isVirtual: function () {

@@ -241,9 +241,22 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
      */
     public function updatePaymentStatus($cartId)
     {
-        $quote = $this->getQuote($cartId);
+        if ($cartId instanceof CartInterface) {
+            $quote = $cartId;
+        } else {
+            $quote = $this->getQuote($cartId);
+        }
         $this->isAvardaPayment($quote);
         $this->executeCommand('avarda_get_payment_status', $quote);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function updateOnlyPaymentStatus($quote)
+    {
+        $this->isAvardaPayment($quote);
+        $this->executeCommand('avarda_get_only_status', $quote);
     }
 
     /**

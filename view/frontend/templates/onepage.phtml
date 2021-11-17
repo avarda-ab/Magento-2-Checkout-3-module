@@ -36,6 +36,7 @@
             rootElementId: "avarda-checkout-iframe",
             redirectUrlBase: '<?= $block->getCallbackUrl() ?>',
             saveOrderUrl: '<?= $block->getSaveOrderUrl() ?>',
+            showPostcode: !!<?= $block->getShowPostcode() ? 1 : 0 ?>,
             redirectUrl: '',
             styles: <?= $block->getStyles() ?>
         };

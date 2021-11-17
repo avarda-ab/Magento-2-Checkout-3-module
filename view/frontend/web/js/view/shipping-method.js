@@ -10,6 +10,7 @@ define([
     'Magento_Checkout/js/action/select-shipping-method',
     'Magento_Checkout/js/checkout-data',
     'Magento_Checkout/js/model/shipping-rate-service',
+    'Magento_Checkout/js/model/shipping-rate-registry',
     'Magento_Checkout/js/model/quote',
     'Magento_Checkout/js/model/url-builder',
     'mage/storage',
@@ -27,6 +28,7 @@ define([
     selectShippingMethodAction,
     checkoutData,
     shippingRateService,
+    shippingRateRegistry,
     quote,
     urlBuilder,
     storage,
@@ -45,6 +47,10 @@ define([
         initializing: false,
         initializeTimeout: false,
 
+        email: ko.observable(),
+        postalCode: ko.observable(),
+        forceRenew: false,
+
         initialize: function () {
             let self = this;
             this._super();
@@ -54,15 +60,48 @@ define([
             }
 
             let initial = shippingService.isLoading.subscribe(function() {
-                // If no shipping method is selected select the first one
-                if (!quote.shippingMethod()) {
-                    let rates = shippingService.getShippingRates()();
-                    if (rates.length > 0) {
-                        self.selectShippingMethod(rates[0])
+                if (!quote.isVirtual() && self.getShowPostcode()) {
+                    $("#checkout-step-shipping_method").hide();
+                    $("#checkout-step-iframe").hide();
+                    if (customer.isLoggedIn()) {
+                        self.email(customer.customerData.email);
+                        self.postalCode(quote.shippingAddress().postcode);
+                    } else {
+                        self.email(quote.guestEmail || quote.shippingAddress().email);
+                        self.postalCode(quote.shippingAddress().postcode);
                     }
-                } else {
-                    // This is needed when shippingMethod is already selected, but it might not be saved properly
-                    setShippingInformationAction();
+                    self.email.subscribe(function (latest) {
+                        if (quote.shippingAddress().email != latest) {
+                            self.forceRenew = true;
+                        }
+                        quote.guestEmail = latest;
+                        quote.shippingAddress().email = latest;
+                        if (quote.billingAddress()) {
+                            quote.billingAddress().email = latest;
+                        }
+                    });
+                    self.postalCode.subscribe(function (latest) {
+                        if (quote.shippingAddress().postcode != latest) {
+                            self.forceRenew = true;
+                        }
+                        quote.shippingAddress().postcode = latest;
+                        if (quote.billingAddress()) {
+                            quote.billingAddress().postcode = latest;
+                        }
+                    });
+                }
+
+                if (!self.getShowPostcode()) {
+                    // If no shipping method is selected select the first one
+                    if (!quote.shippingMethod()) {
+                        let rates = shippingService.getShippingRates()();
+                        if (rates.length > 0) {
+                            self.selectShippingMethod(rates[0])
+                        }
+                    } else {
+                        // This is needed when shippingMethod is already selected, but it might not be saved properly
+                        setShippingInformationAction();
+                    }
                 }
                 // remove this subscription
                 initial.dispose();
@@ -84,6 +123,63 @@ define([
             });
         },
 
+        getShowPostcode: function ()
+        {
+            return !!options.showPostcode;
+        },
+
+        getPostCodeTitle: function ()
+        {
+            if (this.getShowPostcode()) {
+                return $.mage.__("1. Zip/Postal Code and Email");
+            }
+        },
+
+        getShippingMethodTitle: function ()
+        {
+            if (this.getShowPostcode()) {
+                return $.mage.__("2. Shipping Methods");
+            } else {
+                return $.mage.__("1. Shipping Methods");
+            }
+        },
+
+        postCodeStep: function ()
+        {
+            $("#checkout-step-postalcode").show();
+            $("#checkout-step-shipping_method").hide();
+            $("#checkout-step-iframe").hide();
+        },
+
+        postCodeNext: function ()
+        {
+            if ($("#postal_code_form").valid()) {
+                checkoutData.setShippingAddressFromData(quote.shippingAddress());
+                $("#checkout-step-postalcode").hide();
+                $("#checkout-step-shipping_method").show();
+                $("#checkout-step-iframe").show();
+
+                this.reloadShippingMethods();
+                let rates = shippingService.getShippingRates()();
+                if (rates.length > 0 && !quote.shippingMethod()) {
+                    this.selectShippingMethod(rates[0])
+                } else {
+                    setShippingInformationAction();
+                }
+            }
+        },
+
+        /**
+         * Reloads shipping methods from backend
+         */
+        reloadShippingMethods: function()
+        {
+            let address = quote.shippingAddress();
+            shippingRateRegistry.set(address.getKey(), null);
+            shippingRateRegistry.set(address.getCacheKey(), null);
+            quote.shippingAddress(address);
+        },
+
         selectShippingMethod: function (shippingMethod) {
             selectShippingMethodAction(shippingMethod);
             checkoutData.setSelectedShippingRate(shippingMethod['carrier_code'] + '_' + shippingMethod['method_code']);
@@ -99,6 +195,10 @@ define([
          * @param avardaCheckoutInstance
          */
         updateShippingAddressHook: function (data, avardaCheckoutInstance) {
+            if (this.getShowPostcode()) {
+                this.postalCode(data.zip);
+                this.reloadShippingMethods();
+            }
             avardaCheckoutInstance.deliveryAddressChangedContinue();
         },
 
@@ -149,6 +249,8 @@ define([
             if (self.initializing) {
                 return;
             }
+            let renewParam = (self.forceRenew || renew) ? 1 : 0;
+            self.forceRenew = false;
 
             fullScreenLoader.startLoader();
             self.initializing = true;
@@ -156,12 +258,12 @@ define([
 
             if (customer.isLoggedIn()) {
                 serviceUrl = urlBuilder.createUrl('/carts/mine/avarda3-payment/:renew', {
-                    renew: renew
+                    renew: renewParam
                 });
             } else {
                 serviceUrl = urlBuilder.createUrl('/guest-carts/:cartId/avarda3-payment/:renew', {
                     cartId: quote.getQuoteId(),
-                    renew: renew
+                    renew: renewParam
                 });
             }
 
@@ -176,8 +278,12 @@ define([
                     options.purchaseId = response.purchase_data[0];
                     options.purchaseJwt = response.purchase_data[1];
                     options.redirectUrl = options.redirectUrlBase + response.purchase_data[0];
-                    options.deliveryAddressChangedCallback = self.updateShippingAddressHook;
-                    options.beforeSubmitCallback = self.beforeCompleteHook;
+                    options.deliveryAddressChangedCallback = function(data, avardaCheckoutInstance) {
+                        self.updateShippingAddressHook(data, avardaCheckoutInstance);
+                    };
+                    options.beforeSubmitCallback = function(data, avardaCheckoutInstance) {
+                        self.beforeCompleteHook(data, avardaCheckoutInstance);
+                    };
                     options.sessionTimedOutCallback = function(avardaCheckoutInstance) {
                         self.sessionTimedOutCallback(avardaCheckoutInstance);
                         self.initializeIframe(1);

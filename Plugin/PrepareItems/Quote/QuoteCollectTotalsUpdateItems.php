@@ -63,7 +63,7 @@ class QuoteCollectTotalsUpdateItems
             self::$collectTotalsFlag = true;
             try {
                 // Update payment status to determine if session is outdated and needs to be initialized
-                $this->quotePaymentManagement->updatePaymentStatus($subject->getId());
+                $this->quotePaymentManagement->updateOnlyPaymentStatus($subject);
 
                 $state = $this->getState($subject);
                 if ($this->purchaseStateHelper->isComplete($state)) {

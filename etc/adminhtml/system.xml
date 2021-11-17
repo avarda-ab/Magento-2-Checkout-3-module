@@ -47,6 +47,13 @@
                         <label>Instructions</label>
                         <config_path>payment/avarda_checkout3_checkout/instructions</config_path>
                     </field>
+                    <field id="custom_css" translate="label" type="textarea" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Custom Css</label>
+                        <config_path>avarda_checkout3/api/custom_css</config_path>
+                        <comment><![CDATA[<a target="_blank" rel="noopener" href="https://docs.avarda.com/checkout-3/more-features/custom-css-styles/">See documentation here</a>, add each config as one row for example:
+                    <pre class="code-example">buttons.primary.base.backgroundColor='#fff'
+buttons.primary.fontSize='15'</pre>]]></comment>
+                    </field>
                     <field id="country_selector" sortOrder="70" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Show Country Selector</label>
                         <config_path>avarda_checkout3/api/country_selector</config_path>
@@ -57,12 +64,11 @@
                         <config_path>avarda_checkout3/api/show_b2b_link</config_path>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     </field>
-                    <field id="custom_css" translate="label" type="textarea" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Custom Css</label>
-                        <config_path>avarda_checkout3/api/custom_css</config_path>
-                        <comment><![CDATA[<a target="_blank" rel="noopener" href="https://docs.avarda.com/checkout-3/more-features/custom-css-styles/">See documentation here</a>, add each config as one row for example:
-                    <pre class="code-example">buttons.primary.base.backgroundColor='#fff'
-buttons.primary.fontSize='15'</pre>]]></comment>
+                    <field id="show_postcode" sortOrder="70" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Show Postal Code</label>
+                        <config_path>avarda_checkout3/api/show_postcode</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>Show Postal Code before loading shipping methods</comment>
                     </field>
                     <field id="debug" sortOrder="70" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Debug Logging</label>

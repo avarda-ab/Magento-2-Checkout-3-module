@@ -194,6 +194,14 @@ class Checkout extends Template
     }
 
     /**
+     * @return bool
+     */
+    public function getShowPostcode()
+    {
+        return $this->config->getShowPostcode();
+    }
+
+    /**
      * @return array
      */
     public function getCheckoutConfig()
@@ -212,39 +220,6 @@ class Checkout extends Template
     public function getJwtToken($purcheseId)
     {
         return $this->jwtTokenHelper->getNewJwtToken($purcheseId);
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getCustomCssUrl()
-    {
-        $url = $this->config->getCustomCssUrl();
-        if ($url) {
-            if (0 === strpos($url, 'http')) {
-                return $url;
-            }
-
-            return $this->assetRepo->getUrl($url);
-        }
-
-        return null;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getTheme()
-    {
-        return $this->config->getTheme();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isReplaceDefaultCss()
-    {
-        return $this->config->isReplaceDefaultCss();
     }
 
     /**
