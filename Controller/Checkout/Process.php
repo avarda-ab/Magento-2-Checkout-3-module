@@ -8,6 +8,8 @@ namespace Avarda\Checkout3\Controller\Checkout;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Controller\AbstractCheckout;
 use Avarda\Checkout3\Gateway\Config\Config;
+use Avarda\Checkout3\Helper\PaymentData;
+use Avarda\Checkout3\Helper\PurchaseState;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
@@ -23,16 +25,21 @@ class Process extends AbstractCheckout
     /** @var QuotePaymentManagementInterface */
     protected $quotePaymentManagement;
 
+    /** @var PaymentData */
+    protected $paymentData;
+
     public function __construct(
         Context $context,
         LoggerInterface $logger,
         Config $config,
         PageFactory $resultPageFactory,
-        QuotePaymentManagementInterface $quotePaymentManagement
+        QuotePaymentManagementInterface $quotePaymentManagement,
+        PaymentData $paymentData
     ) {
         parent::__construct($context, $logger, $config);
         $this->resultPageFactory = $resultPageFactory;
         $this->quotePaymentManagement = $quotePaymentManagement;
+        $this->paymentData = $paymentData;
     }
 
     /**
@@ -54,11 +61,15 @@ class Process extends AbstractCheckout
                 );
             }
 
-            $quoteId = $this->quotePaymentManagement
-                ->getQuoteIdByPurchaseId($purchaseId);
-
+            $quoteId = $this->quotePaymentManagement->getQuoteIdByPurchaseId($purchaseId);
+            $quote = $this->quotePaymentManagement->getQuote($quoteId);
             $this->quotePaymentManagement->updatePaymentStatus($quoteId);
-            $this->quotePaymentManagement->setQuoteIsActive($quoteId, true);
+
+            if ($this->paymentData->getState($quote->getPayment()) != PurchaseState::COMPLETED) {
+                // If payment was not complete set cart back active
+                $this->quotePaymentManagement->setQuoteIsActive($quoteId, true);
+            }
+
             return $this->resultPageFactory->create();
 
         } catch (PaymentException $e) {

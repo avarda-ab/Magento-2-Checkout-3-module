@@ -346,7 +346,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
      * @param int $cartId
      * @return CartInterface|Quote
      */
-    protected function getQuote($cartId)
+    public function getQuote($cartId)
     {
         if (!isset($this->quote) || $this->quote->getId() !== $cartId) {
             /** @var CartInterface|Quote $quote */

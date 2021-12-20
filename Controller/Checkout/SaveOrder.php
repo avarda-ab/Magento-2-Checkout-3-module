@@ -97,7 +97,7 @@ class SaveOrder extends AbstractCheckout
             $message = __('Failed to save Avarda order. Please try again later.');
         }
 
-        if ($quote) {
+        if ($quote && $quote->getIsActive()) {
             $quote->setIsActive(false);
             $quote->save();
         }

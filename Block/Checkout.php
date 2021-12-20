@@ -243,7 +243,7 @@ class Checkout extends Template
      */
     public function getCompleteCallbackUrl()
     {
-        return $this->getBaseUrl(UrlInterface::URL_TYPE_WEB) . 'rest/V1/avarda3/orderComplete';
+        return $this->getBaseUrl() . 'rest/V1/avarda3/orderComplete';
     }
 
     /**
@@ -269,17 +269,6 @@ class Checkout extends Template
         }
 
         return $this->serializer->serialize($this->jsLayout);
-    }
-
-    /**
-     * Retrieve form key
-     *
-     * @return string
-     * @codeCoverageIgnore
-     */
-    public function getFormKey()
-    {
-        return $this->formKey->getFormKey();
     }
 
     /**

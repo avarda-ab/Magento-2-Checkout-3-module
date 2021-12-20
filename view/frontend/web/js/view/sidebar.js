@@ -19,7 +19,6 @@ define([
          * @return {exports}
          */
         initialize: function () {
-
             var self = this;
             this._super();
         }
