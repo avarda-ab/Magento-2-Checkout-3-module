@@ -19,7 +19,7 @@ interface QuotePaymentManagementInterface
     /**
      * Get purchase ID for quote
      *
-     * @param string $cartId
+     * @param string|int $cartId
      * @param bool   $renew
      * @return string
      */
@@ -36,7 +36,7 @@ interface QuotePaymentManagementInterface
     /**
      * Get quote items additional information not provided by Magento
      *
-     * @param string $cartId
+     * @param string|int $cartId
      * @return ItemDetailsListInterface
      */
     public function getItemDetailsList($cartId);
@@ -54,7 +54,7 @@ interface QuotePaymentManagementInterface
      * renders the customer unable to manipulate the cart while payment is
      * processed.
      *
-     * @param int  $cartId
+     * @param string|int  $cartId
      * @param bool $isActive
      * @return void
      */
@@ -63,7 +63,7 @@ interface QuotePaymentManagementInterface
     /**
      * Update order (quote) from Avarda
      *
-     * @param string $cartId
+     * @param string|int $cartId
      * @return void
      */
     public function updatePaymentStatus($cartId);
@@ -79,7 +79,7 @@ interface QuotePaymentManagementInterface
     /**
      * Prepare and save order to Magento.
      *
-     * @param string $cartId
+     * @param string|int $cartId
      * @throws PaymentException
      * @return void
      */

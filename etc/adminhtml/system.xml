@@ -39,38 +39,38 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/avarda_checkout3_checkout/onepage_redirect_active</config_path>
                     </field>
-                    <field id="title" translate="label" type="text" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="title" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Title</label>
                         <config_path>payment/avarda_checkout3_checkout/title</config_path>
                     </field>
-                    <field id="instructions" translate="label" type="textarea" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="instructions" translate="label" type="textarea" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Instructions</label>
                         <config_path>payment/avarda_checkout3_checkout/instructions</config_path>
                     </field>
-                    <field id="custom_css" translate="label" type="textarea" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="custom_css" translate="label" type="textarea" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Custom Css</label>
                         <config_path>avarda_checkout3/api/custom_css</config_path>
                         <comment><![CDATA[<a target="_blank" rel="noopener" href="https://docs.avarda.com/checkout-3/more-features/custom-css-styles/">See documentation here</a>, add each config as one row for example:
                     <pre class="code-example">buttons.primary.base.backgroundColor='#fff'
 buttons.primary.fontSize='15'</pre>]]></comment>
                     </field>
-                    <field id="country_selector" sortOrder="70" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="country_selector" sortOrder="80" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Show Country Selector</label>
                         <config_path>avarda_checkout3/api/country_selector</config_path>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     </field>
-                    <field id="show_b2b_link" sortOrder="70" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="show_b2b_link" sortOrder="90" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Show B2B Link</label>
                         <config_path>avarda_checkout3/api/show_b2b_link</config_path>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     </field>
-                    <field id="show_postcode" sortOrder="70" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="show_postcode" sortOrder="100" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Show Postal Code</label>
                         <config_path>avarda_checkout3/api/show_postcode</config_path>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <comment>Show Postal Code before loading shipping methods</comment>
                     </field>
-                    <field id="debug" sortOrder="70" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="debug" sortOrder="110" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Debug Logging</label>
                         <config_path>payment/avarda_checkout3_checkout/debug</config_path>
                         <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
@@ -80,63 +80,63 @@ buttons.primary.fontSize='15'</pre>]]></comment>
                 <group id="titles" translate="label comment" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Avarda Method Titles</label>
                     <!-- Payment titles which shows up in emails and order view -->
-                    <field id="avarda_checkout3_invoice_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="avarda_checkout3_invoice_title" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Invoice Title</label>
                         <config_path>payment/avarda_checkout3_invoice/title</config_path>
                     </field>
-                    <field id="avarda_checkout3_loan_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="avarda_checkout3_loan_title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Loan Title</label>
                         <config_path>payment/avarda_checkout3_loan/title</config_path>
                     </field>
-                    <field id="avarda_checkout3_card_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="avarda_checkout3_card_title" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Card Title</label>
                         <config_path>payment/avarda_checkout3_card/title</config_path>
                     </field>
-                    <field id="avarda_checkout3_direct_payment_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="avarda_checkout3_direct_payment_title" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>DirectPayment Title</label>
                         <config_path>payment/avarda_checkout3_direct_payment/title</config_path>
                     </field>
-                    <field id="avarda_checkout3_part_payment_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="avarda_checkout3_part_payment_title" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>PartPayment Title</label>
                         <config_path>payment/avarda_checkout3_part_payment/title</config_path>
                     </field>
-                    <field id="avarda_checkout3_swish_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="avarda_checkout3_swish_title" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Swish Title</label>
                         <config_path>payment/avarda_checkout3_swish/title</config_path>
                     </field>
-                    <field id="avarda_checkout3_high_amount_loan_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="avarda_checkout3_high_amount_loan_title" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>HighAmountLoan Title</label>
                         <config_path>payment/avarda_checkout3_high_amount_loan/title</config_path>
                     </field>
-                    <field id="avarda_checkout3_paypal_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="avarda_checkout3_paypal_title" translate="label" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Paypal Title</label>
                         <config_path>payment/avarda_checkout3_paypal/title</config_path>
                     </field>
-                    <field id="avarda_checkout3_pay_on_delivery_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="avarda_checkout3_pay_on_delivery_title" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>PayOnDelivery Title</label>
                         <config_path>payment/avarda_checkout3_pay_on_delivery/title</config_path>
                     </field>
-                    <field id="avarda_checkout3_b2b_invoice_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="avarda_checkout3_b2b_invoice_title" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>B2bInvoice Title</label>
                         <config_path>payment/avarda_checkout3_b2b_invoice/title</config_path>
                     </field>
-                    <field id="avarda_checkout3_direct_invoice_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="avarda_checkout3_direct_invoice_title" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>DirectInvoice Title</label>
                         <config_path>payment/avarda_checkout3_direct_invoice/title</config_path>
                     </field>
-                    <field id="avarda_checkout3_masterpass_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="avarda_checkout3_masterpass_title" translate="label" type="text" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Masterpass Title</label>
                         <config_path>payment/avarda_checkout3_masterpass/title</config_path>
                     </field>
-                    <field id="avarda_checkout3_mobile_pay_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="avarda_checkout3_mobile_pay_title" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>MobilePay Title</label>
                         <config_path>payment/avarda_checkout3_mobile_pay/title</config_path>
                     </field>
-                    <field id="avarda_checkout3_vipps_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="avarda_checkout3_vipps_title" translate="label" type="text" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Vipps Title</label>
                         <config_path>payment/avarda_checkout3_vipps/title</config_path>
                     </field>
-                    <field id="avarda_checkout3_zero_amount_title" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="avarda_checkout3_zero_amount_title" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>ZeroAmount Title</label>
                         <config_path>payment/avarda_checkout3_zero_amount/title</config_path>
                     </field>
