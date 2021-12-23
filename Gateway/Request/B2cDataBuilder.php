@@ -6,9 +6,11 @@
 namespace Avarda\Checkout3\Gateway\Request;
 
 use Magento\Customer\Model\Session;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Payment\Gateway\Data\OrderAdapterInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
+use Magento\Store\Model\ScopeInterface;
 
 class B2cDataBuilder implements BuilderInterface
 {
@@ -36,10 +38,15 @@ class B2cDataBuilder implements BuilderInterface
     /** @var Session */
     protected $customerSession;
 
+    /** @var ScopeConfigInterface */
+    protected $config;
+
     public function __construct(
-        Session $customerSession
+        Session $customerSession,
+        ScopeConfigInterface $config
     ) {
         $this->customerSession = $customerSession;
+        $this->config = $config;
     }
 
     public function build(array $buildSubject)
@@ -78,7 +85,7 @@ class B2cDataBuilder implements BuilderInterface
             self::STREET_2   => $address->getStreetLine2(),
             self::ZIP        => $address->getPostcode(),
             self::CITY       => $address->getCity(),
-            self::COUNTRY    => $address->getCountryId(),
+            self::COUNTRY    => $address->getCountryId() ?: $this->getDefaultCountry($order),
         ];
     }
 
@@ -101,7 +108,7 @@ class B2cDataBuilder implements BuilderInterface
             self::STREET_2   => $address->getStreetLine2(),
             self::ZIP        => $address->getPostcode(),
             self::CITY       => $address->getCity(),
-            self::COUNTRY    => $address->getCountryId(),
+            self::COUNTRY    => $address->getCountryId() ?: $this->getDefaultCountry($order),
         ];
     }
 
@@ -120,5 +127,18 @@ class B2cDataBuilder implements BuilderInterface
         }
 
         return $customerToken->getValue();
+    }
+
+    /**
+     * @param $order OrderAdapterInterface
+     * @return string
+     */
+    protected function getDefaultCountry($order)
+    {
+        return $this->config->getValue(
+            'general/country/default',
+            ScopeInterface::SCOPE_STORE,
+            $order->getStoreId()
+        );
     }
 }
