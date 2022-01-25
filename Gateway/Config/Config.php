@@ -49,7 +49,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     /** @var StoreManagerInterface */
     protected $storeManager;
 
-    protected $storeCode = null;
+    protected $storeId = null;
 
     public function __construct(
         ScopeConfigInterface $scopeConfig,
@@ -70,22 +70,22 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     /**
      * Can set which store scope to get configs from
-     * @param $storeCode
+     * @param $storeId
      */
-    public function setStoreCode($storeCode)
+    public function setStoreId($storeId)
     {
-        $this->storeCode = $storeCode;
+        $this->storeId = $storeId;
     }
 
     /**
      * @return string|int
      */
-    public function getStoreCode()
+    public function getStoreId()
     {
-        if (!$this->storeCode) {
-            $this->storeCode = $this->storeManager->getStore()->getCode();
+        if (!$this->storeId) {
+            $this->storeId = $this->storeManager->getStore()->getId();
         }
-        return $this->storeCode;
+        return $this->storeId;
     }
 
     /**
@@ -98,7 +98,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         return $this->scopeConfig->getValue(
             $path,
             ScopeInterface::SCOPE_STORE,
-            $this->getStoreCode()
+            $this->getStoreId()
         );
     }
 
@@ -125,7 +125,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function getClientSecret()
     {
-        return $this->encryptor->decrypt($this->getValue(self::KEY_CLIENT_SECRET, $this->getStoreCode()));
+        return $this->encryptor->decrypt($this->getValue(self::KEY_CLIENT_SECRET, $this->getStoreId()));
     }
 
     /**
@@ -133,7 +133,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function getClientId()
     {
-        return $this->getValue(self::KEY_CLIENT_ID, $this->getStoreCode());
+        return $this->getValue(self::KEY_CLIENT_ID, $this->getStoreId());
     }
 
     /**
@@ -168,7 +168,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function getToken()
     {
-        return $this->encryptor->decrypt($this->flagManager->getFlagData(self::KEY_TOKEN_FLAG . $this->getStoreCode()));
+        return $this->encryptor->decrypt($this->flagManager->getFlagData(self::KEY_TOKEN_FLAG . $this->getStoreId()));
     }
 
     /**
@@ -176,7 +176,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function saveNewToken($token)
     {
-        $this->flagManager->saveFlag(self::KEY_TOKEN_FLAG . $this->getStoreCode(), $this->encryptor->encrypt($token));
+        $this->flagManager->saveFlag(self::KEY_TOKEN_FLAG . $this->getStoreId(), $this->encryptor->encrypt($token));
     }
 
     public function getCheckoutJsUrl()

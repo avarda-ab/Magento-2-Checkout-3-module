@@ -189,10 +189,10 @@ class AvardaClient
     {
         // Set store id to get correctly scoped api keys
         if (isset($transferObject->getBody()['additional']['storeId'])) {
-            $this->config->setStoreCode($transferObject->getBody()['additional']['storeId']);
+            $this->config->setStoreId($transferObject->getBody()['additional']['storeId']);
         }
 
-        $tokenValidFlag = 'avarda_checkout3_token_valid_' . $this->config->getStoreCode();
+        $tokenValidFlag = 'avarda_checkout3_token_valid_' . $this->config->getStoreId();
         $tokenValid = $this->flagManager->getFlagData($tokenValidFlag);
         if (!$tokenValid || $tokenValid < time()) {
             $authUrl   = $this->config->getTokenUrl();
