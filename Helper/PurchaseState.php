@@ -28,7 +28,7 @@ class PurchaseState
     const AWAITING_CREDIT_APPROVAL = 'AwaitingCreditApproval';
     const UNKNOWN = 'Unknown';
 
-    public static array $stateIds = [
+    public static $stateIds = [
         0 => self::INITIALIZED,
         1 => self::EMAIL_ZIP_ENTRY,
         2 => self::SSN_ENTRY,
@@ -47,7 +47,7 @@ class PurchaseState
         99 => self::UNKNOWN,
     ];
 
-    public static array $states = [
+    public static $states = [
         'Initialized',
         'EmailZipEntry',
         'SsnEntry',

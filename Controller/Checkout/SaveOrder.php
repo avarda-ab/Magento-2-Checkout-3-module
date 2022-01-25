@@ -90,10 +90,10 @@ class SaveOrder extends AbstractCheckout
             );
         } catch (PaymentException $e) {
             $message = $e->getMessage();
-            $this->logger->error($e);
+            $this->logger->critical($e);
         } catch (Exception $e) {
             // log stacktrace to get why saving fails
-            $this->logger->error($e, $e->getTrace());
+            $this->logger->critical($e, $e->getTrace());
             $message = __('Failed to save Avarda order. Please try again later.');
         }
 
