@@ -306,7 +306,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         }
 
         $payment = $this->getQuote($paymentQueue->getQuoteId())->getPayment();
-        if ($this->paymentDataHelper->getPurchaseData($payment)['purchaseId'] !== $purchaseId) {
+        if (!$this->paymentDataHelper->getPurchaseData($payment) || $this->paymentDataHelper->getPurchaseData($payment)['purchaseId'] !== $purchaseId) {
             // sometimes initialization is done multiple times and sometimes wrong one is left for quote payment
             // when customer is going to pay and so the validation fails. This is mostly fixed, but just to make sure this is left here
             $purchaseData = $payment->getAdditionalInformation(PaymentDetailsInterface::PURCHASE_DATA);
