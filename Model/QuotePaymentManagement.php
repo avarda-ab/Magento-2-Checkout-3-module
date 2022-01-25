@@ -290,7 +290,9 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         $this->paymentQueueRepository->delete($paymentQueue);
 
         $order = $this->orderRepository->get($orderId);
-        $this->orderSender->send($order);
+        if (!$order->getEmailSent()) {
+            $this->orderSender->send($order);
+        }
     }
 
     /**
