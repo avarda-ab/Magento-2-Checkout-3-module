@@ -20,6 +20,7 @@ interface PaymentQueueInterface
     const JWT = 'jwt';
     const EXPIRES = 'expires';
     const UPDATED_AT = 'updated_at';
+    const IS_PROCESSED = 'is_processed';
     /**#@-*/
 
     /**
@@ -111,4 +112,19 @@ interface PaymentQueueInterface
      * @return $this
      */
     public function setUpdatedAt($updatedAt);
+
+    /**
+     * Queue is processed
+     *
+     * @return int
+     */
+    public function getIsProcessed();
+
+    /**
+     * Set queue is processed
+     *
+     * @param int $isProcessed
+     * @return $this
+     */
+    public function setIsProcessed($isProcessed);
 }

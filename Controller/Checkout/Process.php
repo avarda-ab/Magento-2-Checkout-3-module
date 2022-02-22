@@ -10,6 +10,8 @@ use Avarda\Checkout3\Controller\AbstractCheckout;
 use Avarda\Checkout3\Gateway\Config\Config;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
+use Exception;
+use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
@@ -54,7 +56,7 @@ class Process extends AbstractCheckout
 
         try {
             if (($purchaseId = $this->getPurchaseId()) === null) {
-                throw new \Exception(
+                throw new Exception(
                     __('Failed to save order with purchase ID "%purchase_id"', [
                         'purchase_id' => $purchaseId
                     ])
@@ -74,7 +76,7 @@ class Process extends AbstractCheckout
 
         } catch (PaymentException $e) {
             $message = $e->getMessage();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->error($e);
             $message = __('Failed to save Avarda order. Please try again later.');
         }

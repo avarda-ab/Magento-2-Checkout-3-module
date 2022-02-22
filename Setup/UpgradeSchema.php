@@ -22,9 +22,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
         $setup->startSetup();
 
         if (version_compare($context->getVersion(), '1.0.1', '<')) {
-            /**
-             * Create table 'avarda_order_queue'
-             */
             $table = $setup->getConnection()
                 ->newTable($setup->getTable('avarda3_payment_queue'))
                 ->addColumn(
@@ -117,6 +114,20 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE]
                 );
             $setup->getConnection()->createTable($table);
+        }
+
+        if (version_compare($context->getVersion(), '1.1.4', '<')) {
+            $setup->getConnection()
+                ->addColumn(
+                    $setup->getTable('avarda3_payment_queue'),
+                    'is_processed',
+                    [
+                        'type' => \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                        'default' => 0,
+                        'unsigned' => true,
+                        'nullable' => false,
+                        'comment' => 'Is queue processed'
+                    ]);
         }
 
         $setup->endSetup();

@@ -287,7 +287,8 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
             $quote->getPayment()
         );
         $paymentQueue = $this->paymentQueueRepository->get($purchaseData['purchaseId']);
-        $this->paymentQueueRepository->delete($paymentQueue);
+        $paymentQueue->setIsProcessed(1);
+        $this->paymentQueueRepository->save($paymentQueue);
 
         $order = $this->orderRepository->get($orderId);
         if (!$order->getEmailSent()) {

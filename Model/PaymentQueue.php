@@ -122,4 +122,21 @@ class PaymentQueue extends AbstractModel implements PaymentQueueInterface
 
         return $this;
     }
+
+    /**
+     * @inheridoc
+     */
+    public function getIsProcessed()
+    {
+        return $this->getData(self::IS_PROCESSED);
+    }
+
+    /**
+     * @inheridoc
+     */
+    public function setIsProcessed($isProcessed)
+    {
+        $this->setData(self::IS_PROCESSED, $isProcessed);
+        return $this;
+    }
 }

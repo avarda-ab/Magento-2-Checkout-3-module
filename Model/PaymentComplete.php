@@ -62,7 +62,7 @@ class PaymentComplete implements PaymentCompleteInterface
 
                 return "OK";
             } catch (PaymentException $e) {
-                $this->logger->error($e);
+                $this->logger->critical($e);
             }
         } catch (NoSuchEntityException $noSuchEntityException) {
             // Order is already saved
