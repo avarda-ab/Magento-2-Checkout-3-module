@@ -1,0 +1,77 @@
+<!--
+@copyright Copyright © 2021 Avarda. All rights reserved.
+@package   Avarda_Checkout3
+-->
+<!-- ko foreach: getRegion('before-login-form') -->
+<!-- ko template: getTemplate() --><!-- /ko -->
+<!-- /ko -->
+<form class="avarda form form-login" data-role="email-with-possible-login"
+      data-bind="submit:login"
+      method="post">
+    <fieldset id="customer-email-fieldset" class="fieldset" data-bind="blockLoader: isLoading">
+        <div class="field required">
+            <label class="label" for="customer-email"><span data-bind="i18n: 'Email Address'"></span></label>
+            <div class="control">
+                <input class="input-text"
+                       type="email"
+                       data-bind="
+                            textInput: email,
+                            hasFocus: emailFocused,
+                            afterRender: emailHasChanged,
+                            mageInit: {'mage/trim-input':{}}"
+                       name="username"
+                       data-validate="{required:true, 'validate-email':true}"
+                       id="customer-email" />
+            </div>
+        </div>
+
+        <div class="field _required">
+            <label class="label" for="postal_code">
+                <span data-bind="i18n: 'Zip/Postal Code'"></span>
+            </label>
+            <div class="control">
+                <input class="input-text required-entry" data-bind="value: postalCode, valueUpdate: 'keyup'" type="text" name="postal_code" aria-required="true" id="postal_code">
+            </div>
+        </div>
+
+        <div class="field choice" data-bind="if: isPasswordVisible">
+            <input type="checkbox" name="do_login" title="Kirjaudu sisään" value="1" id="do_login" class="checkbox" data-bind="checked: showPassword">
+            <label for="do_login" class="label">
+                <span data-bind="i18n: 'You have already an account. Log in.'"></span>
+            </label>
+        </div>
+        <!--Hidden fields -->
+        <fieldset class="fieldset hidden-fields" data-bind="if: showPassword">
+            <div class="field">
+                <label class="label" for="customer-password"><span data-bind="i18n: 'Password'"></span></label>
+                <div class="control">
+                    <input class="input-text"
+                           data-bind="
+                                attr: {
+                                    placeholder: $t('Password'),
+                                }"
+                           type="password"
+                           name="password"
+                           id="customer-password"
+                           data-validate="{required:true}" autocomplete="off"/>
+                </div>
+
+            </div>
+            <!-- ko foreach: ma('additional-login-form-fields') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!-- /ko -->
+            <div class="actions-toolbar">
+                <input name="context" type="hidden" value="checkout" />
+                <div class="primary">
+                    <button type="submit" class="action login" data-action="checkout-method-login"><span data-bind="i18n: 'Login'"></span></button>
+                </div>
+                <div class="secondary">
+                    <a class="action remind" data-bind="attr: { href: forgotPasswordUrl }">
+                        <span data-bind="i18n: 'Forgot Your Password?'"></span>
+                    </a>
+                </div>
+            </div>
+        </fieldset>
+        <!--Hidden fields -->
+    </fieldset>
+</form>

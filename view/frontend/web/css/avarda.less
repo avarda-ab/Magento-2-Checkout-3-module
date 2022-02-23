@@ -2,27 +2,85 @@
  * @copyright Copyright © 2021 Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
-.search-postcode input {
-    width: 100%;
-    max-width: 250px;
-    border: none;
-    border-bottom: 1px solid;
+.avarda3-checkout-index {
+    .search-postcode input {
+        width: 100%;
+        max-width: 250px;
+        border: none;
+        border-bottom: 1px solid;
 
-    &:focus {
-        box-shadow: none;
-        border-bottom: 1px solid #00699d;
+        &:focus {
+            box-shadow: none;
+            border-bottom: 1px solid #00699d;
+        }
     }
-}
 
-.checkout-payment-method .payment-option-content .form-discount .actions-toolbar {
-    display: block;
-}
+    .checkout-payment-method .payment-option-content .form-discount .actions-toolbar {
+        display: block;
+    }
 
-.opc-wrapper .step-title {
-    font-family: Gotham, sans-serif;
-    font-weight: 700;
-}
+    .opc-wrapper .step-title {
+        font-family: Gotham, sans-serif;
+        font-weight: 700;
+    }
 
-.table-checkout-shipping-method tbody td {
-    font-family: Gotham, sans-serif;
+    .opc-wrapper .form-login {
+        border-bottom: none;
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .actions-toolbar .primary {
+        float: left;
+    }
+
+    #customer-email-fieldset {
+        margin: 0;
+    }
+
+    #customer-password {
+        max-width: 250px;
+    }
+
+    .authentication-wrapper {
+        width: 100%;
+        margin-top: -40px;
+
+        .actions-toolbar > .secondary {
+            margin-right: 0;
+            margin-left: 2rem;
+        }
+    }
+
+    .virtual .authentication-wrapper {
+        margin-top: -50px;
+    }
+
+    .table-checkout-shipping-method tbody td {
+        font-family: Gotham, sans-serif;
+    }
+
+    .cover {
+        z-index: 10;
+        position: absolute;
+        background: rgba(0,0,0,0.2);
+        left: -10px;
+        top: -21px;
+        right: -10px;
+        bottom: -10px;
+        padding: 20px;
+        display: none;
+        border-radius: 5px;
+        &.show {
+            display: block;
+        }
+    }
+
+    #opc-shipping_method {
+        position: relative;
+        &.blur {
+            filter: blur(1px);
+        }
+    }
 }

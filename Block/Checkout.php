@@ -202,6 +202,14 @@ class Checkout extends Template
     }
 
     /**
+     * @return bool
+     */
+    public function getOfferLogin()
+    {
+        return $this->config->getOfferLogin();
+    }
+
+    /**
      * @return array
      */
     public function getCheckoutConfig()
@@ -220,6 +228,15 @@ class Checkout extends Template
     public function getJwtToken($purcheseId)
     {
         return $this->jwtTokenHelper->getNewJwtToken($purcheseId);
+    }
+
+    public function getCheckoutUrl()
+    {
+        if ($this->config->isOnepageRedirectActive()) {
+            return $this->getUrl('avarda3/checkout');
+        } else {
+            return $this->getUrl('avarda3/checkout', ['_query' => ['fromCheckout' => 1]]);
+        }
     }
 
     /**

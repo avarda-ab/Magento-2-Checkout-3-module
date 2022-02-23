@@ -37,10 +37,12 @@
             redirectUrlBase: '<?= $block->getCallbackUrl() ?>',
             saveOrderUrl: '<?= $block->getSaveOrderUrl() ?>',
             showPostcode: !!<?= $block->getShowPostcode() ? 1 : 0 ?>,
+            offerLogin: !!<?= $block->getOfferLogin() ? 1 : 0 ?>,
             redirectUrl: '',
             styles: <?= $block->getStyles() ?>
         };
         window.checkoutConfig = <?= /* @noEscape */ $block->getSerializedCheckoutConfig() ?>;
+        window.checkoutConfig.checkoutUrl = '<?= $block->getCheckoutUrl() ?>';
         window.isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
         window.customerData = window.checkoutConfig.customerData;
         require([
