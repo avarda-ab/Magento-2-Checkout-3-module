@@ -22,6 +22,11 @@
     .opc-wrapper .step-title {
         font-family: Gotham, sans-serif;
         font-weight: 700;
+        border-bottom: 1px solid #ccc;
+    }
+
+    #postal_code_form .step-title {
+        padding-right: 120px;
     }
 
     .opc-wrapper .form-login {
@@ -33,6 +38,11 @@
 
     .actions-toolbar .primary {
         float: left;
+    }
+
+    .methods-shipping,
+    .avarda.form-login {
+        background: none;
     }
 
     #customer-email-fieldset {
@@ -81,6 +91,29 @@
         position: relative;
         &.blur {
             filter: blur(1px);
+        }
+    }
+
+    @media (max-width: 767px) {
+        .authentication-wrapper {
+            width: auto;
+            margin-top: -32px;
+
+            .actions-toolbar {
+                & > .secondary {
+                    text-align: center;
+                    padding-top: 10px;
+                }
+                & > .primary .action-login {
+                    padding: 7px 15px;
+                    font-size: 1.4rem;
+                }
+            }
+        }
+        .methods-shipping {
+            margin-top: 10px;
+            padding-top: 0;
+            border-bottom: none;
         }
     }
 }
