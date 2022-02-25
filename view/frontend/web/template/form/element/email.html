@@ -25,12 +25,12 @@
             </div>
         </div>
 
-        <div class="field _required">
+        <div class="field _required" data-bind="css: {'_required': !showPassword()}">
             <label class="label" for="postal_code">
                 <span data-bind="i18n: 'Zip/Postal Code'"></span>
             </label>
             <div class="control">
-                <input class="input-text required-entry" data-bind="value: postalCode, valueUpdate: 'keyup'" type="text" name="postal_code" aria-required="true" id="postal_code">
+                <input class="input-text" data-bind="value: postalCode, valueUpdate: 'keyup', css: {'required-entry': !showPassword()}" type="text" name="postal_code" id="postal_code">
             </div>
         </div>
 
@@ -57,8 +57,8 @@
                 </div>
 
             </div>
-            <!-- ko foreach: ma('additional-login-form-fields') -->
-            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!-- ko foreach: getRegion('additional-login-form-fields') -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
             <!-- /ko -->
             <div class="actions-toolbar">
                 <input name="context" type="hidden" value="checkout" />
