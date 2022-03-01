@@ -31,7 +31,7 @@
                                     </item>
                                 </item>
                                 <item name="login-form" xsi:type="array">
-                                    <item name="component" xsi:type="string">Magento_Checkout/js/view/authentication</item>
+                                    <item name="component" xsi:type="string">Avarda_Checkout3/js/view/form/login</item>
                                     <item name="displayArea" xsi:type="string">login-form</item>
                                     <item name="children" xsi:type="array">
                                         <item name="errors" xsi:type="array">

@@ -11,7 +11,7 @@ define([
 
     let mixin = {
         defaults: {
-            template: 'Avarda_Checkout3/form/element/email',
+            template: 'Avarda_Checkout3/form/email',
             imports: {
                 postalCode: '${ $.parentName }:postalCode',
                 email: '${ $.parentName }:email',

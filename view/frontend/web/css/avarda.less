@@ -26,7 +26,7 @@
     }
 
     #postal_code_form .step-title {
-        padding-right: 120px;
+        padding-right: 180px;
     }
 
     .opc-wrapper .form-login {
@@ -60,6 +60,8 @@
         .actions-toolbar > .secondary {
             margin-right: 0;
             margin-left: 2rem;
+            line-height: 125%;
+            padding-top: 0;
         }
     }
 
@@ -101,8 +103,10 @@
 
             .actions-toolbar {
                 & > .secondary {
-                    text-align: center;
                     padding-top: 10px;
+                    clear: both;
+                    text-align: left;
+                    margin-left: 0;
                 }
                 & > .primary .action-login {
                     padding: 7px 15px;
@@ -114,6 +118,17 @@
             margin-top: 10px;
             padding-top: 0;
             border-bottom: none;
+        }
+    }
+
+    @media (max-width: 450px) {
+        #postal_code_form .step-title {
+            padding-right: 0;
+        }
+        .authentication-wrapper {
+            margin-top: 10px;
+            max-width: 100%;
+            float: none;
         }
     }
 }
