@@ -1,5 +1,5 @@
 /**
- * @copyright Copyright © 2021 Avarda. All rights reserved.
+ * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
 define([
@@ -46,10 +46,14 @@ define([
         },
         initializing: false,
         initializeTimeout: false,
+        forceRenew: false,
+        isCustomerLoggedIn: customer.isLoggedIn,
 
+        cartLocked: ko.observable(false),
         email: ko.observable(),
         postalCode: ko.observable(),
-        forceRenew: false,
+        showNext: ko.observable(0),
+        offerLogin: ko.observable(null),
 
         initialize: function () {
             let self = this;
@@ -121,6 +125,7 @@ define([
                     }, 350);
                 }
             });
+            this.offerLogin(!!this.showLoginOffer());
         },
 
         getShowPostcode: function ()
@@ -144,6 +149,16 @@ define([
             }
         },
 
+        showLoginOffer: function()
+        {
+            return options.offerLogin && !this.isCustomerLoggedIn();
+        },
+
+        showLoginInfo: function ()
+        {
+            return options.offerLogin && this.isCustomerLoggedIn();
+        },
+
         postCodeStep: function ()
         {
             $("#checkout-step-postalcode").show();
@@ -153,7 +168,15 @@ define([
 
         postCodeNext: function ()
         {
-            if ($("#postal_code_form").valid()) {
+            if ($('#customer-password').val() == '') {
+                this.showNext(0);
+            }
+            let form = $("#postal_code_form");
+            if ($('.avarda.form.form-login').length) {
+                form = $('.form.form-login');
+            }
+
+            if (form.valid()) {
                 checkoutData.setShippingAddressFromData(quote.shippingAddress());
                 $("#checkout-step-postalcode").hide();
                 $("#checkout-step-shipping_method").show();
@@ -195,7 +218,7 @@ define([
          * @param avardaCheckoutInstance
          */
         updateShippingAddressHook: function (data, avardaCheckoutInstance) {
-            if (this.getShowPostcode()) {
+            if (this.getShowPostcode() && !this.cartLocked()) {
                 this.postalCode(data.zip);
                 this.reloadShippingMethods();
             }
@@ -211,6 +234,7 @@ define([
          * @param avardaCheckoutInstance
          */
         beforeCompleteHook: function (data, avardaCheckoutInstance) {
+            let self = this;
             if (quote.shippingMethod() || quote.isVirtual()) {
                 let serviceUrl = '';
                 if (customer.isLoggedIn()) {
@@ -224,13 +248,31 @@ define([
                 storage.post(
                     serviceUrl, []
                 ).done(function () {
+                    self.cartLocked(true);
                     avardaCheckoutInstance.beforeSubmitContinue();
+                    setTimeout(function() {
+                        // Remove loader, if avarda validation fails user will not be forwarded
+                        fullScreenLoader.stopLoader();
+                    }, 1000);
                 }).fail(function (response) {
-                    avardaCheckoutInstance.beforeSubmitAbort(response);
+                    avardaCheckoutInstance.beforeSubmitAbort();
                     fullScreenLoader.stopLoader();
                 });
             } else {
-                avardaCheckoutInstance.beforeSubmitAbort($.mage.__("Missing shipping method. Please select the shipping method and try again."));
+                avardaCheckoutInstance.beforeSubmitAbort();
+                $('<div><p>' +
+                    $.mage.__("Missing shipping method. Please select the shipping method and try again.") +
+                    '</p>')
+                    .modal({
+                        title: $.mage.__('Missing shipping method!'),
+                        buttons: [{
+                            text: 'OK',
+                            class: 'action primary',
+                            click: function () {
+                                this.closeModal();
+                            }
+                        }]
+                    }).modal('openModal');
             }
         },
 

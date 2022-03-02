@@ -1,5 +1,5 @@
 /**
- * @copyright Copyright © 2021 Avarda. All rights reserved.
+ * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
 define([
@@ -27,7 +27,8 @@ define([
             this._super();
         },
 
-        getPaymentStepTitle: function () {
+        getPaymentStepTitle: function ()
+        {
             if (this.isVirtual()) {
                 return $t("1. Select payment");
             } else if(options.showPostcode) {
@@ -37,7 +38,13 @@ define([
             }
         },
 
-        isVirtual: function () {
+        showLogin: function()
+        {
+            return options.offerLogin && this.isVirtual();
+        },
+
+        isVirtual: function ()
+        {
            return quote.isVirtual();
         },
 

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * @copyright   Copyright © 2021 Avarda. All rights reserved.
+ * @copyright   Copyright © Avarda. All rights reserved.
  * @package     Avarda_Checkout3
  */
 -->
@@ -69,6 +69,15 @@ buttons.primary.fontSize='15'</pre>]]></comment>
                         <config_path>avarda_checkout3/api/show_postcode</config_path>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <comment>Show Postal Code before loading shipping methods</comment>
+                    </field>
+                    <field id="offer_login" sortOrder="105" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Offer Login</label>
+                        <config_path>avarda_checkout3/api/offer_login</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>Offer login and check if email has account on checkout</comment>
+                        <depends>
+                            <field id="*/*/show_postcode">1</field>
+                        </depends>
                     </field>
                     <field id="debug" sortOrder="110" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Debug Logging</label>

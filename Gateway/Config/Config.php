@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright © 2021 Avarda. All rights reserved.
+ * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
 namespace Avarda\Checkout3\Gateway\Config;
@@ -29,6 +29,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const KEY_COUNTRY_SELECTOR = 'avarda_checkout3/api/country_selector';
     const KEY_SHOW_B2B_LINK = 'avarda_checkout3/api/show_b2b_link';
     const KEY_SHOW_POSTCODE = 'avarda_checkout3/api/show_postcode';
+    const KEY_OFFER_LOGIN = 'avarda_checkout3/api/offer_login';
 
     const URL_TEST = 'https://avdonl-s-checkout.avarda.org/';
     const URL_PRODUCTION = 'https://avdonl-p-checkout.avarda.org/';
@@ -226,5 +227,13 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function getShowPostcode()
     {
         return (bool)$this->getConfigValue(self::KEY_SHOW_POSTCODE);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getOfferLogin()
+    {
+        return (bool)$this->getConfigValue(self::KEY_OFFER_LOGIN);
     }
 }

@@ -1,17 +1,37 @@
 <!--
-@copyright Copyright © 2021 Avarda. All rights reserved.
+@copyright Copyright © Avarda. All rights reserved.
 @package   Avarda_Checkout3
 -->
 <!--Shipping method template-->
 <li id="opc-shipping_method"
     class="checkout-shipping-method"
-    data-bind="fadeVisible: visible(), blockLoader: isLoading"
+    data-bind="fadeVisible: visible(), blockLoader: isLoading, css: {'blur': cartLocked}"
     role="presentation">
+    <div class="cover" data-bind="css: {'show': cartLocked}"></div>
     <div class="checkout-shipping-method">
         <form id="postal_code_form" if="getPostCodeTitle()">
             <div class="step-title" text="getPostCodeTitle()" data-bind="click: postCodeStep" data-role="title"></div>
+            <!-- ko if: showLoginOffer() -->
+                <!-- ko foreach: requirejs('uiRegistry').get('checkout').getRegion('login-form') -->
+                    <!-- ko template: getTemplate() --><!-- /ko -->
+                <!--/ko-->
+            <!--/ko-->
             <br>
             <div id="checkout-step-postalcode" class="step-content fieldset">
+                <!-- ko if: showLoginOffer() -->
+                    <!-- ko foreach: getRegion('customer-email') -->
+                        <!-- ko template: getTemplate() --><!-- /ko -->
+                    <!--/ko-->
+                <!--/ko-->
+                <!-- ko ifnot: showLoginOffer() -->
+                <div class="field _required">
+                        <label class="label" for="email">
+                            <span data-bind="i18n: 'Email'"></span>
+                        </label>
+                        <div class="control">
+                            <input class="input-text required-entry" data-bind="value: email, valueUpdate: 'keyup'" type="email" name="email" aria-required="true" id="email">
+                        </div>
+                </div>
                 <div class="field _required">
                     <label class="label" for="postal_code">
                         <span data-bind="i18n: 'Zip/Postal Code'"></span>
@@ -20,16 +40,21 @@
                         <input class="input-text required-entry" data-bind="value: postalCode, valueUpdate: 'keyup'" type="text" name="postal_code" aria-required="true" id="postal_code">
                     </div>
                 </div>
-                <div class="field _required">
-                    <label class="label" for="email">
-                        <span data-bind="i18n: 'Email'"></span>
-                    </label>
-                    <div class="control">
-                        <input class="input-text required-entry" data-bind="value: email, valueUpdate: 'keyup'" type="email" name="email" aria-required="true" id="email">
-                    </div>
+                <!-- ko if: showLoginInfo()  -->
+                <div class="field choice">
+                    <span class="label">
+                        <span data-bind="i18n: 'You are logged in.'"></span>
+                    </span>
                 </div>
-                <button class="action secondary checkout" type="submit" data-bind="click: postCodeNext">
-                    <span data-bind="i18n: 'Next'"></span>
+                <!--/ko-->
+                <!--/ko-->
+                <button class="action secondary checkout" type="submit" data-bind="click: postCodeNext, css: {'primary': showNext() }">
+                    <!-- ko if: showNext -->
+                        <span data-bind="i18n: 'Continue as guest'"></span>
+                    <!--/ko-->
+                    <!-- ko ifnot: showNext -->
+                        <span data-bind="i18n: 'Next'"></span>
+                    <!--/ko-->
                 </button>
             </div>
         </form>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * @copyright   Copyright © 2021 Avarda. All rights reserved.
+ * @copyright   Copyright © Avarda. All rights reserved.
  * @package     Avarda_Checkout3
  */
 -->
@@ -30,6 +30,17 @@
                                         <item name="componentDisabled" xsi:type="boolean">true</item>
                                     </item>
                                 </item>
+                                <item name="login-form" xsi:type="array">
+                                    <item name="component" xsi:type="string">Avarda_Checkout3/js/view/form/login</item>
+                                    <item name="displayArea" xsi:type="string">login-form</item>
+                                    <item name="children" xsi:type="array">
+                                        <item name="errors" xsi:type="array">
+                                            <item name="sortOrder" xsi:type="string">0</item>
+                                            <item name="component" xsi:type="string">Magento_Checkout/js/view/authentication-messages</item>
+                                            <item name="displayArea" xsi:type="string">messages</item>
+                                        </item>
+                                    </item>
+                                </item>
                                 <item name="steps" xsi:type="array">
                                     <item name="children" xsi:type="array">
                                         <!-- Disable default steps -->
@@ -51,6 +62,26 @@
                                             <item name="displayArea" xsi:type="string">summary</item>
                                             <item name="sortOrder" xsi:type="string">2</item>
                                             <item name="children" xsi:type="array">
+                                                <item name="customer-email" xsi:type="array">
+                                                    <item name="component" xsi:type="string">Avarda_Checkout3/js/view/form/email</item>
+                                                    <item name="displayArea" xsi:type="string">customer-email</item>
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="before-login-form" xsi:type="array">
+                                                            <item name="component" xsi:type="string">uiComponent</item>
+                                                            <item name="displayArea" xsi:type="string">before-login-form</item>
+                                                            <item name="children" xsi:type="array">
+                                                                <!-- before login form fields -->
+                                                            </item>
+                                                        </item>
+                                                        <item name="additional-login-form-fields" xsi:type="array">
+                                                            <item name="component" xsi:type="string">uiComponent</item>
+                                                            <item name="displayArea" xsi:type="string">additional-login-form-fields</item>
+                                                            <item name="children" xsi:type="array">
+                                                                <!-- additional login form fields -->
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                </item>
                                                 <item name="price" xsi:type="array">
                                                     <item name="component" xsi:type="string">Magento_Tax/js/view/checkout/shipping_method/price</item>
                                                     <item name="displayArea" xsi:type="string">price</item>

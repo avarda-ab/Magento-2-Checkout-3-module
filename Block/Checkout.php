@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright © 2021 Avarda. All rights reserved.
+ * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
 namespace Avarda\Checkout3\Block;
@@ -202,6 +202,14 @@ class Checkout extends Template
     }
 
     /**
+     * @return bool
+     */
+    public function getOfferLogin()
+    {
+        return $this->config->getOfferLogin();
+    }
+
+    /**
      * @return array
      */
     public function getCheckoutConfig()
@@ -220,6 +228,15 @@ class Checkout extends Template
     public function getJwtToken($purcheseId)
     {
         return $this->jwtTokenHelper->getNewJwtToken($purcheseId);
+    }
+
+    public function getCheckoutUrl()
+    {
+        if ($this->config->isOnepageRedirectActive()) {
+            return $this->getUrl('avarda3/checkout');
+        } else {
+            return $this->getUrl('avarda3/checkout', ['_query' => ['fromCheckout' => 1]]);
+        }
     }
 
     /**

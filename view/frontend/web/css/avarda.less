@@ -1,28 +1,134 @@
 /**
- * @copyright Copyright © 2021 Avarda. All rights reserved.
+ * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
-.search-postcode input {
-    width: 100%;
-    max-width: 250px;
-    border: none;
-    border-bottom: 1px solid;
+.avarda3-checkout-index {
+    .search-postcode input {
+        width: 100%;
+        max-width: 250px;
+        border: none;
+        border-bottom: 1px solid;
 
-    &:focus {
-        box-shadow: none;
-        border-bottom: 1px solid #00699d;
+        &:focus {
+            box-shadow: none;
+            border-bottom: 1px solid #00699d;
+        }
     }
-}
 
-.checkout-payment-method .payment-option-content .form-discount .actions-toolbar {
-    display: block;
-}
+    .checkout-payment-method .payment-option-content .form-discount .actions-toolbar {
+        display: block;
+    }
 
-.opc-wrapper .step-title {
-    font-family: Gotham, sans-serif;
-    font-weight: 700;
-}
+    .opc-wrapper .step-title {
+        font-family: Gotham, sans-serif;
+        font-weight: 700;
+        border-bottom: 1px solid #ccc;
+    }
 
-.table-checkout-shipping-method tbody td {
-    font-family: Gotham, sans-serif;
+    #postal_code_form .step-title {
+        padding-right: 180px;
+    }
+
+    .opc-wrapper .form-login {
+        border-bottom: none;
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .actions-toolbar .primary {
+        float: left;
+    }
+
+    .methods-shipping,
+    .avarda.form-login {
+        background: none;
+    }
+
+    #customer-email-fieldset {
+        margin: 0;
+    }
+
+    #customer-password {
+        max-width: 250px;
+    }
+
+    .authentication-wrapper {
+        width: 100%;
+        margin-top: -40px;
+
+        .actions-toolbar > .secondary {
+            margin-right: 0;
+            margin-left: 2rem;
+            line-height: 125%;
+            padding-top: 0;
+        }
+    }
+
+    .virtual .authentication-wrapper {
+        margin-top: -50px;
+    }
+
+    .table-checkout-shipping-method tbody td {
+        font-family: Gotham, sans-serif;
+    }
+
+    .cover {
+        z-index: 10;
+        position: absolute;
+        background: rgba(0,0,0,0.2);
+        left: -10px;
+        top: -21px;
+        right: -10px;
+        bottom: -10px;
+        padding: 20px;
+        display: none;
+        border-radius: 5px;
+        &.show {
+            display: block;
+        }
+    }
+
+    #opc-shipping_method {
+        position: relative;
+        &.blur {
+            filter: blur(1px);
+        }
+    }
+
+    @media (max-width: 767px) {
+        .authentication-wrapper {
+            width: auto;
+            margin-top: -32px;
+
+            .actions-toolbar {
+                & > .secondary {
+                    padding-top: 10px;
+                    clear: both;
+                    text-align: left;
+                    margin-left: 0;
+                }
+                & > .primary .action-login {
+                    padding: 7px 15px;
+                    font-size: 1.4rem;
+                }
+            }
+        }
+        .methods-shipping {
+            margin-top: 10px;
+            padding-top: 0;
+            border-bottom: none;
+        }
+    }
+
+    @media (max-width: 450px) {
+        #postal_code_form .step-title {
+            padding-right: 0;
+        }
+        .authentication-wrapper {
+            margin-top: 10px;
+            max-width: 100%;
+            float: none;
+        }
+    }
 }

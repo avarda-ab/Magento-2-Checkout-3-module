@@ -1,9 +1,14 @@
 <!--
-@copyright Copyright © 2021 Avarda. All rights reserved.
+@copyright Copyright © Avarda. All rights reserved.
 @package   Avarda_Checkout3
 -->
-<li id="avarda_checkout">
+<li id="avarda_checkout" data-bind="css: {'virtual': isVirtual()}">
     <div class="step-title" text="getPaymentStepTitle()" data-role="title"></div>
+    <!-- ko if: showLogin() -->
+        <!-- ko foreach: requirejs('uiRegistry').get('checkout').getRegion('login-form') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+    <!--/ko-->
     <div id="checkout-step-iframe" class="step-content" data-role="content">
         <div id="avarda-checkout-iframe"></div>
     </div>
