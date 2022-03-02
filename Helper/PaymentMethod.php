@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright © 2021 Avarda. All rights reserved.
+ * @copyright Copyright © Avarda. All rights reserved.
  * @package   avarda_checkout3_Checkout
  */
 namespace Avarda\Checkout3\Helper;
