@@ -79,9 +79,9 @@ class GetPaymentStatusHandler implements HandlerInterface
             $shippingAddress->setFirstname($response[$mode]['deliveryAddress']['firstName']);
             $shippingAddress->setLastname($response[$mode]['deliveryAddress']['lastName']);
             $shippingAddress->setStreet($response[$mode]['deliveryAddress']['address1']);
-            $shippingAddress->setPostcode($response[$mode]['deliveryAddress']['zip']);
-            $shippingAddress->setCity($response[$mode]['deliveryAddress']['city']);
-            $shippingAddress->setCountryId($response[$mode]['deliveryAddress']['country']);
+            $shippingAddress->setPostcode($response[$mode]['deliveryAddress']['zip'] ?? $response[$mode]['invoicingAddress']['zip']);
+            $shippingAddress->setCity($response[$mode]['deliveryAddress']['city'] ?? $response[$mode]['invoicingAddress']['city']);
+            $shippingAddress->setCountryId($response[$mode]['deliveryAddress']['country'] ?? $response[$mode]['invoicingAddress']['country']);
             $quote->setShippingAddress($shippingAddress);
         } else {
             $quote->setShippingAddress($billingAddress);
