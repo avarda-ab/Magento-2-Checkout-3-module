@@ -19,6 +19,7 @@ define([
     'Magento_Customer/js/model/customer',
     'Magento_Checkout/js/model/full-screen-loader',
     'Magento_Checkout/js/model/shipping-service',
+    'Magento_Customer/js/customer-data',
     'mage/translate'
 ], function (
     $,
@@ -36,7 +37,8 @@ define([
     errorProcessor,
     customer,
     fullScreenLoader,
-    shippingService
+    shippingService,
+    customerData
 ) {
     'use strict';
 
@@ -332,6 +334,7 @@ define([
                     };
                     options.completedPurchaseCallback = function (avardaCheckoutInstance) {
                         avardaCheckoutInstance.unmount();
+                        customerData.reload(['cart']);
                         window.location.href = options.saveOrderUrl + options.purchaseId;
                     };
 
