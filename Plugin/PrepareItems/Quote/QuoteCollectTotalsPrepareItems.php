@@ -9,6 +9,7 @@ use Avarda\Checkout3\Api\ItemStorageInterface;
 use Avarda\Checkout3\Gateway\Data\ItemAdapter\ArrayDataItemFactory;
 use Avarda\Checkout3\Gateway\Data\ItemAdapter\QuoteItemFactory;
 use Avarda\Checkout3\Gateway\Data\ItemDataObjectFactory;
+use Magento\Catalog\Model\Product\Type;
 use Magento\Quote\Api\Data\CartInterface;
 
 class QuoteCollectTotalsPrepareItems
@@ -122,12 +123,21 @@ class QuoteCollectTotalsPrepareItems
      */
     protected function prepareItems(CartInterface $subject)
     {
+        $addedBundleProductIds = [];
         /** @var \Magento\Quote\Model\Quote\Item $item */
         foreach ($subject->getItemsCollection() as $item) {
             if ($item->getData('product_id') === null ||
-                $item->getData('parent_item_id') !== null ||
+                (
+                    $item->getData('parent_item_id') !== null &&
+                    ($item->getData('parent_item_id') && !isset($addedBundleProductIds[$item->getData('parent_item_id')]))
+                ) ||
                 $item->isDeleted()
             ) {
+                continue;
+            }
+            // if bundle with dynamic pricing discount amount affects its child product
+            if ($item->getProductType() == Type::TYPE_BUNDLE && $item->getProduct()->getPriceType() == '0') {
+                $addedBundleProductIds[$item->getId()] = TRUE;
                 continue;
             }
 

@@ -11,6 +11,7 @@ use Avarda\Checkout3\Gateway\Data\ItemAdapter\OrderItemFactory;
 use Avarda\Checkout3\Gateway\Data\ItemDataObjectFactory;
 use Avarda\Checkout3\Helper\PaymentData;
 use Exception;
+use Magento\Catalog\Model\Product\Type;
 use Magento\Sales\Api\Data\InvoiceInterface;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\Invoice\Item;
@@ -99,13 +100,22 @@ class InvoiceCollectTotalsPrepareItems
      */
     protected function prepareItems(InvoiceInterface $subject)
     {
+        $addedBundleProductIds = [];
         /** @var Item $item */
         foreach ($subject->getItems() as $item) {
             $orderItem = $item->getOrderItem();
             if (!$orderItem->getProductId() ||
-                $orderItem->getData('parent_item_id') !== null ||
+                (
+                    $item->getData('parent_item_id') !== null &&
+                    ($item->getData('parent_item_id') && !isset($addedBundleProductIds[$item->getData('parent_item_id')]))
+                ) ||
                 $item->isDeleted()
             ) {
+                continue;
+            }
+            // if bundle with dynamic pricing discount amount affects its child product
+            if ($orderItem->getProductType() == Type::TYPE_BUNDLE && $orderItem->getProduct()->getPriceType() == '0') {
+                $addedBundleProductIds[$item->getId()] = TRUE;
                 continue;
             }
 
