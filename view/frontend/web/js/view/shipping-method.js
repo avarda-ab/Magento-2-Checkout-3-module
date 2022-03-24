@@ -237,7 +237,14 @@ define([
          */
         beforeCompleteHook: function (data, avardaCheckoutInstance) {
             let self = this;
-            if (quote.shippingMethod() || quote.isVirtual()) {
+            // if cart is locked don't try to lock it again
+            if (self.cartLocked()) {
+                avardaCheckoutInstance.beforeSubmitContinue();
+                setTimeout(function() {
+                    // Remove loader, if avarda validation fails user will not be forwarded
+                    fullScreenLoader.stopLoader();
+                }, 1000);
+            } else if (quote.shippingMethod() || quote.isVirtual()) {
                 let serviceUrl = '';
                 if (customer.isLoggedIn()) {
                     serviceUrl = urlBuilder.createUrl('/carts/mine/avarda3-payment', {});

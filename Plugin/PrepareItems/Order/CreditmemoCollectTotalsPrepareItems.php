@@ -11,6 +11,7 @@ use Avarda\Checkout3\Gateway\Data\ItemAdapter\ArrayDataItemFactory;
 use Avarda\Checkout3\Gateway\Data\ItemAdapter\OrderItemFactory;
 use Avarda\Checkout3\Helper\PaymentData;
 use Exception;
+use Magento\Catalog\Model\Product\Type;
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\Creditmemo\Item;
@@ -99,13 +100,22 @@ class CreditmemoCollectTotalsPrepareItems
      */
     protected function prepareItems(CreditmemoInterface $subject)
     {
+        $addedBundleProductIds = [];
         /** @var Item $item */
         foreach ($subject->getItems() as $item) {
             $orderItem = $item->getOrderItem();
             if (!$orderItem->getProductId() ||
-                $orderItem->getData('parent_item_id') !== null ||
+                (
+                    $item->getData('parent_item_id') !== null &&
+                    ($item->getData('parent_item_id') && !isset($addedBundleProductIds[$item->getData('parent_item_id')]))
+                ) ||
                 $item->isDeleted()
             ) {
+                continue;
+            }
+            // if bundle and grouped with dynamic pricing discount amount affects its child product
+            if ($orderItem->getChildrenItems() && $orderItem->getProduct()->getPriceType() == '0') {
+                $addedBundleProductIds[$item->getId()] = TRUE;
                 continue;
             }
 
