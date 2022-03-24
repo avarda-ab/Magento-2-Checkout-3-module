@@ -113,8 +113,8 @@ class CreditmemoCollectTotalsPrepareItems
             ) {
                 continue;
             }
-            // if bundle with dynamic pricing discount amount affects its child product
-            if ($orderItem->getProductType() == Type::TYPE_BUNDLE && $orderItem->getProduct()->getPriceType() == '0') {
+            // if bundle and grouped with dynamic pricing discount amount affects its child product
+            if ($orderItem->getChildrenItems() && $orderItem->getProduct()->getPriceType() == '0') {
                 $addedBundleProductIds[$item->getId()] = TRUE;
                 continue;
             }

@@ -135,8 +135,8 @@ class QuoteCollectTotalsPrepareItems
             ) {
                 continue;
             }
-            // if bundle with dynamic pricing discount amount affects its child product
-            if ($item->getProductType() == Type::TYPE_BUNDLE && $item->getProduct()->getPriceType() == '0') {
+            // if bundle and grouped with dynamic pricing discount amount affects its child product
+            if ($item->getChildren() && $item->getProduct()->getPriceType() == '0') {
                 $addedBundleProductIds[$item->getId()] = TRUE;
                 continue;
             }
