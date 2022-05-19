@@ -76,10 +76,23 @@ buttons.primary.fontSize='15'</pre>]]></comment>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <comment>Offer login and check if email has account on checkout</comment>
                         <depends>
-                            <field id="*/*/show_postcode">1</field>
+                            <field id="*/*/*/show_postcode">1</field>
                         </depends>
                     </field>
-                    <field id="debug" sortOrder="110" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="show_newsletter" sortOrder="110" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Show Newsletter Subscription</label>
+                        <config_path>avarda_checkout3/api/show_newsletter</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="newsletter_default" sortOrder="115" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Newsletter Selected by Default</label>
+                        <config_path>avarda_checkout3/api/newsletter_default</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <depends>
+                            <field id="*/*/*/show_newsletter">1</field>
+                        </depends>
+                    </field>
+                    <field id="debug" sortOrder="500" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Debug Logging</label>
                         <config_path>payment/avarda_checkout3_checkout/debug</config_path>
                         <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>

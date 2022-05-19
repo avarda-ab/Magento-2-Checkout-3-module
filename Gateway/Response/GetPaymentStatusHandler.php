@@ -5,8 +5,11 @@
  */
 namespace Avarda\Checkout3\Gateway\Response;
 
+use Avarda\Checkout3\Helper\AvardaCheckBoxTypeValues;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PaymentMethod;
+use Magento\Newsletter\Model\SubscriberFactory;
+use Magento\Newsletter\Model\SubscriptionManagerInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
@@ -27,16 +30,21 @@ class GetPaymentStatusHandler implements HandlerInterface
     /** @var PaymentMethod */
     protected $methodHelper;
 
+    /** @var SubscriberFactory */
+    protected $subscriberFactory;
+
     public function __construct(
         CartRepositoryInterface $quoteRepository,
         AddressInterfaceFactory $addressFactory,
         PaymentMethod $paymentMethod,
-        PaymentFactory $paymentFactory
+        PaymentFactory $paymentFactory,
+        SubscriberFactory $subscriberFactory
     ) {
         $this->quoteRepository = $quoteRepository;
         $this->addressFactory = $addressFactory;
         $this->paymentFactory = $paymentFactory;
         $this->methodHelper = $paymentMethod;
+        $this->subscriberFactory = $subscriberFactory;
     }
     /**
      * {@inheritdoc}
@@ -44,7 +52,6 @@ class GetPaymentStatusHandler implements HandlerInterface
     public function handle(array $handlingSubject, array $response)
     {
         $paymentDO = SubjectReader::readPayment($handlingSubject);
-        $payment = $paymentDO->getPayment();
         $order = $paymentDO->getOrder();
 
         $entityId = $order->getId();
@@ -91,6 +98,11 @@ class GetPaymentStatusHandler implements HandlerInterface
         if (isset($response['paymentMethods']['selectedPayment']['type'])) {
             $paymentMethod = $this->methodHelper->getPaymentMethod($response['paymentMethods']['selectedPayment']['type']);
             $quote->getPayment()->setMethod($paymentMethod);
+        }
+
+        if ($response[$mode]['step']['emailNewsletterSubscription'] == AvardaCheckBoxTypeValues::VALUE_CHECKED) {
+            // @todo when magento 2.3. support ends change to use SubscriptionManager::subscribe
+            $this->subscriberFactory->create()->subscribe($email);
         }
 
         // Set payment state
