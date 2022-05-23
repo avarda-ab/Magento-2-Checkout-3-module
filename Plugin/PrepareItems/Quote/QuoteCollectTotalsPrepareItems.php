@@ -172,7 +172,7 @@ class QuoteCollectTotalsPrepareItems
         }
 
         $shippingAddress = $subject->getShippingAddress();
-        if ($shippingAddress && $shippingAddress->getShippingTaxAmount() > 0) {
+        if ($shippingAddress && $shippingAddress->getShippingInclTax() > 0) {
             $itemAdapter = $this->arrayDataItemAdapterFactory->create([
                 'data' => [
                     'name' => $shippingAddress->getShippingDescription(),
