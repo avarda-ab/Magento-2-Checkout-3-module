@@ -79,7 +79,7 @@ class PaymentData
 
         $purchaseData = $this->getPurchaseData($payment);
 
-        return $purchaseData && count($purchaseData)>1 && ($paymentCode == '' || strpos($paymentCode, 'avarda_checkout3') !== false);
+        return $purchaseData && count($purchaseData)>=1 && (!$paymentCode || strpos($paymentCode, 'avarda_checkout3') !== false);
     }
 
     /**

@@ -157,6 +157,15 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
             $quote->getPayment()
         );
 
+        $this->updatePaymentStatus($quote);
+        $paymentState = $this->paymentDataHelper->getState($quote->getPayment());
+        if (
+            $this->purchaseStateHelper->isComplete($paymentState) ||
+            $this->purchaseStateHelper->isDead($paymentState)
+        ) {
+            $renew = true;
+        }
+
         if (!$purchaseData || $renew || (isset($purchaseData['renew']) && $purchaseData['renew'])) {
             /** We have to manually collect totals to populate the item storage */
             $quote->collectTotals();
