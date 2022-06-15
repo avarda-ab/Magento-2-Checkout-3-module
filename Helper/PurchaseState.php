@@ -16,6 +16,7 @@ class PurchaseState
     const PHONE_NUMBER_ENTRY = 'PhoneNumberEntry';
     const PHONE_NUMBER_ENTRY_FOR_KNOWN_CUSTOMER = 'PhoneNumberEntryForKnownCustomer';
     const PERSONAL_INFO = 'PersonalInfo';
+    const PERSONAL_INFO_WITHOUT_SSN = 'PersonalInfoWithoutSsn';
     const WAITING_FOR_SWISH = 'WaitingForSwish';
     const REDIRECTED_TO_DIRECT_PAYMENT_BANK = 'RedirectedToDirectPaymentBank';
     const REDIRECTED_TO_NETS = 'RedirectedToNets';
@@ -44,6 +45,7 @@ class PurchaseState
         12 => self::HANDLED_BY_MERCHANT,
         13 => self::AWAITING_CREDIT_APPROVAL,
         14 => self::PHONE_NUMBER_ENTRY_FOR_KNOWN_CUSTOMER,
+        15 => self::PERSONAL_INFO_WITHOUT_SSN,
         99 => self::UNKNOWN,
     ];
 
@@ -54,6 +56,7 @@ class PurchaseState
         'PhoneNumberEntry',
         'PhoneNumberEntryForKnownCustomer',
         'PersonalInfo',
+        'PersonalInfoWithoutSsn',
         'WaitingForSwish',
         'RedirectedToDirectPaymentBank',
         'RedirectedToNets',
@@ -94,6 +97,8 @@ class PurchaseState
             [
                 self::INITIALIZED,
                 self::EMAIL_ZIP_ENTRY,
+                self::PERSONAL_INFO,
+                self::PERSONAL_INFO_WITHOUT_SSN,
                 self::SSN_ENTRY,
                 self::PHONE_NUMBER_ENTRY,
                 self::PHONE_NUMBER_ENTRY_FOR_KNOWN_CUSTOMER
