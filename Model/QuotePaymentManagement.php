@@ -157,8 +157,14 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
             $quote->getPayment()
         );
 
+        // If purchaseData has 'renew' then something changed so that renew is necessary
+        if (isset($purchaseData['renew']) && $purchaseData['renew']) {
+            $renew = true;
+        }
+
         // If no purchaseData, it means order is not initialized yet
-        if ($purchaseData && count($purchaseData) > 0) {
+        // Also if renew already requested the state update is unnecessary
+        if (!$renew && $purchaseData && count($purchaseData) > 0) {
             $this->updatePaymentStatus($quote);
             $paymentState = $this->paymentDataHelper->getState($quote->getPayment());
             if (
@@ -169,7 +175,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
             }
         }
 
-        if (!$purchaseData || $renew || (isset($purchaseData['renew']) && $purchaseData['renew'])) {
+        if (!$purchaseData || $renew) {
             /** We have to manually collect totals to populate the item storage */
             $quote->collectTotals();
             $purchaseData = $this->initializePurchase($quote);
