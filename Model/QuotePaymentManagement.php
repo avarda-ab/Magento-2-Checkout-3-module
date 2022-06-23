@@ -157,15 +157,6 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
             $quote->getPayment()
         );
 
-        $this->updatePaymentStatus($quote);
-        $paymentState = $this->paymentDataHelper->getState($quote->getPayment());
-        if (
-            $this->purchaseStateHelper->isComplete($paymentState) ||
-            $this->purchaseStateHelper->isDead($paymentState)
-        ) {
-            $renew = true;
-        }
-
         // If purchaseData has 'renew' then something changed so that renew is necessary
         if (isset($purchaseData['renew']) && $purchaseData['renew']) {
             $renew = true;
