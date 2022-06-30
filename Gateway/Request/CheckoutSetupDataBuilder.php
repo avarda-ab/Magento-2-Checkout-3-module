@@ -6,6 +6,7 @@
 namespace Avarda\Checkout3\Gateway\Request;
 
 use Avarda\Checkout3\Gateway\Config\Config;
+use Avarda\Checkout3\Helper\AvardaCheckBoxTypeValues;
 use Magento\Framework\Locale\Resolver;
 use Magento\Payment\Gateway\Data\OrderAdapterInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
@@ -43,6 +44,7 @@ class CheckoutSetupDataBuilder implements BuilderInterface
                 'differentDeliveryAddress'  => $this->showDeliveryAddress($order),
                 'enableB2BLink'             => $this->configHelper->getShowB2Blink(),
                 'enableCountrySelector'     => $this->configHelper->getCountrySelector(),
+                'emailNewsletterSubscription' => $this->getNewsletterSubscription(),
             ]
         ];
     }
@@ -91,5 +93,18 @@ class CheckoutSetupDataBuilder implements BuilderInterface
         $isVirtual = $countItems == 0 ? false : $isVirtual;
 
         return $isVirtual ? 'Hidden' : 'Unchecked';
+    }
+
+    protected function getNewsletterSubscription(): string
+    {
+        if ($this->configHelper->getShowNewsletter()) {
+            if ($this->configHelper->getNewsletterSelectedDefault()) {
+                return AvardaCheckBoxTypeValues::VALUE_CHECKED;
+            } else {
+                return AvardaCheckBoxTypeValues::VALUE_UNCHECKED;
+            }
+        } else {
+            return AvardaCheckBoxTypeValues::VALUE_HIDDEN;
+        }
     }
 }

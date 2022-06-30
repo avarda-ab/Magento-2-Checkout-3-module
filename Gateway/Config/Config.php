@@ -30,6 +30,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const KEY_SHOW_B2B_LINK = 'avarda_checkout3/api/show_b2b_link';
     const KEY_SHOW_POSTCODE = 'avarda_checkout3/api/show_postcode';
     const KEY_OFFER_LOGIN = 'avarda_checkout3/api/offer_login';
+    const KEY_SHOW_NEWSLETTER = 'avarda_checkout3/api/show_newsletter';
+    const KEY_NEWSLETTER_DEFAULT = 'avarda_checkout3/api/newsletter_default';
 
     const URL_TEST = 'https://avdonl-s-checkout.avarda.org/';
     const URL_PRODUCTION = 'https://avdonl-p-checkout.avarda.org/';
@@ -235,5 +237,21 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function getOfferLogin()
     {
         return (bool)$this->getConfigValue(self::KEY_OFFER_LOGIN);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getShowNewsletter(): bool
+    {
+        return (bool)$this->getConfigValue(self::KEY_SHOW_NEWSLETTER);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getNewsletterSelectedDefault(): bool
+    {
+        return (bool)$this->getConfigValue(self::KEY_NEWSLETTER_DEFAULT);
     }
 }
