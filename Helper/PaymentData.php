@@ -7,6 +7,7 @@ namespace Avarda\Checkout3\Helper;
 
 use Avarda\Checkout3\Api\Data\PaymentDetailsInterface;
 use Magento\Payment\Model\InfoInterface;
+use Magento\Payment\Model\Method\Free;
 
 /**
  * Class PaymentData
@@ -79,7 +80,12 @@ class PaymentData
 
         $purchaseData = $this->getPurchaseData($payment);
 
-        return $purchaseData && count($purchaseData)>=1 && (!$paymentCode || strpos($paymentCode, 'avarda_checkout3') !== false);
+        return $purchaseData && count($purchaseData)>=1 && (
+                !$paymentCode ||
+                strpos($paymentCode, 'avarda_checkout3') !== false ||
+                // free method is automatically set in checkout, but it will be changed to avarda zero_sum on status update
+                $paymentCode == Free::PAYMENT_METHOD_FREE_CODE
+            );
     }
 
     /**
