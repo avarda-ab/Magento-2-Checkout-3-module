@@ -19,6 +19,8 @@ class JsonConverter implements ConverterInterface
      * @param ResponseInterface $response
      * @return array
      * @throws ConverterException
+     * @throws WebapiException
+     * @throws AuthorizationException
      */
     public function convert($response)
     {
@@ -29,21 +31,29 @@ class JsonConverter implements ConverterInterface
                 __('Something went wrong with Avarda Checkout. Please try again later.')
             );
         }
+
         if ($response->getStatusCode() === WebapiException::HTTP_UNAUTHORIZED) {
             throw new AuthorizationException(
                 __('Failed to authorize Avarda Checkout.')
             );
-        } elseif (isset($body['errorMessage'])) {
+        }
+
+        if (isset($body['errorMessage'])) {
             throw new WebapiException(__($body['errorMessage']));
-        } elseif (isset($body['Errors'])) {
+        }
+
+        if (isset($body['Errors'])) {
             $errorMsg = '';
             foreach ($body['Errors'] as $error) {
                 $errorMsg .= __($error['errorMessage']) . ' ';
             }
             throw new WebapiException(__($errorMsg));
-        } elseif ($response->getStatusCode() == 400) {
+        }
+
+        if ($response->getStatusCode() == 400) {
             throw new WebapiException(__('Something went wrong with Avarda Checkout. Please try again later.'));
         }
+
         return $body;
     }
 

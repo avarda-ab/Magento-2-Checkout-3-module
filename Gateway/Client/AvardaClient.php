@@ -184,6 +184,8 @@ class AvardaClient
     /**
      * @param $transferObject TransferInterface
      * @return string
+     * @throws ClientException
+     * @throws GuzzleException
      */
     private function getToken($transferObject)
     {
@@ -192,14 +194,31 @@ class AvardaClient
             $this->config->setStoreId($transferObject->getBody()['additional']['storeId']);
         }
 
-        $tokenValidFlag = 'avarda_checkout3_token_valid_' . $this->config->getStoreId();
+        $useAltApi = false;
+        $useAltApiFlagPart = '';
+        if (isset($transferObject->getBody()['additional']['useAltApi'])
+            && $transferObject->getBody()['additional']['useAltApi']
+        ) {
+            $useAltApi = true;
+            $useAltApiFlagPart = 'alt_';
+        }
+
+        $tokenValidFlag = 'avarda_checkout3_token_valid_' . $useAltApiFlagPart . $this->config->getStoreId();
         $tokenValid = $this->flagManager->getFlagData($tokenValidFlag);
         if (!$tokenValid || $tokenValid < time()) {
             $authUrl   = $this->config->getTokenUrl();
-            $authParam = [
-                'clientId'     => $this->config->getClientId(),
-                'clientSecret' => $this->config->getClientSecret()
-            ];
+
+            if ($useAltApi) {
+                $authParam = [
+                    'clientId'     => $this->config->getAlternativeClientId(),
+                    'clientSecret' => $this->config->getAlternativeClientSecret()
+                ];
+            } else {
+                $authParam = [
+                    'clientId'     => $this->config->getClientId(),
+                    'clientSecret' => $this->config->getClientSecret()
+                ];
+            }
 
             $headers = [
                 'content-type' => 'application/json-patch+json'
@@ -208,14 +227,16 @@ class AvardaClient
             $responseArray = json_decode((string)$response->getBody(), true);
             if (!is_array($responseArray)) {
                 throw new ClientException(__('Authentication with avarda responded with invalid response'));
-            } elseif (isset($responseArray['error_description'])) {
-                throw new ClientException(__('Authentication error, check avarda credentials'));
-            } else {
-                $this->flagManager->saveFlag($tokenValidFlag, strtotime($responseArray['tokenExpirationUtc']));
-                $this->config->saveNewToken($responseArray['token']);
             }
+
+            if (isset($responseArray['error_description'])) {
+                throw new ClientException(__('Authentication error, check avarda credentials'));
+            }
+
+            $this->flagManager->saveFlag($tokenValidFlag, strtotime($responseArray['tokenExpirationUtc']));
+            $this->config->saveNewToken($responseArray['token'], $useAltApi);
         }
 
-        return $this->config->getToken();
+        return $this->config->getToken($useAltApi);
     }
 }

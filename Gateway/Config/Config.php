@@ -174,7 +174,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     public function getAlternativeClientSecret()
     {
-        return $this->getConfigValue(self::KEY_ALTERNATIVE_CLIENT_SECRET);
+        return $this->encryptor->decrypt($this->getConfigValue(self::KEY_ALTERNATIVE_CLIENT_SECRET));
     }
 
     /**
@@ -188,17 +188,17 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     /**
      * @return string
      */
-    public function getToken()
+    public function getToken($alternative = false)
     {
-        return $this->encryptor->decrypt($this->flagManager->getFlagData(self::KEY_TOKEN_FLAG . $this->getStoreId()));
+        return $this->encryptor->decrypt($this->flagManager->getFlagData(self::KEY_TOKEN_FLAG  . ($alternative ? 'alt' : '') . $this->getStoreId()));
     }
 
     /**
      * @param $token string
      */
-    public function saveNewToken($token)
+    public function saveNewToken($token, $alternative = false)
     {
-        $this->flagManager->saveFlag(self::KEY_TOKEN_FLAG . $this->getStoreId(), $this->encryptor->encrypt($token));
+        $this->flagManager->saveFlag(self::KEY_TOKEN_FLAG . ($alternative ? 'alt' : '') . $this->getStoreId(), $this->encryptor->encrypt($token));
     }
 
     public function getCheckoutJsUrl()
