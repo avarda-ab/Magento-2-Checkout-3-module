@@ -33,6 +33,10 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const KEY_SHOW_NEWSLETTER = 'avarda_checkout3/api/show_newsletter';
     const KEY_NEWSLETTER_DEFAULT = 'avarda_checkout3/api/newsletter_default';
 
+    const KEY_ALTERNATIVE_CLIENT_ID = 'payment/avarda_checkout3_checkout/alternative_client_id';
+    const KEY_ALTERNATIVE_CLIENT_SECRET = 'payment/avarda_checkout3_checkout/alternative_client_secret';
+    const KEY_ALTERNATIVE_PRODUCT_TYPES = 'payment/avarda_checkout3_checkout/alternative_product_types';
+
     const URL_TEST = 'https://avdonl-s-checkout.avarda.org/';
     const URL_PRODUCTION = 'https://avdonl-p-checkout.avarda.org/';
     const TOKEN_PATH = 'api/partner/tokens';
@@ -158,6 +162,21 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         return $this->getApiUrl() . self::TOKEN_PATH;
     }
 
+    public function getAlternativeProductTypes()
+    {
+        return $this->getConfigValue(self::KEY_ALTERNATIVE_PRODUCT_TYPES);
+    }
+
+    public function getAlternativeClientId()
+    {
+        return $this->getConfigValue(self::KEY_ALTERNATIVE_CLIENT_ID);
+    }
+
+    public function getAlternativeClientSecret()
+    {
+        return $this->encryptor->decrypt($this->getConfigValue(self::KEY_ALTERNATIVE_CLIENT_SECRET));
+    }
+
     /**
      * @return bool
      */
@@ -169,17 +188,17 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     /**
      * @return string
      */
-    public function getToken()
+    public function getToken($alternative = false)
     {
-        return $this->encryptor->decrypt($this->flagManager->getFlagData(self::KEY_TOKEN_FLAG . $this->getStoreId()));
+        return $this->encryptor->decrypt($this->flagManager->getFlagData(self::KEY_TOKEN_FLAG  . ($alternative ? 'alt' : '') . $this->getStoreId()));
     }
 
     /**
      * @param $token string
      */
-    public function saveNewToken($token)
+    public function saveNewToken($token, $alternative = false)
     {
-        $this->flagManager->saveFlag(self::KEY_TOKEN_FLAG . $this->getStoreId(), $this->encryptor->encrypt($token));
+        $this->flagManager->saveFlag(self::KEY_TOKEN_FLAG . ($alternative ? 'alt' : '') . $this->getStoreId(), $this->encryptor->encrypt($token));
     }
 
     public function getCheckoutJsUrl()

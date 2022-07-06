@@ -29,7 +29,13 @@ class ConfigSaveObserver implements ObserverInterface
     public function execute(Observer $observer)
     {
         $paths = $observer->getEvent()->getData('changed_paths');
-        $changed = ['payment/avarda_checkout3_checkout/test_mode', 'payment/avarda_checkout3_checkout/client_secret', 'payment/avarda_checkout3_checkout/client_id'];
+        $changed = [
+            'payment/avarda_checkout3_checkout/test_mode',
+            'payment/avarda_checkout3_checkout/client_secret',
+            'payment/avarda_checkout3_checkout/client_id',
+            'payment/avarda_checkout3_checkout/alternative_client_id',
+            'payment/avarda_checkout3_checkout/alternative_client_secret',
+        ];
         $hasChanged = false;
         foreach ($changed as $item) {
             if (in_array($item, $paths)) {
@@ -42,6 +48,8 @@ class ConfigSaveObserver implements ObserverInterface
             foreach ($this->storeManager->getStores() as $store) {
                 $this->flagManager->deleteFlag('avarda_checkout3_api_token' . $store->getId());
                 $this->flagManager->deleteFlag('avarda_checkout3_token_valid_' . $store->getId());
+                $this->flagManager->deleteFlag('avarda_checkout3_api_token_alt' . $store->getId());
+                $this->flagManager->deleteFlag('avarda_checkout3_token_valid_alt_' . $store->getId());
             }
         }
     }
