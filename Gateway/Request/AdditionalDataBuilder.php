@@ -56,6 +56,12 @@ class AdditionalDataBuilder implements BuilderInterface
             if (in_array($item->getProductType(), $productTypes)) {
                 return true;
             }
+
+            foreach ($item->getChildren() as $childItem) {
+                if (in_array($childItem->getProductType(), $productTypes)) {
+                    return true;
+                }
+            }
         }
 
         return false;
