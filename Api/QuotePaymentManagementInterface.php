@@ -9,6 +9,7 @@ use Avarda\Checkout3\Api\Data\ItemDetailsListInterface;
 use Magento\Framework\Exception\PaymentException;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote;
+use Magento\Sales\Api\Data\OrderInterface;
 
 /**
  * Interface for managing Avarda payment information
@@ -75,6 +76,14 @@ interface QuotePaymentManagementInterface
      * @return void
      */
     public function updateOnlyPaymentStatus($quote);
+
+    /**
+     * Update order payment status from Avarda.
+     *
+     * @param OrderInterface $order
+     * @return void
+     */
+    public function updateOrderPaymentStatus($order);
 
     /**
      * Prepare and save order to Magento.

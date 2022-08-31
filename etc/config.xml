@@ -14,10 +14,12 @@
                 <active>0</active>
                 <test_mode>1</test_mode>
                 <debug>1</debug>
-                <order_status>processing</order_status>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
                 <onepage_redirect_active>0</onepage_redirect_active>
                 <automatic_invoicing_active>0</automatic_invoicing_active>
                 <can_use_checkout>1</can_use_checkout>
+                <can_initialize>1</can_initialize>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>
                 <can_refund>1</can_refund>
@@ -28,6 +30,9 @@
                 <group>avarda_checkout3</group>
                 <model>AvardaCheckout3InvoiceFacade</model>
                 <active>1</active>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <can_initialize>1</can_initialize>
                 <can_cancel>1</can_cancel>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>
@@ -39,6 +44,9 @@
                 <group>avarda_checkout3</group>
                 <model>AvardaCheckout3LoanFacade</model>
                 <active>1</active>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <can_initialize>1</can_initialize>
                 <can_cancel>1</can_cancel>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>
@@ -50,6 +58,9 @@
                 <group>avarda_checkout3</group>
                 <model>AvardaCheckout3CardFacade</model>
                 <active>1</active>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <can_initialize>1</can_initialize>
                 <can_cancel>1</can_cancel>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>
@@ -61,6 +72,9 @@
                 <group>avarda_checkout3</group>
                 <model>AvardaCheckout3DirectPaymentFacade</model>
                 <active>1</active>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <can_initialize>1</can_initialize>
                 <can_cancel>1</can_cancel>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>
@@ -72,6 +86,9 @@
                 <group>avarda_checkout3</group>
                 <model>AvardaCheckout3PartPaymentFacade</model>
                 <active>1</active>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <can_initialize>1</can_initialize>
                 <can_cancel>1</can_cancel>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>
@@ -83,6 +100,9 @@
                 <group>avarda_checkout3</group>
                 <model>AvardaCheckout3SwishFacade</model>
                 <active>1</active>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <can_initialize>1</can_initialize>
                 <can_cancel>1</can_cancel>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>
@@ -94,6 +114,9 @@
                 <group>avarda_checkout3</group>
                 <model>AvardaCheckout3HighAmountLoanFacade</model>
                 <active>1</active>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <can_initialize>1</can_initialize>
                 <can_cancel>1</can_cancel>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>
@@ -105,6 +128,9 @@
                 <group>avarda_checkout3</group>
                 <model>AvardaCheckout3PaypalFacade</model>
                 <active>1</active>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <can_initialize>1</can_initialize>
                 <can_cancel>1</can_cancel>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>
@@ -116,6 +142,9 @@
                 <group>avarda_checkout3</group>
                 <model>AvardaCheckout3PayOnDeliveryFacade</model>
                 <active>1</active>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <can_initialize>1</can_initialize>
                 <can_cancel>1</can_cancel>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>
@@ -127,6 +156,9 @@
                 <group>avarda_checkout3</group>
                 <model>AvardaCheckout3B2bInvoiceFacade</model>
                 <active>1</active>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <can_initialize>1</can_initialize>
                 <can_cancel>1</can_cancel>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>
@@ -138,6 +170,9 @@
                 <group>avarda_checkout3</group>
                 <model>AvardaCheckout3DirectInvoiceFacade</model>
                 <active>1</active>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <can_initialize>1</can_initialize>
                 <can_cancel>1</can_cancel>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>
@@ -149,6 +184,9 @@
                 <group>avarda_checkout3</group>
                 <model>AvardaCheckout3MasterpassFacade</model>
                 <active>1</active>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <can_initialize>1</can_initialize>
                 <can_cancel>1</can_cancel>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>
@@ -160,6 +198,9 @@
                 <group>avarda_checkout3</group>
                 <model>AvardaCheckout3MobilePayFacade</model>
                 <active>1</active>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <can_initialize>1</can_initialize>
                 <can_cancel>1</can_cancel>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>
@@ -171,6 +212,9 @@
                 <group>avarda_checkout3</group>
                 <model>AvardaCheckout3VippsFacade</model>
                 <active>1</active>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <can_initialize>1</can_initialize>
                 <can_cancel>1</can_cancel>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>
@@ -182,6 +226,9 @@
                 <group>avarda_checkout3</group>
                 <model>AvardaCheckout3ZeroAmountFacade</model>
                 <active>1</active>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <can_initialize>1</can_initialize>
                 <can_cancel>1</can_cancel>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>

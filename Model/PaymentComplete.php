@@ -49,14 +49,12 @@ class PaymentComplete implements PaymentCompleteInterface
     {
         try {
             try {
-                $this->quotePaymentManagement->getQuoteIdByPurchaseId($purchaseId);
+                $quoteId = $this->avardaOrderRepository->getByPurchaseId($purchaseId);
                 try {
                     $this->avardaOrderRepository->save($purchaseId);
                 } catch (AlreadyExistsException $alreadyExistsException) {
                     return "Order already saved";
                 }
-
-                $quoteId = $this->quotePaymentManagement->getQuoteIdByPurchaseId($purchaseId);
                 $this->quotePaymentManagement->updatePaymentStatus($quoteId);
                 $this->quotePaymentManagement->placeOrder($quoteId);
 

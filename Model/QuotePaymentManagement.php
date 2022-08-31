@@ -18,12 +18,15 @@ use Magento\Framework\Exception\PaymentException;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectFactoryInterface;
 use Magento\Payment\Model\InfoInterface;
+use Magento\Payment\Model\Method\AbstractMethod;
 use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
+use Magento\Sales\Model\ResourceModel\Order\Status\CollectionFactory;
 
 /**
  * QuotePaymentManagement
@@ -119,6 +122,9 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     /** @var OrderRepositoryInterface */
     protected $orderRepository;
 
+    /** @var CollectionFactory */
+    protected $statusCollectionFactory;
+
     public function __construct(
         ItemManagementInterface $itemManagement,
         ItemStorageInterface $itemStorage,
@@ -131,7 +137,8 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         PaymentQueueInterfaceFactory $paymentQueueFactory,
         CartManagementInterface $cartManagement,
         OrderSender $orderSender,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        CollectionFactory $statusCollectionFactory
     ) {
         $this->itemManagement = $itemManagement;
         $this->itemStorage = $itemStorage;
@@ -145,6 +152,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         $this->cartManagement = $cartManagement;
         $this->orderSender = $orderSender;
         $this->orderRepository = $orderRepository;
+        $this->statusCollectionFactory = $statusCollectionFactory;
     }
 
     /**
@@ -162,10 +170,10 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
             $renew = true;
         }
 
-        // If no purchaseData, it means order is not initialized yet
+        // If no purchaseData, it means order is not initialized yet and initialization should be done
         // Also if renew already requested the state update is unnecessary
         if (!$renew && $purchaseData && count($purchaseData) > 0) {
-            $this->updatePaymentStatus($quote);
+            $this->updateOnlyPaymentStatus($quote);
             $paymentState = $this->paymentDataHelper->getState($quote->getPayment());
             if (
                 $this->purchaseStateHelper->isComplete($paymentState) ||
@@ -176,8 +184,9 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         }
 
         if (!$purchaseData || $renew) {
-            /** We have to manually collect totals to populate the item storage */
+            // We have to manually collect totals to populate the item storage
             $quote->collectTotals();
+            // Initialize order
             $purchaseData = $this->initializePurchase($quote);
         }
 
@@ -281,6 +290,14 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     /**
      * {@inheritdoc}
      */
+    public function updateOrderPaymentStatus($order)
+    {
+        $this->executeCommand('avarda_update_order_status', $order);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function placeOrder($cartId)
     {
         $quote = $this->getQuote($cartId);
@@ -318,6 +335,38 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     /**
      * {@inheritdoc}
      */
+    public function finalizeOrder($order)
+    {
+        $state = $this->paymentDataHelper->getState($order->getPayment());
+        if (!$this->purchaseStateHelper->isComplete($state)) {
+            throw new PaymentException(__('Payment status is not Completed'));
+        }
+
+        // Clean payment queue
+        $purchaseData = $this->paymentDataHelper->getPurchaseData(
+            $order->getPayment()
+        );
+        $paymentQueue = $this->paymentQueueRepository->get($purchaseData['purchaseId']);
+        $paymentQueue->setIsProcessed(1);
+        $this->paymentQueueRepository->save($paymentQueue);
+
+        // Change order status
+        /** @var AbstractMethod $method */
+        $method = $order->getPayment()->getMethodInstance();
+        $newStatus = $method->getConfigData('order_status');
+        $order->setState($this->getState($newStatus));
+        $order->setStatus($newStatus);
+        $order->addCommentToStatusHistory(__('Payment has been accepted.'));
+        $this->orderRepository->save($order);
+
+        if (!$order->getEmailSent()) {
+            $this->orderSender->send($order);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getQuoteIdByPurchaseId($purchaseId)
     {
         $paymentQueue = $this->paymentQueueRepository->get($purchaseId);
@@ -343,17 +392,17 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     /**
      * Execute command for request to Avarda API based on quote.
      *
-     * @param string              $commandCode
-     * @param CartInterface|Quote $quote
+     * @param string $commandCode
+     * @param CartInterface|Quote|OrderInterface $quote
      * @return void
      */
-    protected function executeCommand($commandCode, CartInterface $quote)
+    protected function executeCommand($commandCode, $quote)
     {
         $arguments['amount'] = $quote->getGrandTotal();
 
         /** @var InfoInterface|null $payment */
         $payment = $quote->getPayment();
-        if ($payment !== null && $payment instanceof InfoInterface) {
+        if ($payment instanceof InfoInterface) {
             $arguments['payment'] = $this->paymentDataObjectFactory
                 ->create($payment);
         }
@@ -392,5 +441,17 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
                 'cart_id' => $quote->getId()
             ]));
         }
+    }
+
+    /**
+     * Get state for status
+     * @param $status
+     * @return string
+     */
+    private function getState($status)
+    {
+        $collection = $this->statusCollectionFactory->create()->joinStates();
+        $status = $collection->addAttributeToFilter('main_table.status', $status)->getFirstItem();
+        return $status->getState();
     }
 }

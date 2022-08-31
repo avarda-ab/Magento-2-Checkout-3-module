@@ -20,20 +20,39 @@ class AvardaOrderRepository implements AvardaOrderRepositoryInterface
         ResourceModel\AvardaOrder $resource,
         AvardaOrderFactory $avardaOrderFactory
     ) {
-        $this->resource           = $resource;
+        $this->resource = $resource;
         $this->avardaOrderFactory = $avardaOrderFactory;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function save($purchaseId)
+    public function save($purchaseId, $orderId)
     {
         /** @var AvardaOrder|AvardaOrderInterface $avardaOrder */
         $avardaOrder = $this->avardaOrderFactory->create();
         $avardaOrder->setPurchaseId($purchaseId);
+        $avardaOrder->setOrderId($orderId);
         $this->resource->save($avardaOrder);
         return $avardaOrder;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getByOrderId($orderId)
+    {
+        $avardaOrder = $this->avardaOrderFactory->create();
+        return $avardaOrder->load($orderId, 'order_id');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getByPurchaseId($purchaseId)
+    {
+        $avardaOrder = $this->avardaOrderFactory->create();
+        return $avardaOrder->load($purchaseId, 'purchase_id');
     }
 
     /**

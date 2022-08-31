@@ -56,7 +56,7 @@ class AdditionalDataBuilder implements BuilderInterface
 
     public function getUseAlternative(OrderAdapterInterface $order)
     {
-        $productTypes = explode(',', $this->config->getAlternativeProductTypes() ?: "");
+        $productTypes = array_filter(explode(',', $this->config->getAlternativeProductTypes() ?: ""));
         if (!$productTypes) {
             return false;
         }
@@ -76,9 +76,11 @@ class AdditionalDataBuilder implements BuilderInterface
                 return true;
             }
 
-            foreach ($item->getChildren() as $childItem) {
-                if (in_array($childItem->getProductType(), $productTypes)) {
-                    return true;
+            if ($item->hasChildren()) {
+                foreach ($item->getChildren() as $childItem) {
+                    if (in_array($childItem->getProductType(), $productTypes)) {
+                        return true;
+                    }
                 }
             }
         }

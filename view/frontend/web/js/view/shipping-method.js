@@ -20,6 +20,7 @@ define([
     'Magento_Checkout/js/model/full-screen-loader',
     'Magento_Checkout/js/model/shipping-service',
     'Magento_Customer/js/customer-data',
+    'Magento_Checkout/js/action/place-order',
     'mage/translate'
 ], function (
     $,
@@ -38,7 +39,8 @@ define([
     customer,
     fullScreenLoader,
     shippingService,
-    customerData
+    customerData,
+    placeOrderAction
 ) {
     'use strict';
 
@@ -237,6 +239,7 @@ define([
          */
         beforeCompleteHook: function (data, avardaCheckoutInstance) {
             let self = this;
+
             // if cart is locked don't try to lock it again
             if (self.cartLocked()) {
                 avardaCheckoutInstance.beforeSubmitContinue();
@@ -245,27 +248,40 @@ define([
                     fullScreenLoader.stopLoader();
                 }, 1000);
             } else if (quote.shippingMethod() || quote.isVirtual()) {
-                let serviceUrl = '';
-                if (customer.isLoggedIn()) {
-                    serviceUrl = urlBuilder.createUrl('/carts/mine/avarda3-payment', {});
-                } else {
-                    serviceUrl = urlBuilder.createUrl('/guest-carts/:cartId/avarda3-payment', {
-                        cartId: quote.getQuoteId()
-                    });
-                }
-                fullScreenLoader.startLoader();
-                storage.post(
-                    serviceUrl, []
-                ).done(function () {
-                    self.cartLocked(true);
+                self.cartLocked(true);
+                placeOrderAction({
+                    'method': 'avarda_checkout3_checkout',
+                    'additional_data': {'avarda': JSON.stringify(data)}
+                }).fail(function (response) {
+                    self.cartLocked(false);
+                    var error;
+                    try {
+                        error = JSON.parse(response.responseText).message;
+                    } catch (exception) {
+                        error = $.mage.__('Something went wrong with your request. Please try again later.')
+                    }
+                    $('<div class="messages"><div class="message error"><div>' +
+                        error +
+                        '</div></div></div>')
+                        .modal({
+                            title: $.mage.__('Something went wrong with your request.'),
+                            buttons: [{
+                                text: 'OK',
+                                class: 'action primary',
+                                click: function () {
+                                    this.closeModal();
+                                }
+                            }]
+                        }).modal('openModal');
+                    avardaCheckoutInstance.beforeSubmitAbort();
+                    fullScreenLoader.stopLoader();
+                }).done(function () {
+                    fullScreenLoader.startLoader();
                     avardaCheckoutInstance.beforeSubmitContinue();
                     setTimeout(function() {
                         // Remove loader, if avarda validation fails user will not be forwarded
                         fullScreenLoader.stopLoader();
                     }, 1000);
-                }).fail(function (response) {
-                    avardaCheckoutInstance.beforeSubmitAbort();
-                    fullScreenLoader.stopLoader();
                 });
             } else {
                 avardaCheckoutInstance.beforeSubmitAbort();

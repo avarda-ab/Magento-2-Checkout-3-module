@@ -20,7 +20,7 @@
     <preference for="Avarda\Checkout3\Api\PaymentQueueRepositoryInterface" type="Avarda\Checkout3\Model\PaymentQueueRepository" />
     <preference for="Avarda\Checkout3\Api\PaymentCompleteInterface" type="Avarda\Checkout3\Model\PaymentComplete" />
     <preference for="Avarda\Checkout3\Api\AvardaOrderRepositoryInterface" type="Avarda\Checkout3\Model\AvardaOrderRepository" />
-    <preference for="Avarda\Checkout3\Api\Data\AvardaOrderInterfaceFactory" type="Avarda\Checkout3\Model\AvardaOrder" />
+    <preference for="Avarda\Checkout3\Api\Data\AvardaOrderInterface" type="Avarda\Checkout3\Model\AvardaOrder" />
 
     <preference for="Avarda\Checkout3\Gateway\Data\ItemDataObjectFactoryInterface" type="Avarda\Checkout3\Gateway\Data\ItemDataObjectFactory" />
     <preference for="Avarda\Checkout3\Gateway\Data\ItemDataObjectInterface" type="Avarda\Checkout3\Gateway\Data\ItemDataObject" />
@@ -68,7 +68,12 @@
     <type name="Magento\Sales\Api\Data\CreditmemoInterface">
         <plugin name="avarda_checkout3_CreditmemoCollectTotalsPrepareItems" type="Avarda\Checkout3\Plugin\PrepareItems\Order\CreditmemoCollectTotalsPrepareItems" sortOrder="900" />
     </type>
-
+    <type name="Magento\Checkout\Api\GuestPaymentInformationManagementInterface">
+        <plugin name="avarda_checkout3_guest_place_order" type="Avarda\Checkout3\Plugin\Checkout\GuestPlaceOrderPlugin" />
+    </type>
+    <type name="Magento\Checkout\Api\PaymentInformationManagementInterface">
+        <plugin name="avarda_checkout3_place_order" type="Avarda\Checkout3\Plugin\Checkout\PlaceOrderPlugin" />
+    </type>
     <!-- Avarda payment methods -->
     <virtualType name="AvardaCheckout3Facade" type="Magento\Payment\Model\Method\Adapter">
         <arguments>
@@ -88,8 +93,10 @@
                 <item name="avarda_initialize_payment" xsi:type="string">AvardaCheckout3InitializePaymentCommand</item>
                 <item name="avarda_get_payment_status" xsi:type="string">AvardaCheckout3GetPaymentStatusCommand</item>
                 <item name="avarda_get_only_status" xsi:type="string">AvardaCheckout3GetOnlyPaymentCommand</item>
+                <item name="avarda_update_order_status" xsi:type="string">AvardaCheckout3UpdateOrderStatusCommand</item>
                 <item name="avarda_update_items" xsi:type="string">AvardaCheckout3UpdateItemsCommand</item>
                 <item name="avarda_get_jwt_token" xsi:type="string">AvardaCheckout3GetJwtTokenCommand</item>
+                <item name="initialize" xsi:type="string">AvardaCheckout3PendingPaymentCommand</item>
                 <item name="capture" xsi:type="string">AvardaCheckout3PurchaseOrderCommand</item>
                 <item name="refund" xsi:type="string">AvardaCheckout3RefundCommand</item>
                 <item name="avarda_cancel" xsi:type="string">AvardaCheckout3ReturnCommand</item>
@@ -127,6 +134,15 @@
     <virtualType name="AvardaCheckout3InitializePaymentTransferFactory" type="Avarda\Checkout3\Gateway\Client\TransferFactory">
         <arguments>
             <argument name="uri" xsi:type="string">api/partner/payments</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Get payment status from avarda when saving order as pending_payment status -->
+    <virtualType name="AvardaCheckout3PendingPaymentCommand" type="AvardaCheckout3Command">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">AvardaCheckout3GetPaymentStatusRequest</argument>
+            <argument name="transferFactory" xsi:type="object">AvardaCheckout3GetPaymentStatusTransferFactory</argument>
+            <argument name="handler" xsi:type="object">Avarda\Checkout3\Gateway\Response\PendingPaymentHandler</argument>
         </arguments>
     </virtualType>
 
@@ -180,6 +196,15 @@
             <argument name="requestBuilder" xsi:type="object">AvardaCheckout3GetPaymentStatusRequest</argument>
             <argument name="transferFactory" xsi:type="object">AvardaCheckout3GetPaymentStatusTransferFactory</argument>
             <argument name="handler" xsi:type="object">Avarda\Checkout3\Gateway\Response\GetOnlyStatusHandler</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Update status and customer information after order is paid -->
+    <virtualType name="AvardaCheckout3UpdateOrderStatusCommand" type="AvardaCheckout3Command">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">AvardaCheckout3GetPaymentStatusRequest</argument>
+            <argument name="transferFactory" xsi:type="object">AvardaCheckout3GetPaymentStatusTransferFactory</argument>
+            <argument name="handler" xsi:type="object">Avarda\Checkout3\Gateway\Response\UpdateOrderStatusHandler</argument>
         </arguments>
     </virtualType>
 

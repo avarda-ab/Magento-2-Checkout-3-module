@@ -5,6 +5,8 @@
  */
 namespace Avarda\Checkout3\Setup;
 
+use Magento\Framework\DB\Adapter\AdapterInterface;
+use Magento\Framework\DB\Ddl\Table;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
@@ -26,54 +28,54 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 ->newTable($setup->getTable('avarda3_payment_queue'))
                 ->addColumn(
                     'queue_id',
-                    \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                    Table::TYPE_INTEGER,
                     null,
                     ['identity' => true, 'unsigned' => true, 'nullable' => false, 'primary' => true],
                     'Queue ID'
                 )
                 ->addColumn(
                     'purchase_id',
-                    \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                    Table::TYPE_TEXT,
                     64,
                     ['nullable' => false],
                     'Purchase ID'
                 )
                 ->addColumn(
                     'quote_id',
-                    \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                    Table::TYPE_INTEGER,
                     null,
                     ['unsigned' => true, 'nullable' => true],
                     'Quote ID'
                 )
                 ->addColumn(
                     'jwt',
-                    \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                    Table::TYPE_TEXT,
                     256,
                     ['nullable' => true],
                     'Purchase ID'
                 )
                 ->addColumn(
                     'expires',
-                    \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                    Table::TYPE_INTEGER,
                     null,
                     ['unsigned' => true, 'nullable' => true],
                     'Quote ID'
                 )
                 ->addColumn(
                     'updated_at',
-                    \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
+                    Table::TYPE_TIMESTAMP,
                     null,
-                    ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT_UPDATE],
+                    ['nullable' => false, 'default' => Table::TIMESTAMP_INIT_UPDATE],
                     'Updated At'
                 )
                 ->addIndex(
                     $setup->getIdxName(
                         'avarda3_payment_queue',
                         ['purchase_id'],
-                        \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
+                        AdapterInterface::INDEX_TYPE_UNIQUE
                     ),
                     ['purchase_id'],
-                    ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE]
+                    ['type' => AdapterInterface::INDEX_TYPE_UNIQUE]
                 )
                 ->addIndex(
                     $setup->getIdxName('avarda3_payment_queue', ['updated_at']),
@@ -84,7 +86,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     'quote_id',
                     $setup->getTable('quote'),
                     'entity_id',
-                    \Magento\Framework\DB\Ddl\Table::ACTION_SET_NULL
+                    Table::ACTION_SET_NULL
                 )
                 ->setComment('Avarda Payment Queue');
             $setup->getConnection()->createTable($table);
@@ -93,14 +95,14 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 ->newTable($setup->getTable('avarda3_order_created'))
                 ->addColumn(
                     'entity_id',
-                    \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                    Table::TYPE_INTEGER,
                     null,
                     ['identity' => true, 'unsigned' => true, 'nullable' => false, 'primary' => true],
                     'Entity ID'
                 )
                 ->addColumn(
                     'purchase_id',
-                    \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                    Table::TYPE_TEXT,
                     64,
                     ['nullable' => false],
                     'Purchase ID'
@@ -108,10 +110,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     $setup->getIdxName(
                         'avarda3_order_created',
                         ['purchase_id'],
-                        \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
+                        AdapterInterface::INDEX_TYPE_UNIQUE
                     ),
                     ['purchase_id'],
-                    ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE]
+                    ['type' => AdapterInterface::INDEX_TYPE_UNIQUE]
                 );
             $setup->getConnection()->createTable($table);
         }
@@ -122,12 +124,36 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     $setup->getTable('avarda3_payment_queue'),
                     'is_processed',
                     [
-                        'type' => \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                        'type' => Table::TYPE_INTEGER,
                         'default' => 0,
                         'unsigned' => true,
                         'nullable' => false,
                         'comment' => 'Is queue processed'
                     ]);
+        }
+
+        if (version_compare($context->getVersion(), '1.2.7', '<')) {
+            $setup->getConnection()
+                ->addColumn(
+                    $setup->getTable('avarda3_order_created'),
+                    'order_id',
+                    [
+                        'type' => Table::TYPE_INTEGER,
+                        'unsigned' => true,
+                        'nullable' => true,
+                        'comment' => 'Order Id'
+                    ]
+                );
+            $setup->getConnection()
+                ->addIndex(
+                    $setup->getTable('avarda3_order_created'),
+                    $setup->getIdxName(
+                        'avarda3_order_created',
+                        ['order_id'],
+                        AdapterInterface::INDEX_TYPE_INDEX
+                    ),
+                    ['order_id']
+                );
         }
 
         $setup->endSetup();

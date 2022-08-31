@@ -37,8 +37,4 @@ $jwtToken = $block->getJwtToken($purchaseId);
         styles: <?= $block->getStyles() ?>
     };
     avardaCheckoutInit(options);
-    // make sure minicart data is reloaded
-    require(['Magento_Customer/js/customer-data'], function(customerData) {
-        customerData.reload(['cart']);
-    });
 </script>

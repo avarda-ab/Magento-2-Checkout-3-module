@@ -18,6 +18,7 @@ use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\PaymentException;
 use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\OrderFactory;
 use Psr\Log\LoggerInterface;
 
@@ -41,6 +42,9 @@ class SaveOrder extends AbstractCheckout
     /** @var OrderFactory */
     protected $orderFactory;
 
+    /** @var OrderRepositoryInterface */
+    protected $orderRepository;
+
     public function __construct(
         Context $context,
         LoggerInterface $logger,
@@ -50,7 +54,8 @@ class SaveOrder extends AbstractCheckout
         CartRepositoryInterface $cartRepository,
         PaymentData $paymentData,
         Session $checkoutSession,
-        OrderFactory $orderFactory
+        OrderFactory $orderFactory,
+        OrderRepositoryInterface $orderRepository
     ) {
         parent::__construct($context, $logger, $config);
         $this->quotePaymentManagement = $quotePaymentManagement;
@@ -59,6 +64,7 @@ class SaveOrder extends AbstractCheckout
         $this->paymentData = $paymentData;
         $this->checkoutSession = $checkoutSession;
         $this->orderFactory = $orderFactory;
+        $this->orderRepository = $orderRepository;
     }
 
     /**
@@ -71,43 +77,26 @@ class SaveOrder extends AbstractCheckout
         try {
             if (($purchaseId = $this->getPurchaseId()) === null) {
                 throw new Exception(
-                    __('Failed to save order with purchase ID "%purchase_id"', [
+                    __('Missing purchase ID "%purchase_id"', [
                         'purchase_id' => $purchaseId
                     ])
                 );
             }
 
             $quoteId = $this->quotePaymentManagement->getQuoteIdByPurchaseId($purchaseId);
-            $quote = $this->cartRepository->get($quoteId);
+            $orderId = $this->avardaOrderRepository->getByPurchaseId($purchaseId);
+            $order = $this->orderRepository->get($orderId->getOrderId());
 
-            try {
-                $this->avardaOrderRepository->save($purchaseId);
-            } catch (AlreadyExistsException $alreadyExistsException) {
-                $this->logger->warning("Order with purchase $purchaseId already saved");
+            $this->quotePaymentManagement->updateOrderPaymentStatus($order);
+            $this->quotePaymentManagement->finalizeOrder($order);
 
-                $orderNro = $quote->getReservedOrderId();
-                $order = $this->orderFactory->create()
-                    ->loadByIncrementIdAndStoreId($orderNro, $quote->getStoreId());
-                // Set order and quote information to session, so we can redirect to success page
-                $this->checkoutSession
-                    ->setLastOrderId($order->getId())
-                    ->setLastRealOrderId($order->getIncrementId())
-                    ->setLastOrderStatus($order->getStatus())
-                    ->setLastQuoteId($quoteId)
-                    ->setLastSuccessQuoteId($quoteId);
-
-                return $this->resultRedirectFactory->create()->setPath(
-                    'checkout/onepage/success'
-                );
-            }
-
-
-            // make sure payment method is avarda
-            if (!$this->paymentData->isAvardaPayment($quote->getPayment())) {
-                $quote->getPayment()->setMethod('avarda_checkout3_checkout')->save();
-            }
-            $this->quotePaymentManagement->updatePaymentStatus($quoteId);
-            $this->quotePaymentManagement->placeOrder($quoteId);
+            // Set order and quote information to session, so we can redirect to success page
+            $this->checkoutSession
+                ->setLastOrderId($order->getId())
+                ->setLastRealOrderId($order->getIncrementId())
+                ->setLastOrderStatus($order->getStatus())
+                ->setLastQuoteId($quoteId)
+                ->setLastSuccessQuoteId($quoteId);
 
             return $this->resultRedirectFactory->create()->setPath(
                 'checkout/onepage/success'
@@ -121,6 +110,7 @@ class SaveOrder extends AbstractCheckout
             $message = __('Failed to save Avarda order. Please try again later.');
         }
 
+        $quote = $this->cartRepository->get($quoteId);
         if ($quote && $quote->getIsActive()) {
             $quote->setIsActive(false);
             $quote->save();
