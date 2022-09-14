@@ -29,6 +29,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const KEY_COUNTRY_SELECTOR = 'avarda_checkout3/api/country_selector';
     const KEY_SHOW_B2B_LINK = 'avarda_checkout3/api/show_b2b_link';
     const KEY_SHOW_POSTCODE = 'avarda_checkout3/api/show_postcode';
+    const KEY_ADDRESS_CHANGE = 'avarda_checkout3/api/address_change';
     const KEY_OFFER_LOGIN = 'avarda_checkout3/api/offer_login';
     const KEY_SHOW_NEWSLETTER = 'avarda_checkout3/api/show_newsletter';
     const KEY_NEWSLETTER_DEFAULT = 'avarda_checkout3/api/newsletter_default';
@@ -248,6 +249,14 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function getShowPostcode()
     {
         return (bool)$this->getConfigValue(self::KEY_SHOW_POSTCODE);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAdressChangeCallback()
+    {
+        return (bool)$this->getConfigValue(self::KEY_ADDRESS_CHANGE);
     }
 
     /**

@@ -137,6 +137,11 @@ define([
             return !!options.showPostcode;
         },
 
+        getSubscribeAddressChangeCallback: function ()
+        {
+            return !!options.addressChangeCallback;
+        },
+
         getPostCodeTitle: function ()
         {
             if (this.getShowPostcode()) {
@@ -345,9 +350,11 @@ define([
                     options.purchaseId = response.purchase_data[0];
                     options.purchaseJwt = response.purchase_data[1];
                     options.redirectUrl = options.redirectUrlBase + response.purchase_data[0];
-                    options.deliveryAddressChangedCallback = function(data, avardaCheckoutInstance) {
-                        self.updateShippingAddressHook(data, avardaCheckoutInstance);
-                    };
+                    if (self.getSubscribeAddressChangeCallback()) {
+                        options.deliveryAddressChangedCallback = function (data, avardaCheckoutInstance) {
+                            self.updateShippingAddressHook(data, avardaCheckoutInstance);
+                        };
+                    }
                     options.beforeSubmitCallback = function(data, avardaCheckoutInstance) {
                         self.beforeCompleteHook(data, avardaCheckoutInstance);
                     };

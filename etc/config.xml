@@ -7,6 +7,11 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
+        <avarda_checkout3>
+            <api>
+                <address_change>1</address_change>
+            </api>
+        </avarda_checkout3>
         <payment>
             <avarda_checkout3_checkout>
                 <title>Avarda Checkout</title>
