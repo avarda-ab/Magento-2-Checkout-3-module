@@ -90,9 +90,15 @@ class CheckoutSetupDataBuilder implements BuilderInterface
                 break;
             }
         }
-        $isVirtual = $countItems == 0 ? false : $isVirtual;
+        $isVirtual = !($countItems == 0) && $isVirtual;
 
-        return $isVirtual ? 'Hidden' : 'Unchecked';
+        if ($isVirtual) {
+            return AvardaCheckBoxTypeValues::VALUE_HIDDEN;
+        } else if ($order->getBillingAddress() != $order->getShippingAddress()) {
+            return AvardaCheckBoxTypeValues::VALUE_CHECKED;
+        } else {
+            return AvardaCheckBoxTypeValues::VALUE_UNCHECKED;
+        }
     }
 
     protected function getNewsletterSubscription(): string

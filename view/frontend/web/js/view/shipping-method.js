@@ -21,6 +21,7 @@ define([
     'Magento_Checkout/js/model/shipping-service',
     'Magento_Customer/js/customer-data',
     'Magento_Checkout/js/action/place-order',
+    'Magento_Checkout/js/model/checkout-data-resolver',
     'mage/translate'
 ], function (
     $,
@@ -40,7 +41,8 @@ define([
     fullScreenLoader,
     shippingService,
     customerData,
-    placeOrderAction
+    placeOrderAction,
+    checkoutDataResolver
 ) {
     'use strict';
 
@@ -68,6 +70,9 @@ define([
             }
 
             let initial = shippingService.isLoading.subscribe(function() {
+                checkoutDataResolver.resolveBillingAddress();
+                checkoutDataResolver.resolveShippingAddress();
+
                 if (!quote.isVirtual() && self.getShowPostcode()) {
                     $("#checkout-step-shipping_method").hide();
                     $("#checkout-step-iframe").hide();
@@ -100,7 +105,7 @@ define([
                 }
 
                 if (!self.getShowPostcode()) {
-                    // If no shipping method is selected select the first one
+                    // If no shipping method is selected, select the first one
                     if (!quote.shippingMethod()) {
                         let rates = shippingService.getShippingRates()();
                         if (rates.length > 0) {
