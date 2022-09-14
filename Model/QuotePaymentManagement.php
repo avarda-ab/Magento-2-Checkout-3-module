@@ -298,43 +298,6 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     /**
      * {@inheritdoc}
      */
-    public function placeOrder($cartId)
-    {
-        $quote = $this->getQuote($cartId);
-        $this->isAvardaPayment($quote);
-
-        $state = $this->paymentDataHelper->getState($quote->getPayment());
-        if (!$this->purchaseStateHelper->isComplete($state)) {
-            throw new PaymentException(__('Status is not Completed'));
-        }
-
-        /** Unfreeze cart before placing the order */
-        $this->setQuoteIsActive($cartId, true);
-
-        /** Must set checkout method for guests */
-        if (!$quote->getCustomerId()) {
-            $quote->setCheckoutMethod(CartManagementInterface::METHOD_GUEST);
-        }
-
-        $orderId = $this->cartManagement->placeOrder($cartId);
-
-        // Clean payment queue
-        $purchaseData = $this->paymentDataHelper->getPurchaseData(
-            $quote->getPayment()
-        );
-        $paymentQueue = $this->paymentQueueRepository->get($purchaseData['purchaseId']);
-        $paymentQueue->setIsProcessed(1);
-        $this->paymentQueueRepository->save($paymentQueue);
-
-        $order = $this->orderRepository->get($orderId);
-        if (!$order->getEmailSent()) {
-            $this->orderSender->send($order);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function finalizeOrder($order)
     {
         $state = $this->paymentDataHelper->getState($order->getPayment());
@@ -347,17 +310,21 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
             $order->getPayment()
         );
         $paymentQueue = $this->paymentQueueRepository->get($purchaseData['purchaseId']);
-        $paymentQueue->setIsProcessed(1);
-        $this->paymentQueueRepository->save($paymentQueue);
+        if (!$paymentQueue->getIsProcessed()) {
+            $paymentQueue->setIsProcessed(1);
+            $this->paymentQueueRepository->save($paymentQueue);
+        }
 
         // Change order status
         /** @var AbstractMethod $method */
         $method = $order->getPayment()->getMethodInstance();
         $newStatus = $method->getConfigData('order_status');
-        $order->setState($this->getState($newStatus));
-        $order->setStatus($newStatus);
-        $order->addCommentToStatusHistory(__('Payment has been accepted.'));
-        $this->orderRepository->save($order);
+        if ($order->getStatus() != $newStatus) {
+            $order->setState($this->getState($newStatus));
+            $order->setStatus($newStatus);
+            $order->addCommentToStatusHistory(__('Payment has been accepted.'));
+            $this->orderRepository->save($order);
+        }
 
         if (!$order->getEmailSent()) {
             $this->orderSender->send($order);

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @copyright Copyright © Avarda. All rights reserved.
+ * @package   Avarda_Checkout3
+ */
 
 namespace Avarda\Checkout3\Plugin\Checkout;
 
@@ -46,7 +50,7 @@ class PlaceOrderPlugin extends PlaceOrderPluginAbstract
             $additionalData = json_decode($paymentMethod->getAdditionalData()['avarda'], true);
             $quote = $this->cartRepository->getActive($cartId);
             $this->setShippingAddress($quote, $additionalData);
-            if ($billingAddress && !$billingAddress->getTelephone()) {
+            if ($billingAddress) {
                 $this->setBillingAddress($billingAddress, $additionalData);
             }
         }

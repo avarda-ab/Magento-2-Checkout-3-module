@@ -61,7 +61,7 @@ class Process extends AbstractCheckout
      */
     public function execute()
     {
-        // Show no route if Avarda is inactive and notify webmaster in logs.
+        // Show no route if Avarda is inactive
         if (!$this->isCallback() && !$this->config->isActive()) {
             return $this->noroute('/checkout/avarda3/process');
         }
@@ -78,12 +78,9 @@ class Process extends AbstractCheckout
             $quoteId = $this->quotePaymentManagement->getQuoteIdByPurchaseId($purchaseId);
             $this->quotePaymentManagement->updatePaymentStatus($quoteId);
             return $this->resultPageFactory->create();
-
-        } catch (PaymentException $e) {
-            $message = $e->getMessage();
         } catch (Exception $e) {
             $this->logger->error($e);
-            $message = __('Failed to save Avarda order. Please try again later.');
+            $message = $e->getMessage();
         }
 
         $this->messageManager->addErrorMessage($message);

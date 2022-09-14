@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by avarda.
- * User: juhni
- * Date: 24.8.2022
- * Time: 13.53
+ * @copyright Copyright © Avarda. All rights reserved.
+ * @package   Avarda_Checkout3
  */
 
 namespace Avarda\Checkout3\Plugin\Checkout;
@@ -52,7 +50,6 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
      * @param $email
      * @param PaymentInterface $paymentMethod
      * @param AddressInterface|null $billingAddress
-     * @return void
      * @throws NoSuchEntityException
      */
     public function beforeSavePaymentInformationAndPlaceOrder(
@@ -67,7 +64,7 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
             $quoteIdMask = $this->quoteIdMaskFactory->create()->load($cartId, 'masked_id');
             $quote = $this->cartRepository->get($quoteIdMask->getQuoteId());
             $this->setShippingAddress($quote, $additionalData);
-            if ($billingAddress && !$billingAddress->getTelephone()) {
+            if ($billingAddress) {
                 $this->setBillingAddress($billingAddress, $additionalData);
             }
         }
@@ -76,10 +73,8 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
     /**
      * @param $subject
      * @param $orderId
-     * @param $cartId
      * @return mixed
      * @throws AlreadyExistsException
-     * @throws NoSuchEntityException
      */
     public function afterSavePaymentInformationAndPlaceOrder($subject, $orderId)
     {

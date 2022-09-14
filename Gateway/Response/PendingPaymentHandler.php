@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by avarda.
- * User: juhni
- * Date: 23.8.2022
- * Time: 14.01
+ * @copyright Copyright © Avarda. All rights reserved.
+ * @package   Avarda_Checkout3
  */
 
 namespace Avarda\Checkout3\Gateway\Response;

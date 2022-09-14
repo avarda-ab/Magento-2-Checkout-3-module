@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by avarda.
- * User: juhni
- * Date: 24.8.2022
- * Time: 14.06
+ * @copyright Copyright © Avarda. All rights reserved.
+ * @package   Avarda_Checkout3
  */
 
 namespace Avarda\Checkout3\Plugin\Checkout;
@@ -11,9 +9,11 @@ namespace Avarda\Checkout3\Plugin\Checkout;
 use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
 use Avarda\Checkout3\Api\Data\PaymentDetailsInterface;
 use Avarda\Checkout3\Model\AvardaOrderFactory;
+use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 
 abstract class PlaceOrderPluginAbstract
@@ -70,9 +70,9 @@ abstract class PlaceOrderPluginAbstract
 
     /**
      * @param $orderId int|string
-     * @param $quote Order
+     * @param $order Quote|CartInterface|Order|OrderInterface
      * @return void
-     * @throws \Magento\Framework\Exception\AlreadyExistsException
+     * @throws AlreadyExistsException
      */
     public function saveOrderCreated($orderId, $order)
     {

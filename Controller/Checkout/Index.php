@@ -17,6 +17,8 @@ use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Psr\Log\LoggerInterface;
@@ -78,6 +80,8 @@ class Index extends AbstractCheckout
 
     /**
      * @return ResultInterface
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function execute()
     {
