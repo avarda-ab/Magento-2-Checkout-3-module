@@ -259,14 +259,28 @@ define([
                 }, 1000);
             } else if (quote.shippingMethod() || quote.isVirtual()) {
                 self.cartLocked(true);
+
+                // if postcode not showing then email is not set yet
+                if (!self.getShowPostcode()) {
+                    quote.guestEmail = data.email;
+                    quote.shippingAddress().email = data.email;
+                    if (quote.billingAddress()) {
+                        quote.billingAddress().email = data.email;
+                    }
+                }
+
                 placeOrderAction({
                     'method': 'avarda_checkout3_checkout',
                     'additional_data': {'avarda': JSON.stringify(data)}
                 }).fail(function (response) {
                     self.cartLocked(false);
-                    var error;
+                    let error;
                     try {
-                        error = JSON.parse(response.responseText).message;
+                        let result = JSON.parse(response.responseText);
+                        error = result.message;
+                        $.each(result.parameters, function(key, val){
+                            error = error.replace('%' + key, val);
+                        });
                     } catch (exception) {
                         error = $.mage.__('Something went wrong with your request. Please try again later.')
                     }
