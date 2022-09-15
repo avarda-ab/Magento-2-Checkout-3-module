@@ -20,6 +20,8 @@ define([
     'Magento_Checkout/js/model/full-screen-loader',
     'Magento_Checkout/js/model/shipping-service',
     'Magento_Customer/js/customer-data',
+    'Magento_Checkout/js/action/place-order',
+    'Magento_Checkout/js/model/checkout-data-resolver',
     'mage/translate'
 ], function (
     $,
@@ -38,7 +40,9 @@ define([
     customer,
     fullScreenLoader,
     shippingService,
-    customerData
+    customerData,
+    placeOrderAction,
+    checkoutDataResolver
 ) {
     'use strict';
 
@@ -66,6 +70,9 @@ define([
             }
 
             let initial = shippingService.isLoading.subscribe(function() {
+                checkoutDataResolver.resolveBillingAddress();
+                checkoutDataResolver.resolveShippingAddress();
+
                 if (!quote.isVirtual() && self.getShowPostcode()) {
                     $("#checkout-step-shipping_method").hide();
                     $("#checkout-step-iframe").hide();
@@ -98,7 +105,7 @@ define([
                 }
 
                 if (!self.getShowPostcode()) {
-                    // If no shipping method is selected select the first one
+                    // If no shipping method is selected, select the first one
                     if (!quote.shippingMethod()) {
                         let rates = shippingService.getShippingRates()();
                         if (rates.length > 0) {
@@ -133,6 +140,11 @@ define([
         getShowPostcode: function ()
         {
             return !!options.showPostcode;
+        },
+
+        getSubscribeAddressChangeCallback: function ()
+        {
+            return !!options.addressChangeCallback;
         },
 
         getPostCodeTitle: function ()
@@ -237,6 +249,7 @@ define([
          */
         beforeCompleteHook: function (data, avardaCheckoutInstance) {
             let self = this;
+
             // if cart is locked don't try to lock it again
             if (self.cartLocked()) {
                 avardaCheckoutInstance.beforeSubmitContinue();
@@ -245,27 +258,54 @@ define([
                     fullScreenLoader.stopLoader();
                 }, 1000);
             } else if (quote.shippingMethod() || quote.isVirtual()) {
-                let serviceUrl = '';
-                if (customer.isLoggedIn()) {
-                    serviceUrl = urlBuilder.createUrl('/carts/mine/avarda3-payment', {});
-                } else {
-                    serviceUrl = urlBuilder.createUrl('/guest-carts/:cartId/avarda3-payment', {
-                        cartId: quote.getQuoteId()
-                    });
+                self.cartLocked(true);
+
+                // if postcode not showing then email is not set yet
+                if (!self.getShowPostcode()) {
+                    quote.guestEmail = data.email;
+                    quote.shippingAddress().email = data.email;
+                    if (quote.billingAddress()) {
+                        quote.billingAddress().email = data.email;
+                    }
                 }
-                fullScreenLoader.startLoader();
-                storage.post(
-                    serviceUrl, []
-                ).done(function () {
-                    self.cartLocked(true);
+
+                placeOrderAction({
+                    'method': 'avarda_checkout3_checkout',
+                    'additional_data': {'avarda': JSON.stringify(data)}
+                }).fail(function (response) {
+                    self.cartLocked(false);
+                    let error;
+                    try {
+                        let result = JSON.parse(response.responseText);
+                        error = result.message;
+                        $.each(result.parameters, function(key, val){
+                            error = error.replace('%' + key, val);
+                        });
+                    } catch (exception) {
+                        error = $.mage.__('Something went wrong with your request. Please try again later.')
+                    }
+                    $('<div class="messages"><div class="message error"><div>' +
+                        error +
+                        '</div></div></div>')
+                        .modal({
+                            title: $.mage.__('Something went wrong with your request.'),
+                            buttons: [{
+                                text: 'OK',
+                                class: 'action primary',
+                                click: function () {
+                                    this.closeModal();
+                                }
+                            }]
+                        }).modal('openModal');
+                    avardaCheckoutInstance.beforeSubmitAbort();
+                    fullScreenLoader.stopLoader();
+                }).done(function () {
+                    fullScreenLoader.startLoader();
                     avardaCheckoutInstance.beforeSubmitContinue();
                     setTimeout(function() {
                         // Remove loader, if avarda validation fails user will not be forwarded
                         fullScreenLoader.stopLoader();
                     }, 1000);
-                }).fail(function (response) {
-                    avardaCheckoutInstance.beforeSubmitAbort();
-                    fullScreenLoader.stopLoader();
                 });
             } else {
                 avardaCheckoutInstance.beforeSubmitAbort();
@@ -329,9 +369,11 @@ define([
                     options.purchaseId = response.purchase_data[0];
                     options.purchaseJwt = response.purchase_data[1];
                     options.redirectUrl = options.redirectUrlBase + response.purchase_data[0];
-                    options.deliveryAddressChangedCallback = function(data, avardaCheckoutInstance) {
-                        self.updateShippingAddressHook(data, avardaCheckoutInstance);
-                    };
+                    if (self.getSubscribeAddressChangeCallback()) {
+                        options.deliveryAddressChangedCallback = function (data, avardaCheckoutInstance) {
+                            self.updateShippingAddressHook(data, avardaCheckoutInstance);
+                        };
+                    }
                     options.beforeSubmitCallback = function(data, avardaCheckoutInstance) {
                         self.beforeCompleteHook(data, avardaCheckoutInstance);
                     };

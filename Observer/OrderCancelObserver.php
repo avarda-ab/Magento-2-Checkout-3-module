@@ -5,6 +5,7 @@
  */
 namespace Avarda\Checkout3\Observer;
 
+use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
 use Magento\Framework\Event\Observer;
@@ -28,16 +29,21 @@ class OrderCancelObserver implements ObserverInterface
     /** @var PaymentDataObjectFactoryInterface */
     protected $paymentDataObjectFactory;
 
+    /** @var AvardaOrderRepositoryInterface */
+    protected $avardaOrderRepository;
+
     public function __construct(
         PaymentData $paymentDataHelper,
         PurchaseState $purchaseState,
         CommandPoolInterface $commandPool,
-        PaymentDataObjectFactoryInterface $paymentDataObjectFactory
+        PaymentDataObjectFactoryInterface $paymentDataObjectFactory,
+        AvardaOrderRepositoryInterface $avardaOrderRepository
     ) {
         $this->paymentDataHelper = $paymentDataHelper;
         $this->purchaseState = $purchaseState;
         $this->paymentDataObjectFactory = $paymentDataObjectFactory;
         $this->commandPool = $commandPool;
+        $this->avardaOrderRepository = $avardaOrderRepository;
     }
 
     public function execute(Observer $observer)
@@ -53,13 +59,21 @@ class OrderCancelObserver implements ObserverInterface
             if ($this->purchaseState->isComplete($state)) {
 
                 /** @var InfoInterface|null $payment */
-                if ($payment !== null && $payment instanceof InfoInterface) {
+                if ($payment instanceof InfoInterface) {
                     $arguments['payment'] = $this->paymentDataObjectFactory
                         ->create($payment);
                 }
 
                 $arguments['amount'] = $payment->getAmountOrdered();
                 $this->commandPool->get('avarda_cancel')->execute($arguments);
+            } else {
+                // If pending payment was canceled delete the order complete row
+                try {
+                    $avardaOrder = $this->avardaOrderRepository->getByOrderId($order->getId());
+                    $this->avardaOrderRepository->delete($avardaOrder);
+                } catch (\Exception $e) {
+                    // Do nothing
+                }
             }
         }
     }

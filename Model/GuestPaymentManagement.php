@@ -9,6 +9,9 @@ use Avarda\Checkout3\Api\Data\PaymentDetailsInterface;
 use Avarda\Checkout3\Api\Data\PaymentDetailsInterfaceFactory;
 use Avarda\Checkout3\Api\GuestPaymentManagementInterface;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
+use Magento\Framework\Exception\PaymentException;
+use Magento\Quote\Model\QuoteIdMask;
+use Magento\Quote\Model\QuoteIdMaskFactory;
 
 /**
  * GuestPaymentManagement
@@ -26,14 +29,14 @@ class GuestPaymentManagement implements GuestPaymentManagementInterface
     /**
      * A common interface to execute Webapi actions.
      *
-     * @var \Avarda\Checkout3\Api\QuotePaymentManagementInterface
+     * @var QuotePaymentManagementInterface
      */
     protected $quotePaymentManagement;
 
     /**
      * Required to get the real quote ID from masked quote ID.
      *
-     * @var \Magento\Quote\Model\QuoteIdMaskFactory
+     * @var QuoteIdMaskFactory
      */
     protected $quoteIdMaskFactory;
 
@@ -42,12 +45,12 @@ class GuestPaymentManagement implements GuestPaymentManagementInterface
      *
      * @param PaymentDetailsInterfaceFactory $paymentDetailsFactory
      * @param QuotePaymentManagementInterface $quotePaymentManagement
-     * @param \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory
+     * @param QuoteIdMaskFactory $quoteIdMaskFactory
      */
     public function __construct(
         PaymentDetailsInterfaceFactory $paymentDetailsFactory,
         QuotePaymentManagementInterface $quotePaymentManagement,
-        \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory
+        QuoteIdMaskFactory $quoteIdMaskFactory
     ) {
         $this->paymentDetailsFactory = $paymentDetailsFactory;
         $this->quotePaymentManagement = $quotePaymentManagement;
@@ -64,7 +67,6 @@ class GuestPaymentManagement implements GuestPaymentManagementInterface
             $renew
         );
 
-        /** @var PaymentDetailsInterface $paymentDetails */
         $paymentDetails = $this->paymentDetailsFactory->create();
         $paymentDetails->setPurchaseData($purchaseData);
         return $paymentDetails;
@@ -95,16 +97,16 @@ class GuestPaymentManagement implements GuestPaymentManagementInterface
      *
      * @param string $cartId
      * @return int
+     * @throws PaymentException
      */
     protected function getQuoteId($cartId)
     {
-        /** @var \Magento\Quote\Model\QuoteIdMask $quoteIdMask */
         $quoteIdMask = $this->quoteIdMaskFactory->create()
             ->load($cartId, 'masked_id');
 
         $quoteId = $quoteIdMask->getData('quote_id');
         if ($quoteId === null) {
-            throw new \Magento\Framework\Exception\PaymentException(
+            throw new PaymentException(
                 __('Could not find quote with given ID.')
             );
         }

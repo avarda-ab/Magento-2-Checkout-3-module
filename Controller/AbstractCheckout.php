@@ -49,10 +49,7 @@ abstract class AbstractCheckout extends Action
     {
         return (
             (bool) $this->_request->getParam('callback', false) === true ||
-            $this->_request->getParam(
-                'PaymentStatus',
-                self::CALLBACK_FAILURE
-            ) === self::CALLBACK_SUCCESS
+            $this->_request->getParam('PaymentStatus', self::CALLBACK_FAILURE) === self::CALLBACK_SUCCESS
         );
     }
 

@@ -5,6 +5,7 @@
  */
 namespace Avarda\Checkout3\Controller\Checkout;
 
+use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Controller\AbstractCheckout;
 use Avarda\Checkout3\Gateway\Config\Config;
@@ -17,6 +18,7 @@ use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\PaymentException;
 use Magento\Framework\View\Result\PageFactory;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
 class Process extends AbstractCheckout
@@ -30,18 +32,28 @@ class Process extends AbstractCheckout
     /** @var PaymentData */
     protected $paymentData;
 
+    /** @var OrderRepositoryInterface */
+    protected $orderRepository;
+
+    /** @var AvardaOrderRepositoryInterface */
+    protected $avardaOrderRepository;
+
     public function __construct(
         Context $context,
         LoggerInterface $logger,
         Config $config,
         PageFactory $resultPageFactory,
         QuotePaymentManagementInterface $quotePaymentManagement,
-        PaymentData $paymentData
+        PaymentData $paymentData,
+        OrderRepositoryInterface $orderRepository,
+        AvardaOrderRepositoryInterface $avardaOrderRepository
     ) {
         parent::__construct($context, $logger, $config);
         $this->resultPageFactory = $resultPageFactory;
         $this->quotePaymentManagement = $quotePaymentManagement;
         $this->paymentData = $paymentData;
+        $this->orderRepository = $orderRepository;
+        $this->avardaOrderRepository = $avardaOrderRepository;
     }
 
     /**
@@ -49,7 +61,7 @@ class Process extends AbstractCheckout
      */
     public function execute()
     {
-        // Show no route if Avarda is inactive and notify webmaster in logs.
+        // Show no route if Avarda is inactive
         if (!$this->isCallback() && !$this->config->isActive()) {
             return $this->noroute('/checkout/avarda3/process');
         }
@@ -64,21 +76,11 @@ class Process extends AbstractCheckout
             }
 
             $quoteId = $this->quotePaymentManagement->getQuoteIdByPurchaseId($purchaseId);
-            $quote = $this->quotePaymentManagement->getQuote($quoteId);
             $this->quotePaymentManagement->updatePaymentStatus($quoteId);
-
-            if ($this->paymentData->getState($quote->getPayment()) != PurchaseState::COMPLETED) {
-                // If payment was not complete set cart back active
-                $this->quotePaymentManagement->setQuoteIsActive($quoteId, true);
-            }
-
             return $this->resultPageFactory->create();
-
-        } catch (PaymentException $e) {
-            $message = $e->getMessage();
         } catch (Exception $e) {
             $this->logger->error($e);
-            $message = __('Failed to save Avarda order. Please try again later.');
+            $message = $e->getMessage();
         }
 
         $this->messageManager->addErrorMessage($message);

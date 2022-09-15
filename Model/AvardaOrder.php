@@ -37,4 +37,27 @@ class AvardaOrder extends AbstractModel implements AvardaOrderInterface
 
         return $this;
     }
+
+    /**
+     * Order id
+     *
+     * @return string
+     */
+    public function getOrderId()
+    {
+        return $this->getData(self::ORDER_ID);
+    }
+
+    /**
+     * Set order id
+     *
+     * @param string $orderId
+     * @return $this
+     */
+    public function setOrderId(string $orderId)
+    {
+        $this->setData(self::ORDER_ID, $orderId);
+
+        return $this;
+    }
 }

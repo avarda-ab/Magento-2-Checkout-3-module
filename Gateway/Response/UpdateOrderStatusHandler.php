@@ -9,23 +9,16 @@ use Avarda\Checkout3\Helper\AvardaCheckBoxTypeValues;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PaymentMethod;
 use Magento\Newsletter\Model\SubscriberFactory;
-use Magento\Newsletter\Model\SubscriptionManagerInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
-use Magento\Quote\Api\CartRepositoryInterface;
-use Magento\Quote\Api\Data\AddressInterfaceFactory;
-use Magento\Quote\Model\Quote\PaymentFactory;
+use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
 
-class GetPaymentStatusHandler implements HandlerInterface
+class UpdateOrderStatusHandler implements HandlerInterface
 {
-    /** @var CartRepositoryInterface */
-    protected $quoteRepository;
-
-    /** @var AddressInterfaceFactory */
-    protected $addressFactory;
-
-    /** @var PaymentFactory */
-    protected $paymentFactory;
+    /** @var OrderRepositoryInterface */
+    protected $orderRepository;
 
     /** @var PaymentMethod */
     protected $methodHelper;
@@ -34,15 +27,11 @@ class GetPaymentStatusHandler implements HandlerInterface
     protected $subscriberFactory;
 
     public function __construct(
-        CartRepositoryInterface $quoteRepository,
-        AddressInterfaceFactory $addressFactory,
+        OrderRepositoryInterface $orderRepository,
         PaymentMethod $paymentMethod,
-        PaymentFactory $paymentFactory,
         SubscriberFactory $subscriberFactory
     ) {
-        $this->quoteRepository = $quoteRepository;
-        $this->addressFactory = $addressFactory;
-        $this->paymentFactory = $paymentFactory;
+        $this->orderRepository = $orderRepository;
         $this->methodHelper = $paymentMethod;
         $this->subscriberFactory = $subscriberFactory;
     }
@@ -55,21 +44,21 @@ class GetPaymentStatusHandler implements HandlerInterface
         $order = $paymentDO->getOrder();
 
         $entityId = $order->getId();
-        $quote = $this->quoteRepository->get($entityId);
-
+        /** @var Order|OrderInterface $order */
+        $order = $this->orderRepository->get($entityId);
         $mode = $response['mode'] == 'B2B' ? 'b2B' : 'b2C';
 
+        // Initially phone number is set as dummy so update it to correct one
         $telephone = $response[$mode]['userInputs']['phone'];
         $email = $response[$mode]['userInputs']['email'];
-        $quote->setCustomerEmail($email);
-
-        $billingAddress = $this->addressFactory->create();
+        $billingAddress = $order->getBillingAddress();
         $billingAddress->setTelephone($telephone);
         $billingAddress->setEmail($email);
         if ($mode == 'b2C') {
             $billingAddress->setFirstname($response[$mode]['invoicingAddress']['firstName']);
             $billingAddress->setLastname($response[$mode]['invoicingAddress']['lastName']);
         } else {
+            // B2B customer set Company name to name fields
             $billingAddress->setFirstname($response[$mode]['invoicingAddress']['name']);
             $billingAddress->setLastname($response[$mode]['invoicingAddress']['name']);
         }
@@ -81,10 +70,9 @@ class GetPaymentStatusHandler implements HandlerInterface
         $billingAddress->setPostcode($response[$mode]['invoicingAddress']['zip']);
         $billingAddress->setCity($response[$mode]['invoicingAddress']['city']);
         $billingAddress->setCountryId($response[$mode]['invoicingAddress']['country']);
-        $quote->setBillingAddress($billingAddress);
 
         if ($response[$mode]['deliveryAddress']['firstName']) {
-            $shippingAddress = $this->addressFactory->create();
+            $shippingAddress = $order->getShippingAddress();
             $shippingAddress->setTelephone($telephone);
             $shippingAddress->setEmail($email);
             $shippingAddress->setFirstname($response[$mode]['deliveryAddress']['firstName']);
@@ -97,15 +85,22 @@ class GetPaymentStatusHandler implements HandlerInterface
             $shippingAddress->setPostcode($response[$mode]['deliveryAddress']['zip'] ?? $response[$mode]['invoicingAddress']['zip']);
             $shippingAddress->setCity($response[$mode]['deliveryAddress']['city'] ?? $response[$mode]['invoicingAddress']['city']);
             $shippingAddress->setCountryId($response[$mode]['deliveryAddress']['country'] ?? $response[$mode]['invoicingAddress']['country']);
-            $quote->setShippingAddress($shippingAddress);
         } else {
-            $quote->setShippingAddress($billingAddress);
+            $shippingAddress = $order->getShippingAddress();
+            $shippingAddress->setTelephone($telephone);
+            $shippingAddress->setEmail($email);
+            $shippingAddress->setFirstname($billingAddress->getFirstname());
+            $shippingAddress->setLastname($billingAddress->getLastname());
+            $shippingAddress->setCity($billingAddress->getCity());
+            $shippingAddress->setPostcode($billingAddress->getPostcode());
+            $shippingAddress->setStreet($billingAddress->getStreet());
+            $shippingAddress->setCountryId($billingAddress->getCountryId());
         }
 
         // Set payment method
         if (isset($response['paymentMethods']['selectedPayment']['type'])) {
             $paymentMethod = $this->methodHelper->getPaymentMethod($response['paymentMethods']['selectedPayment']['type']);
-            $quote->getPayment()->setMethod($paymentMethod);
+            $order->getPayment()->setMethod($paymentMethod);
         }
 
         if ($response[$mode]['step']['emailNewsletterSubscription'] == AvardaCheckBoxTypeValues::VALUE_CHECKED) {
@@ -114,7 +109,7 @@ class GetPaymentStatusHandler implements HandlerInterface
         }
 
         // Set payment state
-        $quote->getPayment()->setAdditionalInformation(
+        $order->getPayment()->setAdditionalInformation(
             PaymentData::STATE,
             $response[$mode]['step']['current']
         );

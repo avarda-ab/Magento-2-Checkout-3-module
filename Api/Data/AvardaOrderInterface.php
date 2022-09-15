@@ -9,6 +9,7 @@ interface AvardaOrderInterface
 {
     const ENTITY_ID = 'entity_id';
     const PURCHASE_ID = 'purchase_id';
+    const ORDER_ID = 'order_id';
 
     /**
      * Queue id
@@ -39,4 +40,12 @@ interface AvardaOrderInterface
      * @return $this
      */
     public function setPurchaseId(string $purchaseId);
+
+    /**
+     * Set order id
+     *
+     * @param string $orderId
+     * @return $this
+     */
+    public function setOrderId(string $orderId);
 }

@@ -7,27 +7,33 @@ namespace Avarda\Checkout3\Gateway\Request;
 
 use Avarda\Checkout3\Gateway\Config\Config;
 use Magento\Payment\Gateway\Data\OrderAdapterInterface;
+use Magento\Payment\Gateway\Data\Quote\QuoteAdapter;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
+use Magento\Quote\Api\Data\CartInterfaceFactory;
 
 /**
  * Class OrderReferenceDataBuilder
  */
 class AdditionalDataBuilder implements BuilderInterface
 {
-
     /**
      * These data for GatewayClient to build the url correctly
      */
     const ADDITIONAL = 'additional';
 
     /** @var Config  */
-    private Config $config;
+    private $config;
+
+    /** @var CartInterfaceFactory */
+    private $cartInterfaceFactory;
 
     public function __construct(
-        Config $config
+        Config $config,
+        CartInterfaceFactory $cartInterfaceFactory
     ) {
         $this->config = $config;
+        $this->cartInterfaceFactory = $cartInterfaceFactory;
     }
 
     /**
@@ -50,11 +56,32 @@ class AdditionalDataBuilder implements BuilderInterface
 
     public function getUseAlternative(OrderAdapterInterface $order)
     {
-        $productTypes = explode(',', $this->config->getAlternativeProductTypes() ?: "");
+        $productTypes = array_filter(explode(',', $this->config->getAlternativeProductTypes() ?: ""));
+        if (!$productTypes) {
+            return false;
+        }
 
-        foreach ($order->getItems() as $item) {
+        $items = $order->getItems();
+        if (!$items && $order instanceof QuoteAdapter) {
+            // If cart is not active cart items will not loaded,
+            // but cartRepository->get calls are cached without items loaded so that doesn't help either and
+            // $order is an adapter, so it doesn't have getItemsCollection method
+            // thus we load the quote with model so that we get the items loaded properly
+            $quote = $this->cartInterfaceFactory->create()->loadByIdWithoutStore($order->getId());
+            $items = $quote->getItemsCollection()->getItems();
+        }
+
+        foreach ($items as $item) {
             if (in_array($item->getProductType(), $productTypes)) {
                 return true;
+            }
+
+            if ($item->hasChildren()) {
+                foreach ($item->getChildren() as $childItem) {
+                    if (in_array($childItem->getProductType(), $productTypes)) {
+                        return true;
+                    }
+                }
             }
         }
 

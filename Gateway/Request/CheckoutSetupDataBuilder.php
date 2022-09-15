@@ -8,6 +8,7 @@ namespace Avarda\Checkout3\Gateway\Request;
 use Avarda\Checkout3\Gateway\Config\Config;
 use Avarda\Checkout3\Helper\AvardaCheckBoxTypeValues;
 use Magento\Framework\Locale\Resolver;
+use Magento\Payment\Gateway\Data\AddressAdapterInterface;
 use Magento\Payment\Gateway\Data\OrderAdapterInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
@@ -90,9 +91,15 @@ class CheckoutSetupDataBuilder implements BuilderInterface
                 break;
             }
         }
-        $isVirtual = $countItems == 0 ? false : $isVirtual;
+        $isVirtual = !($countItems == 0) && $isVirtual;
 
-        return $isVirtual ? 'Hidden' : 'Unchecked';
+        if ($isVirtual) {
+            return AvardaCheckBoxTypeValues::VALUE_HIDDEN;
+        } else if ($this->isAddressDifferent($order->getBillingAddress(), $order->getShippingAddress())) {
+            return AvardaCheckBoxTypeValues::VALUE_CHECKED;
+        } else {
+            return AvardaCheckBoxTypeValues::VALUE_UNCHECKED;
+        }
     }
 
     protected function getNewsletterSubscription(): string
@@ -105,6 +112,28 @@ class CheckoutSetupDataBuilder implements BuilderInterface
             }
         } else {
             return AvardaCheckBoxTypeValues::VALUE_HIDDEN;
+        }
+    }
+
+    /**
+     * @param $address1 AddressAdapterInterface
+     * @param $address2 AddressAdapterInterface
+     * @return bool
+     */
+    protected function isAddressDifferent($address1, $address2): bool
+    {
+        if (
+            $address1->getFirstname() != $address2->getFirstname() ||
+            $address1->getLastname() != $address2->getLastname() ||
+            $address1->getStreetLine1() != $address2->getStreetLine1() ||
+            $address1->getStreetLine2() != $address2->getStreetLine2() ||
+            $address1->getCity() != $address2->getCity() ||
+            $address1->getPostcode() != $address2->getPostcode() ||
+            $address1->getCountryId() != $address2->getCountryId()
+        ) {
+            return true;
+        } else {
+            return false;
         }
     }
 }

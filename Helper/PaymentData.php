@@ -8,6 +8,7 @@ namespace Avarda\Checkout3\Helper;
 use Avarda\Checkout3\Api\Data\PaymentDetailsInterface;
 use Magento\Payment\Model\InfoInterface;
 use Magento\Payment\Model\Method\Free;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
 
 /**
  * Class PaymentData
@@ -66,7 +67,7 @@ class PaymentData
     /**
      * Check if payment is an Avarda Checkout3, simply by searching for the purchase and payment method
      *
-     * @param InfoInterface $payment
+     * @param InfoInterface|OrderPaymentInterface $payment
      * @return bool
      */
     public function isAvardaPayment(InfoInterface $payment)

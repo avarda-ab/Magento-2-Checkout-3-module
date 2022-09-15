@@ -64,7 +64,7 @@
         </data>
     </route>
 
-    <!-- Avarda serverside ordercomplete callback -->
+    <!-- Avarda serverside order complete callback -->
     <route url="/V1/avarda3/orderComplete" method="POST">
         <service class="Avarda\Checkout3\Api\PaymentCompleteInterface" method="execute"/>
         <resources>

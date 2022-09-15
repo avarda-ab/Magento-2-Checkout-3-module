@@ -10,10 +10,9 @@ use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
 use Avarda\Checkout3\Api\PaymentCompleteInterface;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use \Magento\Framework\App\RequestInterface;
-use Magento\Framework\Controller\Result\RedirectFactory;
-use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\PaymentException;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
 class PaymentComplete implements PaymentCompleteInterface
@@ -24,8 +23,8 @@ class PaymentComplete implements PaymentCompleteInterface
     /** @var RequestInterface */
     protected $avardaOrderRepository;
 
-    /** @var RedirectFactory */
-    protected $redirectFactory;
+    /** @var OrderRepositoryInterface */
+    protected $orderRepository;
 
     /** @var LoggerInterface */
     protected $logger;
@@ -33,12 +32,12 @@ class PaymentComplete implements PaymentCompleteInterface
     public function __construct(
         QuotePaymentManagementInterface $quotePaymentManagement,
         AvardaOrderRepositoryInterface $avardaOrderRepository,
-        RedirectFactory $redirectFactory,
+        OrderRepositoryInterface $orderRepository,
         LoggerInterface $logger
     ) {
         $this->quotePaymentManagement = $quotePaymentManagement;
         $this->avardaOrderRepository = $avardaOrderRepository;
-        $this->redirectFactory = $redirectFactory;
+        $this->orderRepository = $orderRepository;
         $this->logger = $logger;
     }
 
@@ -49,16 +48,16 @@ class PaymentComplete implements PaymentCompleteInterface
     {
         try {
             try {
-                $this->quotePaymentManagement->getQuoteIdByPurchaseId($purchaseId);
-                try {
-                    $this->avardaOrderRepository->save($purchaseId);
-                } catch (AlreadyExistsException $alreadyExistsException) {
-                    return "Order already saved";
+                $orderId = $this->avardaOrderRepository->getByPurchaseId($purchaseId);
+                // No order found
+                if (!$orderId->getOrderId()) {
+                    $this->logger->warning("No order found with '{$purchaseId}'");
+                    return "";
                 }
 
-                $quoteId = $this->quotePaymentManagement->getQuoteIdByPurchaseId($purchaseId);
-                $this->quotePaymentManagement->updatePaymentStatus($quoteId);
-                $this->quotePaymentManagement->placeOrder($quoteId);
+                $order = $this->orderRepository->get($orderId->getOrderId());
+                $this->quotePaymentManagement->updateOrderPaymentStatus($order);
+                $this->quotePaymentManagement->finalizeOrder($order);
 
                 return "OK";
             } catch (PaymentException $e) {

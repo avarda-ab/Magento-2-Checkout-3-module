@@ -204,6 +204,14 @@ class Checkout extends Template
     /**
      * @return bool
      */
+    public function getAdressChangeCallback()
+    {
+        return $this->config->getAdressChangeCallback();
+    }
+
+    /**
+     * @return bool
+     */
     public function getOfferLogin()
     {
         return $this->config->getOfferLogin();

@@ -77,7 +77,6 @@ class PaymentQueueRepository implements PaymentQueueRepositoryInterface
      */
     public function getById($queueId)
     {
-        /** @var PaymentQueueInterface $paymentQueueModel */
         $paymentQueueModel = $this->paymentQueueFactory->create()->load($queueId);
         if (!$paymentQueueModel->getId()) {
             // payment queue does not exist
