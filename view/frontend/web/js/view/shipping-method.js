@@ -72,6 +72,8 @@ define([
             let initial = shippingService.isLoading.subscribe(function() {
                 checkoutDataResolver.resolveBillingAddress();
                 checkoutDataResolver.resolveShippingAddress();
+                // resolvers for some reason disables the form fields so enable them back
+                $('#email, #postal_code, #login-email, #login-password, #customer-email').attr('disabled', false);
 
                 if (!quote.isVirtual() && self.getShowPostcode()) {
                     $("#checkout-step-shipping_method").hide();
@@ -79,6 +81,7 @@ define([
                     if (customer.isLoggedIn()) {
                         self.email(customer.customerData.email);
                         self.postalCode(quote.shippingAddress().postcode);
+                        self.postCodeNext()
                     } else {
                         self.email(quote.guestEmail || quote.shippingAddress().email);
                         self.postalCode(quote.shippingAddress().postcode);
