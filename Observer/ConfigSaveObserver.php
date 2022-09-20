@@ -5,6 +5,9 @@
  */
 namespace Avarda\Checkout3\Observer;
 
+use Avarda\Checkout3\Helper\PaymentMethod;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\FlagManager;
@@ -18,12 +21,22 @@ class ConfigSaveObserver implements ObserverInterface
     /** @var StoreManagerInterface */
     protected $storeManager;
 
+    /** @var WriterInterface */
+    protected $configWriter;
+
+    /** @var ScopeConfigInterface */
+    protected $config;
+
     public function __construct(
         FlagManager $flagManager,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        WriterInterface $configWriter,
+        ScopeConfigInterface $config
     ) {
         $this->flagManager = $flagManager;
         $this->storeManager = $storeManager;
+        $this->configWriter = $configWriter;
+        $this->config = $config;
     }
 
     public function execute(Observer $observer)
@@ -50,6 +63,12 @@ class ConfigSaveObserver implements ObserverInterface
                 $this->flagManager->deleteFlag('avarda_checkout3_token_valid_' . $store->getId());
                 $this->flagManager->deleteFlag('avarda_checkout3_api_token_alt' . $store->getId());
                 $this->flagManager->deleteFlag('avarda_checkout3_token_valid_alt_' . $store->getId());
+            }
+        }
+        if (in_array('payment/avarda_checkout3_checkout/order_status', $paths)) {
+            $value = $this->config->getValue('payment/avarda_checkout3_checkout/order_status');
+            foreach (PaymentMethod::$codes as $code) {
+                $this->configWriter->save("payment/{$code}/order_status", $value);
             }
         }
     }

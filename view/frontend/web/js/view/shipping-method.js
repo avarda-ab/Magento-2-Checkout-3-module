@@ -73,7 +73,7 @@ define([
                 checkoutDataResolver.resolveBillingAddress();
                 checkoutDataResolver.resolveShippingAddress();
                 // resolvers for some reason disables the form fields so enable them back
-                $('#email, #postal_code').attr('disabled', false);
+                $('#email, #postal_code, #login-email, #login-password, #customer-email').attr('disabled', false);
 
                 if (!quote.isVirtual() && self.getShowPostcode()) {
                     $("#checkout-step-shipping_method").hide();
