@@ -21,7 +21,7 @@
                             mageInit: {'mage/trim-input':{}}"
                        name="username"
                        data-validate="{required:true, 'validate-email':true}"
-                       id="customer-email" />
+                       id="customer-email">
             </div>
         </div>
 
@@ -53,7 +53,7 @@
                            type="password"
                            name="password"
                            id="customer-password"
-                           data-validate="{required:true}" autocomplete="off"/>
+                           data-validate="{required:true}" autocomplete="off">
                 </div>
 
             </div>
@@ -61,7 +61,7 @@
                 <!-- ko template: getTemplate() --><!-- /ko -->
             <!-- /ko -->
             <div class="actions-toolbar">
-                <input name="context" type="hidden" value="checkout" />
+                <input name="context" type="hidden" value="checkout">
                 <div class="primary">
                     <button type="submit" class="action login" data-action="checkout-method-login"><span data-bind="i18n: 'Login'"></span></button>
                 </div>
