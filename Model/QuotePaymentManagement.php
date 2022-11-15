@@ -25,8 +25,11 @@ use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
+use Magento\Sales\Model\OrderFactory;
 use Magento\Sales\Model\ResourceModel\Order\Status\CollectionFactory;
+use Magento\Sales\Model\Spi\OrderResourceInterface;
 
 /**
  * QuotePaymentManagement
@@ -125,6 +128,12 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     /** @var CollectionFactory */
     protected $statusCollectionFactory;
 
+    /** @var OrderResourceInterface */
+    protected $orderResource;
+
+    /** @var OrderFactory */
+    protected $orderFactory;
+
     public function __construct(
         ItemManagementInterface $itemManagement,
         ItemStorageInterface $itemStorage,
@@ -138,7 +147,9 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         CartManagementInterface $cartManagement,
         OrderSender $orderSender,
         OrderRepositoryInterface $orderRepository,
-        CollectionFactory $statusCollectionFactory
+        CollectionFactory $statusCollectionFactory,
+        OrderResourceInterface $orderResource,
+        OrderFactory $orderFactory
     ) {
         $this->itemManagement = $itemManagement;
         $this->itemStorage = $itemStorage;
@@ -153,6 +164,8 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         $this->orderSender = $orderSender;
         $this->orderRepository = $orderRepository;
         $this->statusCollectionFactory = $statusCollectionFactory;
+        $this->orderResource = $orderResource;
+        $this->orderFactory = $orderFactory;
     }
 
     /**
@@ -296,7 +309,11 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param $order OrderInterface|Order
+     * @return void
+     * @throws PaymentException
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function finalizeOrder($order)
     {
@@ -326,7 +343,10 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
             $this->orderRepository->save($order);
         }
 
-        if (!$order->getEmailSent()) {
+        // Reload order object from db to avoid sending duplicate email
+        $orderResource = $this->orderFactory->create();
+        $this->orderResource->load($orderResource, $order->getId());
+        if (!$orderResource->getEmailSent()) {
             $this->orderSender->send($order);
         }
     }
