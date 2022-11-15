@@ -47,7 +47,7 @@ class PlaceOrderPlugin extends PlaceOrderPluginAbstract
         AddressInterface $billingAddress = null
     ) {
         if (isset($paymentMethod->getAdditionalData()['avarda'])) {
-            $additionalData = json_decode($paymentMethod->getAdditionalData()['avarda'], true);
+            $additionalData = json_decode($paymentMethod->getAdditionalData()['avarda'] ?? '', true);
             $quote = $this->cartRepository->getActive($cartId);
             $this->setShippingAddress($quote, $additionalData);
             if ($billingAddress) {

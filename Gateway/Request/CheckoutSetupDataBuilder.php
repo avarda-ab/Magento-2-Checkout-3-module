@@ -95,7 +95,7 @@ class CheckoutSetupDataBuilder implements BuilderInterface
 
         if ($isVirtual) {
             return AvardaCheckBoxTypeValues::VALUE_HIDDEN;
-        } else if ($this->isAddressDifferent($order->getBillingAddress(), $order->getShippingAddress())) {
+        } elseif ($this->isAddressDifferent($order->getBillingAddress(), $order->getShippingAddress())) {
             return AvardaCheckBoxTypeValues::VALUE_CHECKED;
         } else {
             return AvardaCheckBoxTypeValues::VALUE_UNCHECKED;

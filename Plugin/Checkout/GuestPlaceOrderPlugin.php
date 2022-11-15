@@ -60,7 +60,7 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
         AddressInterface $billingAddress = null
     ) {
         if (isset($paymentMethod->getAdditionalData()['avarda'])) {
-            $additionalData = json_decode($paymentMethod->getAdditionalData()['avarda'], true);
+            $additionalData = json_decode($paymentMethod->getAdditionalData()['avarda'] ?? '', true);
             $quoteIdMask = $this->quoteIdMaskFactory->create()->load($cartId, 'masked_id');
             $quote = $this->cartRepository->get($quoteIdMask->getQuoteId());
             $this->setShippingAddress($quote, $additionalData);
