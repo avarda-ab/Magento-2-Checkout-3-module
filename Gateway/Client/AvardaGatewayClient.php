@@ -70,7 +70,7 @@ class AvardaGatewayClient implements ClientInterface
                     );
             }
 
-            $result = is_array($result) ? $result : json_decode($result, true);
+            $result = is_array($result) ? $result : json_decode($result ?? '', true);
             $log['response'] = $result;
         } catch (\RuntimeException $e) {
             $this->logger->debug($log);

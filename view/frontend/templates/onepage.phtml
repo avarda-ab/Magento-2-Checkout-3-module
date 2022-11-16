@@ -46,12 +46,5 @@
         window.checkoutConfig.checkoutUrl = '<?= $block->getCheckoutUrl() ?>';
         window.isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
         window.customerData = window.checkoutConfig.customerData;
-        require([
-            'mage/url',
-            'Magento_Ui/js/block-loader'
-        ], function(url, blockLoader) {
-            blockLoader("<?= $block->escapeJs($block->escapeUrl($block->getViewFileUrl('images/loader-1.gif'))) ?>");
-            return url.setBaseUrl('<?= $block->escapeJs($block->escapeUrl($block->getBaseUrl())) ?>');
-        })
     </script>
 </div>

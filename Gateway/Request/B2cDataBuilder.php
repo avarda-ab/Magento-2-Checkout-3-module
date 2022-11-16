@@ -60,7 +60,7 @@ class B2cDataBuilder implements BuilderInterface
                 "invoicingAddress" => $this->getBillingAddress($order),
                 "deliveryAddress" => $this->getShippingAddress($order),
                 "userInputs" => [
-                    "phone" => $order->getBillingAddress()->getTelephone(),
+                    "phone" => $this->getTelephone($order->getBillingAddress()),
                     "email" => $order->getBillingAddress()->getEmail()
                 ]
             ]
@@ -78,7 +78,7 @@ class B2cDataBuilder implements BuilderInterface
             return [];
         }
 
-        return [
+        $addressData = [
             self::FIRST_NAME => $address->getFirstname(),
             self::LAST_NAME  => $address->getLastname(),
             self::STREET_1   => $address->getStreetLine1(),
@@ -87,6 +87,8 @@ class B2cDataBuilder implements BuilderInterface
             self::CITY       => $address->getCity(),
             self::COUNTRY    => $address->getCountryId() ?: $this->getDefaultCountry($order),
         ];
+
+        return $this->checkAddressData($addressData);
     }
 
     /**
@@ -101,7 +103,7 @@ class B2cDataBuilder implements BuilderInterface
             return $this->getBillingAddress($order);
         }
 
-        return [
+        $addressData = [
             self::FIRST_NAME => $address->getFirstname(),
             self::LAST_NAME  => $address->getLastname(),
             self::STREET_1   => $address->getStreetLine1(),
@@ -110,6 +112,8 @@ class B2cDataBuilder implements BuilderInterface
             self::CITY       => $address->getCity(),
             self::COUNTRY    => $address->getCountryId() ?: $this->getDefaultCountry($order),
         ];
+
+        return $this->checkAddressData($addressData);
     }
 
     protected function getCustomerToken()
@@ -140,5 +144,40 @@ class B2cDataBuilder implements BuilderInterface
             ScopeInterface::SCOPE_STORE,
             $order->getStoreId()
         );
+    }
+
+    /**
+     * If after saving the order for pending payment there is an error dummy number is saved to cart as well,
+     * but we don't want to do new initialization with dummy phone number
+     *
+     * @param $address
+     * @return string|void
+     */
+    protected function getTelephone($address)
+    {
+        if (in_array($address->getTelephone(), ['010123123', '+35810123123', '+358010123123'])) {
+            return '';
+        } else {
+            $address->getTelephone();
+        }
+    }
+
+    /**
+     * Check that address doesn't have masked data, which could be caused by same error why we check telephone
+     *
+     * @param array $addressData
+     * @return array
+     */
+    public function checkAddressData($addressData)
+    {
+        foreach ($addressData as $key => $value) {
+            // asterix is not allowed in any address field so if there is
+            // then user is recognized and address filled by avarda, and we should send empty address
+            if (strpos($addressData[$key] ?? '', '*') !== false) {
+                return [];
+            }
+        }
+
+        return $addressData;
     }
 }

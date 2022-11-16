@@ -5,6 +5,7 @@
  */
 namespace Avarda\Checkout3\Gateway\Config;
 
+use Avarda\Checkout3\Model\Ui\ConfigProviderBase;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\FlagManager;
@@ -65,7 +66,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         FlagManager $flagManager,
         Url $url,
         StoreManagerInterface $storeManager,
-        $methodCode = 'avarda_checkout3_checkout',
+        $methodCode = ConfigProviderBase::CODE,
         $pathPattern = self::DEFAULT_PATH_PATTERN
     ) {
         parent::__construct($scopeConfig, $methodCode, $pathPattern);

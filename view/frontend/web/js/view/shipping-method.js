@@ -72,8 +72,6 @@ define([
             let initial = shippingService.isLoading.subscribe(function() {
                 checkoutDataResolver.resolveBillingAddress();
                 checkoutDataResolver.resolveShippingAddress();
-                // resolvers for some reason disables the form fields so enable them back
-                $('#email, #postal_code, #login-email, #login-password, #customer-email').attr('disabled', false);
 
                 if (!quote.isVirtual() && self.getShowPostcode()) {
                     $("#checkout-step-shipping_method").hide();
@@ -281,11 +279,11 @@ define([
                     try {
                         let result = JSON.parse(response.responseText);
                         error = result.message;
-                        $.each(result.parameters, function(key, val){
+                        $.each(result.parameters, function(key, val) {
                             error = error.replace('%' + key, val);
                         });
                     } catch (exception) {
-                        error = $.mage.__('Something went wrong with your request. Please try again later.')
+                        error = $.mage.__('Something went wrong with your request. Please try again later.');
                     }
                     $('<div class="messages"><div class="message error"><div>' +
                         error +
