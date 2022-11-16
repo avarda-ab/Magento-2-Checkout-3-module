@@ -57,10 +57,14 @@ class UpdateOrderStatusHandler implements HandlerInterface
         if ($mode == 'b2C') {
             $billingAddress->setFirstname($response[$mode]['invoicingAddress']['firstName']);
             $billingAddress->setLastname($response[$mode]['invoicingAddress']['lastName']);
+            $order->setCustomerFirstname($response[$mode]['invoicingAddress']['firstName']);
+            $order->setCustomerLastname($response[$mode]['invoicingAddress']['lastName']);
         } else {
             // B2B customer set Company name to name fields
             $billingAddress->setFirstname($response[$mode]['invoicingAddress']['name']);
             $billingAddress->setLastname($response[$mode]['invoicingAddress']['name']);
+            $order->setCustomerFirstname($response[$mode]['invoicingAddress']['name']);
+            $order->setCustomerLastname($response[$mode]['invoicingAddress']['name']);
         }
         $street2 = $response[$mode]['invoicingAddress']['address2'];
         $billingAddress->setStreet(
