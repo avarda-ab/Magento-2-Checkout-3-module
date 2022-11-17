@@ -13,6 +13,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\PaymentInterface;
+use Magento\Quote\Model\Quote\AddressFactory;
 
 class PlaceOrderPlugin extends PlaceOrderPluginAbstract
 {
@@ -25,11 +26,12 @@ class PlaceOrderPlugin extends PlaceOrderPluginAbstract
     public function __construct(
         CartRepositoryInterface $cartRepository,
         AvardaOrderRepositoryInterface $avardaOrderRepository,
-        PaymentData $paymentDataHelper
+        PaymentData $paymentDataHelper,
+        AddressFactory $addressFactory
     ) {
         $this->cartRepository = $cartRepository;
         $this->paymentDataHelper = $paymentDataHelper;
-        parent::__construct($avardaOrderRepository);
+        parent::__construct($avardaOrderRepository, $addressFactory);
     }
 
     /**
@@ -37,7 +39,7 @@ class PlaceOrderPlugin extends PlaceOrderPluginAbstract
      * @param $cartId
      * @param PaymentInterface $paymentMethod
      * @param AddressInterface|null $billingAddress
-     * @return void
+     * @return void|array
      * @throws NoSuchEntityException
      */
     public function beforeSavePaymentInformationAndPlaceOrder(
@@ -50,9 +52,8 @@ class PlaceOrderPlugin extends PlaceOrderPluginAbstract
             $additionalData = json_decode($paymentMethod->getAdditionalData()['avarda'] ?? '', true);
             $quote = $this->cartRepository->getActive($cartId);
             $this->setShippingAddress($quote, $additionalData);
-            if ($billingAddress) {
-                $this->setBillingAddress($billingAddress, $additionalData);
-            }
+            $billingAddress = $this->setBillingAddress($billingAddress, $additionalData);
+            return [$cartId, $paymentMethod, $billingAddress];
         }
     }
 

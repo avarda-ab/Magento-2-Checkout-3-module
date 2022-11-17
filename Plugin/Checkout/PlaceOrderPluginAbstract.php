@@ -13,6 +13,7 @@ use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\Quote\AddressFactory;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 
@@ -21,10 +22,15 @@ abstract class PlaceOrderPluginAbstract
     /** @var AvardaOrderRepositoryInterface */
     protected $avardaOrderRepository;
 
+    /** @var AddressFactory */
+    protected $addressFactory;
+
     public function __construct(
-        AvardaOrderRepositoryInterface $avardaOrderRepository
+        AvardaOrderRepositoryInterface $avardaOrderRepository,
+        AddressFactory $addressFactory
     ) {
         $this->avardaOrderRepository = $avardaOrderRepository;
+        $this->addressFactory = $addressFactory;
     }
 
     /**
@@ -55,6 +61,9 @@ abstract class PlaceOrderPluginAbstract
      */
     public function setBillingAddress($billingAddress, $additionalData)
     {
+        if (!$billingAddress) {
+            $billingAddress = $this->addressFactory->create();
+        }
         $billingAddress->setFirstname($additionalData['invoicingAddress']['firstName']);
         $billingAddress->setLastname($additionalData['invoicingAddress']['lastName']);
         $billingAddress->setStreet([$additionalData['invoicingAddress']['address1'], $additionalData['invoicingAddress']['address2']]);
@@ -78,5 +87,18 @@ abstract class PlaceOrderPluginAbstract
     {
         $purchaseId = $order->getPayment()->getAdditionalInformation(PaymentDetailsInterface::PURCHASE_DATA)['purchaseId'];
         $this->avardaOrderRepository->save($purchaseId, $orderId);
+    }
+
+    /**
+     * @param string $email
+     * @param array $additionalData
+     * @return string
+     */
+    public function checkEmail($email, $additionalData)
+    {
+        if (!$email) {
+            $email = $additionalData['email'];
+        }
+        return $email;
     }
 }

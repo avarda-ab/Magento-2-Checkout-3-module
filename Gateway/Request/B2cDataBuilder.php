@@ -171,7 +171,7 @@ class B2cDataBuilder implements BuilderInterface
     public function checkAddressData($addressData)
     {
         foreach ($addressData as $key => $value) {
-            // asterix is not allowed in any address field so if there is
+            // Asterisk is not allowed in any address field so if there is
             // then user is recognized and address filled by avarda, and we should send empty address
             if (strpos($addressData[$key] ?? '', '*') !== false) {
                 return [];
