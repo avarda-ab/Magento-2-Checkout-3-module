@@ -13,6 +13,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\PaymentInterface;
+use Magento\Quote\Model\Quote\AddressFactory;
 use Magento\Quote\Model\QuoteIdMaskFactory;
 use Magento\Sales\Api\OrderRepositoryInterface;
 
@@ -35,13 +36,14 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
         QuoteIdMaskFactory $quoteIdMaskFactory,
         AvardaOrderRepositoryInterface $avardaOrderRepository,
         PaymentData $paymentDataHelper,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        AddressFactory $addressFactory
     ) {
         $this->cartRepository = $cartRepository;
         $this->quoteIdMaskFactory = $quoteIdMaskFactory;
         $this->paymentDataHelper = $paymentDataHelper;
         $this->orderRepository = $orderRepository;
-        parent::__construct($avardaOrderRepository);
+        parent::__construct($avardaOrderRepository, $addressFactory);
     }
 
     /**
@@ -64,9 +66,9 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
             $quoteIdMask = $this->quoteIdMaskFactory->create()->load($cartId, 'masked_id');
             $quote = $this->cartRepository->get($quoteIdMask->getQuoteId());
             $this->setShippingAddress($quote, $additionalData);
-            if ($billingAddress) {
-                $this->setBillingAddress($billingAddress, $additionalData);
-            }
+            $billingAddress = $this->setBillingAddress($billingAddress, $additionalData);
+            $email = $this->checkEmail($email, $additionalData);
+            return [$cartId, $email, $paymentMethod, $billingAddress];
         }
     }
 
