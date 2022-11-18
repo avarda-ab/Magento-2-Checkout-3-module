@@ -262,7 +262,7 @@ define([
                 self.cartLocked(true);
 
                 // if postcode not showing then email is not set yet
-                if (!self.getShowPostcode()) {
+                if (!self.getShowPostcode() || !quote.guestEmail || !quote.billingAddress().email) {
                     quote.guestEmail = data.email;
                     quote.shippingAddress().email = data.email;
                     if (quote.billingAddress()) {
