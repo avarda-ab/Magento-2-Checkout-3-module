@@ -75,30 +75,32 @@ class UpdateOrderStatusHandler implements HandlerInterface
         $billingAddress->setCity($response[$mode]['invoicingAddress']['city']);
         $billingAddress->setCountryId($response[$mode]['invoicingAddress']['country']);
 
-        if ($response[$mode]['deliveryAddress']['firstName']) {
-            $shippingAddress = $order->getShippingAddress();
-            $shippingAddress->setTelephone($telephone);
-            $shippingAddress->setEmail($email);
-            $shippingAddress->setFirstname($response[$mode]['deliveryAddress']['firstName']);
-            $shippingAddress->setLastname($response[$mode]['deliveryAddress']['lastName']);
-            $street2 = $response[$mode]['deliveryAddress']['address2'];
-            $shippingAddress->setStreet(
-                $response[$mode]['deliveryAddress']['address1'] .
-                (isset($street2) && $street2 ? "\n" . $response[$mode]['deliveryAddress']['address2'] : '')
-            );
-            $shippingAddress->setPostcode($response[$mode]['deliveryAddress']['zip'] ?? $response[$mode]['invoicingAddress']['zip']);
-            $shippingAddress->setCity($response[$mode]['deliveryAddress']['city'] ?? $response[$mode]['invoicingAddress']['city']);
-            $shippingAddress->setCountryId($response[$mode]['deliveryAddress']['country'] ?? $response[$mode]['invoicingAddress']['country']);
-        } elseif ($order->getIsNotVirtual()) {
-            $shippingAddress = $order->getShippingAddress();
-            $shippingAddress->setTelephone($telephone);
-            $shippingAddress->setEmail($email);
-            $shippingAddress->setFirstname($billingAddress->getFirstname());
-            $shippingAddress->setLastname($billingAddress->getLastname());
-            $shippingAddress->setCity($billingAddress->getCity());
-            $shippingAddress->setPostcode($billingAddress->getPostcode());
-            $shippingAddress->setStreet($billingAddress->getStreet());
-            $shippingAddress->setCountryId($billingAddress->getCountryId());
+        if ($order->getIsNotVirtual()) {
+            if ($response[$mode]['deliveryAddress']['firstName']) {
+                $shippingAddress = $order->getShippingAddress();
+                $shippingAddress->setTelephone($telephone);
+                $shippingAddress->setEmail($email);
+                $shippingAddress->setFirstname($response[$mode]['deliveryAddress']['firstName']);
+                $shippingAddress->setLastname($response[$mode]['deliveryAddress']['lastName']);
+                $street2 = $response[$mode]['deliveryAddress']['address2'];
+                $shippingAddress->setStreet(
+                    $response[$mode]['deliveryAddress']['address1'] .
+                    (isset($street2) && $street2 ? "\n" . $response[$mode]['deliveryAddress']['address2'] : '')
+                );
+                $shippingAddress->setPostcode($response[$mode]['deliveryAddress']['zip'] ?? $response[$mode]['invoicingAddress']['zip']);
+                $shippingAddress->setCity($response[$mode]['deliveryAddress']['city'] ?? $response[$mode]['invoicingAddress']['city']);
+                $shippingAddress->setCountryId($response[$mode]['deliveryAddress']['country'] ?? $response[$mode]['invoicingAddress']['country']);
+            } else {
+                $shippingAddress = $order->getShippingAddress();
+                $shippingAddress->setTelephone($telephone);
+                $shippingAddress->setEmail($email);
+                $shippingAddress->setFirstname($billingAddress->getFirstname());
+                $shippingAddress->setLastname($billingAddress->getLastname());
+                $shippingAddress->setCity($billingAddress->getCity());
+                $shippingAddress->setPostcode($billingAddress->getPostcode());
+                $shippingAddress->setStreet($billingAddress->getStreet());
+                $shippingAddress->setCountryId($billingAddress->getCountryId());
+            }
         }
 
         // Set payment method

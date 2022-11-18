@@ -119,6 +119,10 @@ define([
                 }
                 // remove this subscription
                 initial.dispose();
+
+                // make sure isloading is false because getShippingRates also starts the loader
+                // it will disable input fields in magento versions <2.4.3
+                shippingService.isLoading(false);
             });
 
             /**
@@ -262,7 +266,7 @@ define([
                 self.cartLocked(true);
 
                 // if postcode not showing then email is not set yet
-                if (!self.getShowPostcode()) {
+                if (!self.getShowPostcode() || !quote.guestEmail || !quote.billingAddress().email) {
                     quote.guestEmail = data.email;
                     quote.shippingAddress().email = data.email;
                     if (quote.billingAddress()) {
