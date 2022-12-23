@@ -336,7 +336,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         /** @var AbstractMethod $method */
         $method = $order->getPayment()->getMethodInstance();
         $newStatus = $method->getConfigData('order_status');
-        if ($order->getStatus() != $newStatus) {
+        if ($order->getState() == Order::STATE_PENDING_PAYMENT) {
             $order->setState($this->getState($newStatus));
             $order->setStatus($newStatus);
             $order->addCommentToStatusHistory(__('Payment has been accepted.'));
