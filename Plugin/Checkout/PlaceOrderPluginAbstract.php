@@ -41,8 +41,16 @@ abstract class PlaceOrderPluginAbstract
     public function setShippingAddress($quote, $additionalData)
     {
         $shippingAddress = $quote->getShippingAddress();
-        $shippingAddress->setFirstname($additionalData['deliveryAddress']['firstName']);
-        $shippingAddress->setLastname($additionalData['deliveryAddress']['lastName']);
+
+        if ($additionalData['mode'] == 'B2B') {
+            $shippingAddress->setFirstname($additionalData['deliveryAddress']['name']);
+            $shippingAddress->setLastname($additionalData['deliveryAddress']['name']);
+            $shippingAddress->setCompany($additionalData['deliveryAddress']['name']);
+        } else {
+            $shippingAddress->setFirstname($additionalData['deliveryAddress']['firstName']);
+            $shippingAddress->setLastname($additionalData['deliveryAddress']['lastName']);
+        }
+
         $shippingAddress->setStreet([$additionalData['deliveryAddress']['address1'], $additionalData['deliveryAddress']['address2']]);
         $shippingAddress->setCity($additionalData['deliveryAddress']['city']);
         $shippingAddress->setPostcode($additionalData['deliveryAddress']['zip']);
@@ -64,8 +72,16 @@ abstract class PlaceOrderPluginAbstract
         if (!$billingAddress) {
             $billingAddress = $this->addressFactory->create();
         }
-        $billingAddress->setFirstname($additionalData['invoicingAddress']['firstName']);
-        $billingAddress->setLastname($additionalData['invoicingAddress']['lastName']);
+
+        if ($additionalData['mode'] == 'B2B') {
+            $billingAddress->setFirstname($additionalData['invoicingAddress']['name']);
+            $billingAddress->setLastname($additionalData['invoicingAddress']['name']);
+            $billingAddress->setCompany($additionalData['invoicingAddress']['name']);
+        } else {
+            $billingAddress->setFirstname($additionalData['invoicingAddress']['firstName']);
+            $billingAddress->setLastname($additionalData['invoicingAddress']['lastName']);
+        }
+
         $billingAddress->setStreet([$additionalData['invoicingAddress']['address1'], $additionalData['invoicingAddress']['address2']]);
         $billingAddress->setCity($additionalData['invoicingAddress']['city']);
         $billingAddress->setPostcode($additionalData['invoicingAddress']['zip']);

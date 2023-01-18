@@ -52,6 +52,7 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
      * @param $email
      * @param PaymentInterface $paymentMethod
      * @param AddressInterface|null $billingAddress
+     * @return void|array
      * @throws NoSuchEntityException
      */
     public function beforeSavePaymentInformationAndPlaceOrder(
