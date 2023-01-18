@@ -151,14 +151,14 @@ class B2cDataBuilder implements BuilderInterface
      * but we don't want to do new initialization with dummy phone number
      *
      * @param $address
-     * @return string|void
+     * @return string
      */
     protected function getTelephone($address)
     {
         if (in_array($address->getTelephone(), ['010123123', '+35810123123', '+358010123123'])) {
             return '';
         } else {
-            $address->getTelephone();
+            return $address->getTelephone();
         }
     }
 
