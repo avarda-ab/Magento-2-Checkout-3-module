@@ -14,6 +14,7 @@ use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
 use Magento\Framework\Exception\AlreadyExistsException;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\PaymentException;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectFactoryInterface;
@@ -27,6 +28,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
+use Magento\Sales\Model\Order\Payment\Transaction;
 use Magento\Sales\Model\OrderFactory;
 use Magento\Sales\Model\ResourceModel\Order\Status\CollectionFactory;
 use Magento\Sales\Model\Spi\OrderResourceInterface;
@@ -209,8 +211,9 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     /**
      * {@inheritdoc}
      *
-     * @param CartInterface|Quote $quote
+     * @param CartInterface $quote
      * @return bool|string
+     * @throws LocalizedException
      */
     public function initializePurchase(CartInterface $quote)
     {
@@ -340,6 +343,14 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
             $order->setState($this->getState($newStatus));
             $order->setStatus($newStatus);
             $order->addCommentToStatusHistory(__('Payment has been accepted.'));
+
+            $payment = $order->getPayment();
+            $payment->setBaseAmountAuthorized($order->getBaseTotalDue());
+            $payment->setAmountAuthorized($order->getTotalDue());
+            $payment->setTransactionId($purchaseData['purchaseId'])
+                ->setIsTransactionClosed(0);
+            $payment->addTransaction(Transaction::TYPE_AUTH);
+
             $this->orderRepository->save($order);
         }
 
