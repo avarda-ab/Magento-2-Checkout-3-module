@@ -226,7 +226,11 @@ class AvardaClient
             $response = $this->post($authUrl, $authParam, $headers);
             $responseArray = json_decode((string)$response->getBody(), true);
             if (!is_array($responseArray)) {
-                throw new ClientException(__('Authentication with avarda responded with invalid response'));
+                throw new ClientException(__(
+                    'Authentication with avarda responded with invalid response (%1: %2)',
+                    $response->getStatusCode(),
+                    $response->getReasonPhrase()
+                ));
             }
 
             if (isset($responseArray['error_description'])) {
