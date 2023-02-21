@@ -42,7 +42,9 @@ abstract class PlaceOrderPluginAbstract
     {
         $shippingAddress = $quote->getShippingAddress();
 
-        if ($additionalData['mode'] == 'B2B') {
+        // If b2b address there should be company name,
+        // but if no delivery address given it might not be there
+        if ($additionalData['mode'] == 'B2B' && isset($additionalData['deliveryAddress']['name'])) {
             $shippingAddress->setFirstname($additionalData['deliveryAddress']['name']);
             $shippingAddress->setLastname($additionalData['deliveryAddress']['name']);
             $shippingAddress->setCompany($additionalData['deliveryAddress']['name']);
