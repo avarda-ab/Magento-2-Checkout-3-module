@@ -134,7 +134,7 @@ abstract class PlaceOrderPluginAbstract
     {
         $purchaseId = $quote->getPayment()->getAdditionalInformation(PaymentDetailsInterface::PURCHASE_DATA)['purchaseId'];
         if ($purchaseId != $data['purchaseId']) {
-            throw new LocalizedException(__('PurchaseId does not match, please try again'));
+            throw new LocalizedException(__('Validation error, please try again'));
         }
         return true;
     }
