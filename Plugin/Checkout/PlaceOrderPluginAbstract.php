@@ -130,7 +130,7 @@ abstract class PlaceOrderPluginAbstract
      * @return true
      * @throws LocalizedException
      */
-    public function validatePurchase($quote, $data)
+    public function validatePurchase($quote, $data): bool
     {
         $purchaseId = $quote->getPayment()->getAdditionalInformation(PaymentDetailsInterface::PURCHASE_DATA)['purchaseId'];
         if ($purchaseId != $data['purchaseId']) {
