@@ -50,9 +50,10 @@ define([
         defaults: {
             template: 'Avarda_Checkout3/shipping-method'
         },
-        initializing: false,
+        initializing: ko.observable(false),
         initializeTimeout: false,
-        forceRenew: false,
+        forceRenew: ko.observable(false),
+        purchaseId: ko.observable(''),
         isCustomerLoggedIn: customer.isLoggedIn,
 
         cartLocked: ko.observable(false),
@@ -86,7 +87,7 @@ define([
                     }
                     self.email.subscribe(function (latest) {
                         if (quote.shippingAddress().email != latest) {
-                            self.forceRenew = true;
+                            self.forceRenew(true);
                         }
                         quote.guestEmail = latest;
                         quote.shippingAddress().email = latest;
@@ -96,7 +97,7 @@ define([
                     });
                     self.postalCode.subscribe(function (latest) {
                         if (quote.shippingAddress().postcode != latest) {
-                            self.forceRenew = true;
+                            self.forceRenew(true);
                         }
                         quote.shippingAddress().postcode = latest;
                         if (quote.billingAddress()) {
@@ -342,14 +343,14 @@ define([
          */
         initializeIframe: function(renew) {
             let self = this;
-            if (self.initializing) {
-                return;
+            if (self.initializing()) {
+                return true;
             }
-            let renewParam = (self.forceRenew || renew) ? 1 : 0;
-            self.forceRenew = false;
+            let renewParam = (self.forceRenew() || renew) ? 1 : 0;
+            self.forceRenew(false);
 
             fullScreenLoader.startLoader();
-            self.initializing = true;
+            self.initializing(true);
             let serviceUrl = '';
 
             if (customer.isLoggedIn()) {
@@ -372,6 +373,7 @@ define([
                         avardaCheckout.unmount();
                     }
                     options.purchaseId = response.purchase_data[0];
+                    self.purchaseId(options.purchaseId);
                     options.purchaseJwt = response.purchase_data[1];
                     options.redirectUrl = options.redirectUrlBase + response.purchase_data[0];
                     if (self.getSubscribeAddressChangeCallback()) {
@@ -399,11 +401,11 @@ define([
                     avardaCheckout.refreshForm();
                 }
                 fullScreenLoader.stopLoader();
-                self.initializing = false;
+                self.initializing(false);
             }).fail(function (response) {
                 errorProcessor.process(response);
                 fullScreenLoader.stopLoader();
-                self.initializing = false;
+                self.initializing(false);
             });
 
             return true;
