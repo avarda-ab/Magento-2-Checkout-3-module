@@ -50,6 +50,6 @@ class GetOnlyStatusHandler implements HandlerInterface
         $quote->getPayment()->setAdditionalInformation(
             PaymentData::STATE,
             $response[$mode]['step']['current']
-        );
+        )->setAdditionalInformation('renew', false);
     }
 }

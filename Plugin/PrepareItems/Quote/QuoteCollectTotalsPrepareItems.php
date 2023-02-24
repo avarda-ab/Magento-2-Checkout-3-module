@@ -9,13 +9,14 @@ use Avarda\Checkout3\Api\ItemStorageInterface;
 use Avarda\Checkout3\Gateway\Data\ItemAdapter\ArrayDataItemFactory;
 use Avarda\Checkout3\Gateway\Data\ItemAdapter\QuoteItemFactory;
 use Avarda\Checkout3\Gateway\Data\ItemDataObjectFactory;
-use Magento\Catalog\Model\Product\Type;
+use Avarda\Checkout3\Helper\PaymentData;
 use Magento\Quote\Api\Data\CartInterface;
+use Psr\Log\LoggerInterface;
 
 class QuoteCollectTotalsPrepareItems
 {
     /**
-     * @var \Psr\Log\LoggerInterface $logger
+     * @var LoggerInterface $logger
      */
     protected $logger;
 
@@ -40,7 +41,7 @@ class QuoteCollectTotalsPrepareItems
     protected $arrayDataItemAdapterFactory;
 
     /**
-     * @var \Avarda\Checkout3\Helper\PaymentData
+     * @var PaymentData
      */
     protected $paymentDataHelper;
 
@@ -52,20 +53,20 @@ class QuoteCollectTotalsPrepareItems
     /**
      * QuoteCollectTotals constructor.
      *
-     * @param \Psr\Log\LoggerInterface $logger
+     * @param LoggerInterface $logger
      * @param ItemStorageInterface $itemStorage
      * @param ItemDataObjectFactory $itemDataObjectFactory,
      * @param QuoteItemFactory $quoteItemAdapterFactory
      * @param ArrayDataItemFactory $arrayDataItemAdapterFactory
-     * @param \Avarda\Checkout3\Helper\PaymentData $paymentDataHelper
+     * @param PaymentData $paymentDataHelper
      */
     public function __construct(
-        \Psr\Log\LoggerInterface $logger,
+        LoggerInterface $logger,
         ItemStorageInterface $itemStorage,
         ItemDataObjectFactory $itemDataObjectFactory,
         QuoteItemFactory $quoteItemAdapterFactory,
         ArrayDataItemFactory $arrayDataItemAdapterFactory,
-        \Avarda\Checkout3\Helper\PaymentData $paymentDataHelper
+        PaymentData $paymentDataHelper
     ) {
         $this->logger = $logger;
         $this->itemStorage = $itemStorage;
@@ -137,7 +138,7 @@ class QuoteCollectTotalsPrepareItems
             }
             // if bundle and grouped with dynamic pricing discount amount affects its child product
             if ($item->getChildren() && $item->getProduct()->getPriceType() == '0') {
-                $addedBundleProductIds[$item->getId()] = TRUE;
+                $addedBundleProductIds[$item->getId()] = true;
                 continue;
             }
 

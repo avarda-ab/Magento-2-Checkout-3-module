@@ -9,6 +9,7 @@ namespace Avarda\Checkout3\Plugin\Checkout;
 use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
 use Avarda\Checkout3\Helper\PaymentData;
 use Magento\Framework\Exception\AlreadyExistsException;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\AddressInterface;
@@ -41,6 +42,7 @@ class PlaceOrderPlugin extends PlaceOrderPluginAbstract
      * @param AddressInterface|null $billingAddress
      * @return void|array
      * @throws NoSuchEntityException
+     * @throws LocalizedException
      */
     public function beforeSavePaymentInformationAndPlaceOrder(
         $subject,
@@ -51,6 +53,9 @@ class PlaceOrderPlugin extends PlaceOrderPluginAbstract
         if (isset($paymentMethod->getAdditionalData()['avarda'])) {
             $additionalData = json_decode($paymentMethod->getAdditionalData()['avarda'] ?? '', true);
             $quote = $this->cartRepository->getActive($cartId);
+
+            $this->validatePurchase($quote, $additionalData);
+
             $this->setShippingAddress($quote, $additionalData);
             $billingAddress = $this->setBillingAddress($billingAddress, $additionalData);
             return [$cartId, $paymentMethod, $billingAddress];

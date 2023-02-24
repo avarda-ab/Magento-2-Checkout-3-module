@@ -284,6 +284,7 @@
         <arguments>
             <argument name="requestBuilder" xsi:type="object">AvardaCheckout3ReturnRequest</argument>
             <argument name="transferFactory" xsi:type="object">AvardaCheckout3ReturnTransferFactory</argument>
+            <argument name="handler" xsi:type="object">Avarda\Checkout3\Gateway\Response\ReturnPaymentHandler</argument>
         </arguments>
     </virtualType>
     <virtualType name="AvardaCheckout3ReturnRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
