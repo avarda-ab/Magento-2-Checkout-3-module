@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Plugin\PrepareItems\Order;
 
 use Avarda\Checkout3\Api\ItemStorageInterface;
@@ -115,21 +116,21 @@ class CreditmemoCollectTotalsPrepareItems
             }
             // if bundle and grouped with dynamic pricing discount amount affects its child product
             if ($orderItem->getChildrenItems() && $orderItem->getProduct()->getPriceType() == '0') {
-                $addedBundleProductIds[$item->getId()] = TRUE;
+                $addedBundleProductIds[$item->getId()] = true;
                 continue;
             }
 
             $itemAdapter = $this->orderItemAdapterFactory->create([
-                'orderItem' => $orderItem
+                'orderItem' => $orderItem,
             ]);
             $itemDataObject = $this->itemDataObjectFactory->create(
                 $itemAdapter,
                 $item->getQty(),
                 $item->getRowTotalInclTax() -
-                    $item->getDiscountAmount(),
+                $item->getDiscountAmount(),
                 $item->getTaxAmount() +
-                    $item->getDiscountTaxCompensationAmount() +
-                    $item->getWeeeTaxAppliedAmount()
+                $item->getDiscountTaxCompensationAmount() +
+                $item->getWeeeTaxAppliedAmount()
             );
 
             $this->itemStorage->addItem($itemDataObject);
@@ -149,7 +150,7 @@ class CreditmemoCollectTotalsPrepareItems
             $itemAdapter = $this->arrayDataItemAdapterFactory->create([
                 'data' => [
                     'name' => $order->getShippingDescription(),
-                    'sku' => $order->getShippingMethod(),
+                    'sku'  => $order->getShippingMethod(),
                 ],
             ]);
             $itemDataObject = $this->itemDataObjectFactory->create(
@@ -175,7 +176,7 @@ class CreditmemoCollectTotalsPrepareItems
             $itemAdapter = $this->arrayDataItemAdapterFactory->create([
                 'data' => [
                     'name' => __('Gift Card'),
-                    'sku' => __('giftcard'),
+                    'sku'  => __('giftcard'),
                 ],
             ]);
             $itemDataObject = $this->itemDataObjectFactory->create(

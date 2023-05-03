@@ -74,6 +74,7 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
             $this->setShippingAddress($quote, $additionalData);
             $billingAddress = $this->setBillingAddress($billingAddress, $additionalData);
             $email = $this->checkEmail($email, $additionalData);
+
             return [$cartId, $email, $paymentMethod, $billingAddress];
         }
     }
@@ -90,6 +91,7 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
         if ($this->paymentDataHelper->isAvardaPayment($order->getPayment())) {
             $this->saveOrderCreated($orderId, $order);
         }
+
         return $orderId;
     }
 }

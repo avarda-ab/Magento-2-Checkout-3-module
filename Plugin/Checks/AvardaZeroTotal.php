@@ -17,7 +17,7 @@ class AvardaZeroTotal
      * @param $result
      * @param $paymentMethod MethodInterface
      * @param $quote CartInterface
-     * @return bool|mixed
+     * @return bool
      */
     public function afterIsApplicable($subject, $result, $paymentMethod, $quote)
     {

@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Block\Adminhtml\System\Config\Fieldset;
 
 use Magento\Backend\Block\Context;
@@ -56,7 +57,7 @@ class Payment extends Fieldset
             ' onclick="avardaToggleSolution.call(this, \'' . $htmlId . "', '" . $this->getUrl('adminhtml/*/state') . '\'); return false;">' .
             '<span class="state-closed">' . __('Configure') . '</span>' .
             '<span class="state-opened">' . __('Close') . '</span>' .
-        '</button>';
+            '</button>';
 
         $html .= '</div>';
         $html .= '<div class="heading"><strong>' . $element->getLegend() . '</strong>';
@@ -105,6 +106,7 @@ class Payment extends Fieldset
                 Fieldset.toggleCollapse(id, url);
             }
         });";
+
         return $this->_jsHelper->getScript($script);
     }
 }

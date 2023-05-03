@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Model\Ui;
 
 use Avarda\Checkout3\Gateway\Config\Config;
@@ -35,8 +36,8 @@ class ConfigProviderBase implements ConfigProviderInterface
             'payment' => [
                 self::CODE => [
                     'isActive' => $active,
-                ]
-            ]
+                ],
+            ],
         ];
 
         return $config;

@@ -3,11 +3,13 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Observer;
 
 use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
+use Exception;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
@@ -71,7 +73,7 @@ class OrderCancelObserver implements ObserverInterface
                 try {
                     $avardaOrder = $this->avardaOrderRepository->getByOrderId($order->getId());
                     $this->avardaOrderRepository->delete($avardaOrder);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     // Do nothing
                 }
             }

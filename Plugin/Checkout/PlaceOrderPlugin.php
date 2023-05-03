@@ -58,6 +58,7 @@ class PlaceOrderPlugin extends PlaceOrderPluginAbstract
 
             $this->setShippingAddress($quote, $additionalData);
             $billingAddress = $this->setBillingAddress($billingAddress, $additionalData);
+
             return [$cartId, $paymentMethod, $billingAddress];
         }
     }
@@ -76,6 +77,7 @@ class PlaceOrderPlugin extends PlaceOrderPluginAbstract
         if ($this->paymentDataHelper->isAvardaPayment($quote->getPayment())) {
             $this->saveOrderCreated($orderId, $quote);
         }
+
         return $orderId;
     }
 }

@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout
  */
+
 namespace Avarda\Checkout3\Gateway\Request;
 
 use Magento\Payment\Gateway\Helper\SubjectReader;
@@ -24,7 +25,7 @@ class OrderReferenceDataBuilder implements BuilderInterface
     public function build(array $buildSubject)
     {
         $paymentDO = SubjectReader::readPayment($buildSubject);
-        $order     = $paymentDO->getOrder();
+        $order = $paymentDO->getOrder();
 
         return [self::ORDER_REFERENCE => $order->getOrderIncrementId()];
     }

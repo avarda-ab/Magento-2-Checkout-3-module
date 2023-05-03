@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Setup;
 
 use Magento\Framework\DB\Adapter\AdapterInterface;
@@ -124,12 +125,13 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     $setup->getTable('avarda3_payment_queue'),
                     'is_processed',
                     [
-                        'type' => Table::TYPE_INTEGER,
-                        'default' => 0,
+                        'type'     => Table::TYPE_INTEGER,
+                        'default'  => 0,
                         'unsigned' => true,
                         'nullable' => false,
-                        'comment' => 'Is queue processed'
-                    ]);
+                        'comment'  => 'Is queue processed',
+                    ]
+                );
         }
 
         if (version_compare($context->getVersion(), '1.2.7', '<')) {
@@ -138,10 +140,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     $setup->getTable('avarda3_order_created'),
                     'order_id',
                     [
-                        'type' => Table::TYPE_INTEGER,
+                        'type'     => Table::TYPE_INTEGER,
                         'unsigned' => true,
                         'nullable' => true,
-                        'comment' => 'Order Id'
+                        'comment'  => 'Order Id',
                     ]
                 );
             $setup->getConnection()

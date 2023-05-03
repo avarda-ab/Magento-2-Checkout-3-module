@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Gateway\Response;
 
 use Avarda\Checkout3\Helper\AvardaCheckBoxTypeValues;
@@ -35,6 +36,7 @@ class UpdateOrderStatusHandler implements HandlerInterface
         $this->methodHelper = $paymentMethod;
         $this->subscriberFactory = $subscriberFactory;
     }
+
     /**
      * {@inheritdoc}
      */

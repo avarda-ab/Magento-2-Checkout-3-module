@@ -17,9 +17,9 @@ use Magento\Framework\Exception\PaymentException;
 interface PaymentCompleteInterface
 {
     /**
-     * @throws PaymentException
      * @param string $purchaseId the external purchaseId
      * @return ItemDetailsListInterface
+     * @throws PaymentException
      */
     public function execute($purchaseId);
 }

@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Controller\Checkout;
 
 use Avarda\Checkout3\Controller\AbstractCheckout;
@@ -111,6 +112,7 @@ class Index extends AbstractCheckout
             $this->messageManager->addErrorMessage(
                 __('Guest checkout is disabled.')
             );
+
             return $this->resultRedirectFactory
                 ->create()->setPath('checkout/cart');
         }
@@ -150,6 +152,7 @@ class Index extends AbstractCheckout
 
         $resultPage = $this->resultPageFactory->create();
         $resultPage->getConfig()->getTitle()->set(__('Checkout'));
+
         return $resultPage;
     }
 }

@@ -3,11 +3,13 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Plugin\PrepareItems\Quote;
 
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
+use Exception;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\Exception\PaymentException;
 use Magento\Framework\Webapi\Exception as WebapiException;
@@ -76,7 +78,7 @@ class QuoteCollectTotalsUpdateItems
                         $renew = true;
                     }
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $renew = true;
             }
             if ($renew) {
@@ -94,7 +96,7 @@ class QuoteCollectTotalsUpdateItems
      * @param CartInterface|Quote $subject
      *
      * @return int
-     *@throws PaymentException
+     * @throws PaymentException
      *
      */
     protected function getState(CartInterface $subject)

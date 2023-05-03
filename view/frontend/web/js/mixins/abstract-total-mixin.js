@@ -11,6 +11,6 @@ define([], function () {
         }
     };
     return function (target) {
-      return target.extend(mixin);
+        return target.extend(mixin);
     };
 });

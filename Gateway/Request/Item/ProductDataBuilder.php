@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Gateway\Request\Item;
 
 use Avarda\Checkout3\Gateway\Helper\ItemSubjectReader;
@@ -32,7 +33,7 @@ class ProductDataBuilder implements BuilderInterface
 
         return [
             self::DESCRIPTION => mb_substr($item->getName(), 0, 35),
-            self::NOTES => mb_substr($item->getSku(), 0, 35),
+            self::NOTES       => mb_substr($item->getSku(), 0, 35),
         ];
     }
 }

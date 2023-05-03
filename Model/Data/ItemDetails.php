@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Model\Data;
 
 use Avarda\Checkout3\Api\Data\ItemDetailsInterface;
@@ -121,7 +122,8 @@ class ItemDetails extends AbstractExtensibleModel implements
     /**
      * {@inheritdoc}
      */
-    public function setMinSaleQty($minQty)    {
+    public function setMinSaleQty($minQty)
+    {
         return $this->setData(self::MIN_SALE_QTY, $minQty);
     }
 
@@ -136,7 +138,8 @@ class ItemDetails extends AbstractExtensibleModel implements
     /**
      * {@inheritdoc}
      */
-    public function setMaxSaleQty($maxQty)    {
+    public function setMaxSaleQty($maxQty)
+    {
         return $this->setData(self::MAX_SALE_QTY, $maxQty);
     }
 
@@ -151,7 +154,8 @@ class ItemDetails extends AbstractExtensibleModel implements
     /**
      * {@inheritdoc}
      */
-    public function setQtyIncrements($qtyIncrements)    {
+    public function setQtyIncrements($qtyIncrements)
+    {
         return $this->setData(self::QTY_INCREMENTS, $qtyIncrements);
     }
 }

@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Helper;
 
 use Avarda\Checkout3\Api\Data\PaymentDetailsInterface;
@@ -41,7 +42,7 @@ class JwtToken
     public function getNewJwtToken($purchaseId)
     {
         $arguments = [
-            'purchase_id' =>  $purchaseId
+            'purchase_id' => $purchaseId,
         ];
 
         $paymentQueue = $this->paymentQueueRepository->get($purchaseId);
@@ -59,6 +60,7 @@ class JwtToken
             ->execute($arguments);
 
         $purchaseData = $payment->getAdditionalInformation(PaymentDetailsInterface::PURCHASE_DATA);
+
         return $purchaseData['jwt'];
     }
 }

@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Gateway\Request\Item;
 
 use Avarda\Checkout3\Gateway\Helper\ItemSubjectReader;
@@ -35,7 +36,7 @@ class TaxDataBuilder implements BuilderInterface
         $taxAmount = ItemSubjectReader::readTaxAmount($buildSubject);
 
         return [
-            self::TAX_CODE => $item->getTaxPercent(),
+            self::TAX_CODE   => $item->getTaxPercent(),
             self::TAX_AMOUNT => $this->formatPrice($taxAmount),
         ];
     }
