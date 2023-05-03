@@ -3,9 +3,11 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Gateway\Helper;
 
 use Avarda\Checkout3\Gateway\Data\ItemAdapterInterface;
+use InvalidArgumentException;
 
 /**
  * This class encapsulates implicit interfaces (array structures) used in
@@ -29,7 +31,7 @@ class ItemSubjectReader
         if (!isset($subject['item'])
             || !$subject['item'] instanceof ItemAdapterInterface
         ) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'Item data object should be provided'
             );
         }
@@ -47,7 +49,7 @@ class ItemSubjectReader
     public static function readQty(array $subject)
     {
         if (!isset($subject['qty']) || !is_numeric($subject['qty'])) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'Quantity should be provided'
             );
         }
@@ -65,7 +67,7 @@ class ItemSubjectReader
     public static function readAmount(array $subject)
     {
         if (!isset($subject['amount']) || !is_numeric($subject['amount'])) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'Amount should be provided'
             );
         }
@@ -83,7 +85,7 @@ class ItemSubjectReader
     public static function readTaxAmount(array $subject)
     {
         if (!isset($subject['tax_amount']) || !is_numeric($subject['tax_amount'])) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'Tax amount should be provided'
             );
         }

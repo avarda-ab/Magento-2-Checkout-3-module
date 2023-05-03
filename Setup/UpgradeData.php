@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Setup;
 
 use Magento\Customer\Setup\CustomerSetupFactory;
@@ -26,6 +27,7 @@ class UpgradeData implements UpgradeDataInterface
 
     /**
      * UpgradeData constructor.
+     *
      * @param CustomerSetupFactory $customerSetupFactory
      * @param AttributeSetFactory $attributeSetFactory
      */

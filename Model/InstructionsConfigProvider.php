@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Model;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
@@ -50,9 +51,10 @@ class InstructionsConfigProvider implements ConfigProviderInterface
         $config = [];
         if ($this->methodInstance->isAvailable()) {
             $config['payment']['instructions'][$this->methodCode] = [
-                'instructions' => $this->getInstructions($this->methodCode)
+                'instructions' => $this->getInstructions($this->methodCode),
             ];
         }
+
         return $config;
     }
 

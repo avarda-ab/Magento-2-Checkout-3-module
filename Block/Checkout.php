@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Block;
 
 use Avarda\Checkout3\Gateway\Config\Config;
@@ -330,7 +331,7 @@ class Checkout extends Template
     {
         $customCss = $this->config->getCustomCss();
         $styles = [];
-        if ($customCss && count(explode("\n", $customCss))>0) {
+        if ($customCss && count(explode("\n", $customCss)) > 0) {
             foreach (explode("\n", $customCss) as $row) {
                 if (!trim($row) && strpos($row, '=') === false) {
                     continue;
@@ -365,6 +366,7 @@ class Checkout extends Template
         if (!$stylesJson) {
             $stylesJson = '[]';
         }
+
         return $stylesJson;
     }
 }

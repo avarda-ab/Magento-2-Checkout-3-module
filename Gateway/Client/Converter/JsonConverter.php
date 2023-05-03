@@ -3,8 +3,10 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Gateway\Client\Converter;
 
+use Exception;
 use Magento\Framework\Exception\AuthorizationException;
 use Magento\Framework\Webapi\Exception as WebapiException;
 use Magento\Payment\Gateway\Http\ConverterException;
@@ -26,7 +28,7 @@ class JsonConverter implements ConverterInterface
     {
         try {
             $body = json_decode((string)$response->getBody(), true);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new ConverterException(
                 __('Something went wrong with Avarda Checkout. Please try again later.')
             );

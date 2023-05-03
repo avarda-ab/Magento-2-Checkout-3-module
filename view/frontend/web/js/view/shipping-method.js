@@ -70,7 +70,7 @@ define([
                 self.initializeIframe();
             }
 
-            let initial = shippingService.isLoading.subscribe(function() {
+            let initial = shippingService.isLoading.subscribe(function () {
                 checkoutDataResolver.resolveBillingAddress();
                 checkoutDataResolver.resolveShippingAddress();
 
@@ -135,7 +135,7 @@ define([
                     // Avoid duplicate and same time initialization, which can cause
                     // problems on backend if run too simultaneously
                     clearTimeout(self.initializeTimeout);
-                    self.initializeTimeout = setTimeout(function(){
+                    self.initializeTimeout = setTimeout(function () {
                         self.initializeIframe();
                     }, 350);
                 }
@@ -143,25 +143,21 @@ define([
             this.offerLogin(!!this.showLoginOffer());
         },
 
-        getShowPostcode: function ()
-        {
+        getShowPostcode: function () {
             return !!options.showPostcode;
         },
 
-        getSubscribeAddressChangeCallback: function ()
-        {
+        getSubscribeAddressChangeCallback: function () {
             return !!options.addressChangeCallback;
         },
 
-        getPostCodeTitle: function ()
-        {
+        getPostCodeTitle: function () {
             if (this.getShowPostcode()) {
                 return $.mage.__("1. Zip/Postal Code and Email");
             }
         },
 
-        getShippingMethodTitle: function ()
-        {
+        getShippingMethodTitle: function () {
             if (this.getShowPostcode()) {
                 return $.mage.__("2. Shipping Methods");
             } else {
@@ -169,25 +165,21 @@ define([
             }
         },
 
-        showLoginOffer: function()
-        {
+        showLoginOffer: function () {
             return options.offerLogin && !this.isCustomerLoggedIn();
         },
 
-        showLoginInfo: function ()
-        {
+        showLoginInfo: function () {
             return options.offerLogin && this.isCustomerLoggedIn();
         },
 
-        postCodeStep: function ()
-        {
+        postCodeStep: function () {
             $("#checkout-step-postalcode").show();
             $("#checkout-step-shipping_method").hide();
             $("#checkout-step-iframe").hide();
         },
 
-        postCodeNext: function ()
-        {
+        postCodeNext: function () {
             if ($('#customer-password').val() == '') {
                 this.showNext(0);
             }
@@ -215,8 +207,7 @@ define([
         /**
          * Reloads shipping methods from backend
          */
-        reloadShippingMethods: function()
-        {
+        reloadShippingMethods: function () {
             let address = quote.shippingAddress();
             shippingRateRegistry.set(address.getKey(), null);
             shippingRateRegistry.set(address.getCacheKey(), null);
@@ -248,7 +239,7 @@ define([
         /**
          * Before redirecting away from the checkout page
          * is called right before the Check-Out is completed.
-         * This function must call result.continue() or result.cancel() function.
+         * This function must call avardaCheckoutInstance.beforeSubmitContinue() or avardaCheckoutInstance.beforeSubmitAbort() function.
          *
          * @param data
          * @param avardaCheckoutInstance
@@ -259,7 +250,7 @@ define([
             // if cart is locked don't try to lock it again
             if (self.cartLocked()) {
                 avardaCheckoutInstance.beforeSubmitContinue();
-                setTimeout(function() {
+                setTimeout(function () {
                     // Remove loader, if avarda validation fails user will not be forwarded
                     fullScreenLoader.stopLoader();
                 }, 1000);
@@ -280,11 +271,11 @@ define([
                     'additional_data': {'avarda': JSON.stringify(data)}
                 }).fail(function (response) {
                     self.cartLocked(false);
-                    let error;
+                    let error = '';
                     try {
                         let result = JSON.parse(response.responseText);
                         error = result.message;
-                        $.each(result.parameters, function(key, val) {
+                        $.each(result.parameters, function (key, val) {
                             error = error.replace('%' + key, val);
                         });
                     } catch (exception) {
@@ -331,7 +322,7 @@ define([
             }
         },
 
-        sessionTimedOutCallback: function(avardaCheckoutInstance) {
+        sessionTimedOutCallback: function (avardaCheckoutInstance) {
             avardaCheckoutInstance.unmount();
             options.purchaseId = undefined;
         },
@@ -341,7 +332,7 @@ define([
          *
          * @returns {boolean}
          */
-        initializeIframe: function(renew) {
+        initializeIframe: function (renew) {
             let self = this;
             if (self.initializing()) {
                 return true;
@@ -381,10 +372,10 @@ define([
                             self.updateShippingAddressHook(data, avardaCheckoutInstance);
                         };
                     }
-                    options.beforeSubmitCallback = function(data, avardaCheckoutInstance) {
+                    options.beforeSubmitCallback = function (data, avardaCheckoutInstance) {
                         self.beforeCompleteHook(data, avardaCheckoutInstance);
                     };
-                    options.sessionTimedOutCallback = function(avardaCheckoutInstance) {
+                    options.sessionTimedOutCallback = function (avardaCheckoutInstance) {
                         self.sessionTimedOutCallback(avardaCheckoutInstance);
                         self.initializeIframe(1);
                     };

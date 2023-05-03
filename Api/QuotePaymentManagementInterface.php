@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Api;
 
 use Avarda\Checkout3\Api\Data\ItemDetailsListInterface;
@@ -13,6 +14,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 
 /**
  * Interface for managing Avarda payment information
+ *
  * @api
  */
 interface QuotePaymentManagementInterface
@@ -21,7 +23,7 @@ interface QuotePaymentManagementInterface
      * Get purchase ID for quote
      *
      * @param string|int $cartId
-     * @param bool   $renew
+     * @param bool $renew
      * @return string
      */
     public function getPurchaseData($cartId, bool $renew = false);
@@ -55,7 +57,7 @@ interface QuotePaymentManagementInterface
      * renders the customer unable to manipulate the cart while payment is
      * processed.
      *
-     * @param string|int  $cartId
+     * @param string|int $cartId
      * @param bool $isActive
      * @return void
      */
@@ -89,8 +91,8 @@ interface QuotePaymentManagementInterface
      * Get quote ID by Avarda purchase ID
      *
      * @param string $purchaseId
-     * @throws PaymentException
      * @return int
+     * @throws PaymentException
      */
     public function getQuoteIdByPurchaseId($purchaseId);
 }

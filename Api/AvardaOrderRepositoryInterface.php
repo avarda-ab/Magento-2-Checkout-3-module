@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Api;
 
 use Avarda\Checkout3\Model\AvardaOrder;
@@ -27,6 +28,7 @@ interface AvardaOrderRepositoryInterface
 
     /**
      * To find the orderId with purchaseId
+     *
      * @param $purchaseId
      * @return AvardaOrder
      */

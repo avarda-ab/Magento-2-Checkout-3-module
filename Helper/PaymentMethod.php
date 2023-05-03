@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   avarda_checkout3_Checkout
  */
+
 namespace Avarda\Checkout3\Helper;
 
 /**
@@ -33,21 +34,21 @@ class PaymentMethod
      * @var array
      */
     public static $codes = [
-        self::INVOICE => "avarda_checkout3_invoice",
-        self::LOAN => "avarda_checkout3_loan",
-        self::CARD => "avarda_checkout3_card",
-        self::DIRECT_PAYMENT => "avarda_checkout3_direct_payment",
-        self::PART_PAYMENT => "avarda_checkout3_part_payment",
-        self::SWISH => "avarda_checkout3_swish",
+        self::INVOICE          => "avarda_checkout3_invoice",
+        self::LOAN             => "avarda_checkout3_loan",
+        self::CARD             => "avarda_checkout3_card",
+        self::DIRECT_PAYMENT   => "avarda_checkout3_direct_payment",
+        self::PART_PAYMENT     => "avarda_checkout3_part_payment",
+        self::SWISH            => "avarda_checkout3_swish",
         self::HIGH_AMOUNT_LOAN => "avarda_checkout3_high_amount_loan",
-        self::PAYPAL => "avarda_checkout3_paypal",
-        self::PAY_ON_DELIVERY => "avarda_checkout3_pay_on_delivery",
-        self::B2B_INVOICE => "avarda_checkout3_b2b_invoice",
-        self::DIRECT_INVOICE => "avarda_checkout3_direct_invoice",
-        self::MASTERPASS => "avarda_checkout3_masterpass",
-        self::MOBILE_PAY => "avarda_checkout3_mobile_pay",
-        self::VIPPS => "avarda_checkout3_vipps",
-        self::ZERO_AMOUNT => "avarda_checkout3_zero_amount",
+        self::PAYPAL           => "avarda_checkout3_paypal",
+        self::PAY_ON_DELIVERY  => "avarda_checkout3_pay_on_delivery",
+        self::B2B_INVOICE      => "avarda_checkout3_b2b_invoice",
+        self::DIRECT_INVOICE   => "avarda_checkout3_direct_invoice",
+        self::MASTERPASS       => "avarda_checkout3_masterpass",
+        self::MOBILE_PAY       => "avarda_checkout3_mobile_pay",
+        self::VIPPS            => "avarda_checkout3_vipps",
+        self::ZERO_AMOUNT      => "avarda_checkout3_zero_amount",
     ];
 
     /**

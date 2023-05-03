@@ -3,11 +3,14 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Model;
 
 use Avarda\Checkout3\Api\Data\PaymentQueueInterface;
 use Avarda\Checkout3\Api\Data\PaymentQueueInterfaceFactory;
 use Avarda\Checkout3\Api\PaymentQueueRepositoryInterface;
+use Avarda\Checkout3\Model\ResourceModel\PaymentQueue as PaymentQueueResource;
+use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;

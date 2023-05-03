@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Gateway\Request;
 
 use Magento\Payment\Gateway\Helper\SubjectReader;
@@ -41,7 +42,7 @@ class TranIdDataBuilder implements BuilderInterface
      */
     public function build(array $buildSubject)
     {
-        $paymentDO     = SubjectReader::readPayment($buildSubject);
+        $paymentDO = SubjectReader::readPayment($buildSubject);
         $transactionId = $this->paymentDataHelper->getTransactionId();
         $paymentDO->getPayment()->setTransactionId($transactionId);
 

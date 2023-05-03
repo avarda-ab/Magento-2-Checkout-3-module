@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Gateway\Response;
 
 use Avarda\Checkout3\Helper\PaymentData;
@@ -28,6 +29,7 @@ class GetOnlyStatusHandler implements HandlerInterface
         $this->quoteRepository = $quoteRepository;
         $this->methodHelper = $paymentMethod;
     }
+
     /**
      * {@inheritdoc}
      */

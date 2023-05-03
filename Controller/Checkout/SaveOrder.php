@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Controller\Checkout;
 
 use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
@@ -77,9 +78,7 @@ class SaveOrder extends AbstractCheckout
         try {
             if (($purchaseId = $this->getPurchaseId()) === null) {
                 throw new Exception(
-                    __('Missing purchase ID "%purchase_id"', [
-                        'purchase_id' => $purchaseId
-                    ])
+                    __('Missing purchase ID "%purchase_id"', ['purchase_id' => $purchaseId])
                 );
             }
 
@@ -117,6 +116,7 @@ class SaveOrder extends AbstractCheckout
         }
 
         $this->messageManager->addErrorMessage($message);
+
         return $this->resultRedirectFactory->create()->setPath(
             'checkout/cart'
         );

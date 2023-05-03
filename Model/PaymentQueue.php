@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Model;
 
 use Avarda\Checkout3\Api\Data\PaymentQueueInterface;
@@ -137,6 +138,7 @@ class PaymentQueue extends AbstractModel implements PaymentQueueInterface
     public function setIsProcessed($isProcessed)
     {
         $this->setData(self::IS_PROCESSED, $isProcessed);
+
         return $this;
     }
 }

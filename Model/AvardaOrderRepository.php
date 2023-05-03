@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Model;
 
 use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
@@ -34,6 +35,7 @@ class AvardaOrderRepository implements AvardaOrderRepositoryInterface
         $avardaOrder->setPurchaseId($purchaseId);
         $avardaOrder->setOrderId($orderId);
         $this->resource->save($avardaOrder);
+
         return $avardaOrder;
     }
 
@@ -43,6 +45,7 @@ class AvardaOrderRepository implements AvardaOrderRepositoryInterface
     public function getByOrderId($orderId)
     {
         $avardaOrder = $this->avardaOrderFactory->create();
+
         return $avardaOrder->load($orderId, 'order_id');
     }
 
@@ -52,6 +55,7 @@ class AvardaOrderRepository implements AvardaOrderRepositoryInterface
     public function getByPurchaseId($purchaseId)
     {
         $avardaOrder = $this->avardaOrderFactory->create();
+
         return $avardaOrder->load($purchaseId, 'purchase_id');
     }
 

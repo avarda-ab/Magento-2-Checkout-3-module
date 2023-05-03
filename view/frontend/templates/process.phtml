@@ -9,7 +9,7 @@ $jwtToken = $block->getJwtToken($purchaseId);
 ?>
 <div id="avarda-checkout-iframe"></div>
 <script>
-    var CHECKOUT3_JS_BUNDLE = '<?= $block->getCheckOutClientScriptPath(); ?>';
+    const CHECKOUT3_JS_BUNDLE = '<?= $block->getCheckOutClientScriptPath(); ?>';
     (function(e,t,n,a,s,c,o,i,r){e[a]=e[a]||function(){(e[a].q=e[a].q||[
     ]).push(arguments)};e[a].i=s;i=t.createElement(n);i.async=1
     ;i.src=o+"?v="+c+"&ts="+1*new Date;r=t.getElementsByTagName(n)[0]
@@ -25,7 +25,7 @@ $jwtToken = $block->getJwtToken($purchaseId);
         redirectUrl: '<?= $block->getCallbackUrl() . $purchaseId ?>',
         completedPurchaseCallback: function (avardaCheckoutInstance) {
             avardaCheckoutInstance.unmount();
-            window.location.href = "<?= $this->getSaveOrderUrl()  . $purchaseId ?>";
+            window.location.href = "<?= $this->getSaveOrderUrl() . $purchaseId ?>";
         },
         beforeSubmitCallback: function (data, avardaCheckoutInstance) {
             avardaCheckoutInstance.beforeSubmitContinue();

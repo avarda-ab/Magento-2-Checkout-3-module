@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Helper;
 
 /**
@@ -30,16 +31,16 @@ class PurchaseState
     const UNKNOWN = 'Unknown';
 
     public static $stateIds = [
-        0 => self::INITIALIZED,
-        1 => self::EMAIL_ZIP_ENTRY,
-        2 => self::SSN_ENTRY,
-        3 => self::PHONE_NUMBER_ENTRY,
-        4 => self::PERSONAL_INFO,
-        5 => self::WAITING_FOR_SWISH,
-        6 => self::REDIRECTED_TO_DIRECT_PAYMENT_BANK,
-        7 => self::REDIRECTED_TO_NETS,
-        8 => self::WAITING_FOR_BANK_ID,
-        9 => self::REDIRECTED_TO_TUPAS,
+        0  => self::INITIALIZED,
+        1  => self::EMAIL_ZIP_ENTRY,
+        2  => self::SSN_ENTRY,
+        3  => self::PHONE_NUMBER_ENTRY,
+        4  => self::PERSONAL_INFO,
+        5  => self::WAITING_FOR_SWISH,
+        6  => self::REDIRECTED_TO_DIRECT_PAYMENT_BANK,
+        7  => self::REDIRECTED_TO_NETS,
+        8  => self::WAITING_FOR_BANK_ID,
+        9  => self::REDIRECTED_TO_TUPAS,
         10 => self::COMPLETED,
         11 => self::TIMED_OUT,
         12 => self::HANDLED_BY_MERCHANT,

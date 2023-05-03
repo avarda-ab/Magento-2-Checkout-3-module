@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Model;
 
 use Avarda\Checkout3\Api\Data\PaymentDetailsInterface;
@@ -52,6 +53,7 @@ class PaymentManagement implements PaymentManagementInterface
         $purchaseData = $this->quotePaymentManagement->getPurchaseData($cartId, $renew);
         $paymentDetails = $this->paymentDetailsFactory->create();
         $paymentDetails->setPurchaseData($purchaseData);
+
         return $paymentDetails;
     }
 

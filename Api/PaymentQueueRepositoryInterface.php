@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Api;
 
 use Avarda\Checkout3\Api\Data\PaymentQueueInterface;
@@ -13,6 +14,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 
 /**
  * Payment Queue CRUD interface.
+ *
  * @api
  */
 interface PaymentQueueRepositoryInterface

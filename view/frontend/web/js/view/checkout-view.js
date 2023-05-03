@@ -27,25 +27,22 @@ define([
             this._super();
         },
 
-        getPaymentStepTitle: function ()
-        {
+        getPaymentStepTitle: function () {
             if (this.isVirtual()) {
                 return $t("1. Select payment");
-            } else if(options.showPostcode) {
+            } else if (options.showPostcode) {
                 return $t("3. Select payment");
             } else {
                 return $t("2. Select payment");
             }
         },
 
-        showLogin: function()
-        {
+        showLogin: function () {
             return options.offerLogin && this.isVirtual();
         },
 
-        isVirtual: function ()
-        {
-           return quote.isVirtual();
+        isVirtual: function () {
+            return quote.isVirtual();
         },
 
         navigate: function () {

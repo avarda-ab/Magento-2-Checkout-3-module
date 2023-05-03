@@ -9,7 +9,7 @@ namespace Avarda\Checkout3\Model;
 use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
 use Avarda\Checkout3\Api\PaymentCompleteInterface;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
-use \Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\PaymentException;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -52,6 +52,7 @@ class PaymentComplete implements PaymentCompleteInterface
                 // No order found
                 if (!$orderId->getOrderId()) {
                     $this->logger->warning("No order found with '{$purchaseId}'");
+
                     return "";
                 }
 

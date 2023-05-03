@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Controller\Checkout;
 
 use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
@@ -70,13 +71,14 @@ class Process extends AbstractCheckout
             if (($purchaseId = $this->getPurchaseId()) === null) {
                 throw new Exception(
                     __('Failed to save order with purchase ID "%purchase_id"', [
-                        'purchase_id' => $purchaseId
+                        'purchase_id' => $purchaseId,
                     ])
                 );
             }
 
             $quoteId = $this->quotePaymentManagement->getQuoteIdByPurchaseId($purchaseId);
             $this->quotePaymentManagement->updatePaymentStatus($quoteId);
+
             return $this->resultPageFactory->create();
         } catch (Exception $e) {
             $this->logger->error($e);
@@ -84,6 +86,7 @@ class Process extends AbstractCheckout
         }
 
         $this->messageManager->addErrorMessage($message);
+
         return $this->resultRedirectFactory
             ->create()->setPath('avarda3/checkout');
     }

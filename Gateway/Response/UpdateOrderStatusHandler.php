@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Gateway\Response;
 
 use Avarda\Checkout3\Helper\AvardaCheckBoxTypeValues;
@@ -35,6 +36,7 @@ class UpdateOrderStatusHandler implements HandlerInterface
         $this->methodHelper = $paymentMethod;
         $this->subscriberFactory = $subscriberFactory;
     }
+
     /**
      * {@inheritdoc}
      */
@@ -61,10 +63,11 @@ class UpdateOrderStatusHandler implements HandlerInterface
             $order->setCustomerLastname($response[$mode]['invoicingAddress']['lastName']);
         } else {
             // B2B customer set Company name to name fields
-            $billingAddress->setFirstname($response[$mode]['invoicingAddress']['name']);
-            $billingAddress->setLastname($response[$mode]['invoicingAddress']['name']);
-            $order->setCustomerFirstname($response[$mode]['invoicingAddress']['name']);
-            $order->setCustomerLastname($response[$mode]['invoicingAddress']['name']);
+            $billingAddress->setFirstname($response[$mode]['customerInfo']['firstName']);
+            $billingAddress->setLastname($response[$mode]['customerInfo']['lastName']);
+            $billingAddress->setCompany($response[$mode]['invoicingAddress']['name']);
+            $order->setCustomerFirstname($response[$mode]['customerInfo']['firstName']);
+            $order->setCustomerLastname($response[$mode]['customerInfo']['lastName']);
         }
         $street2 = $response[$mode]['invoicingAddress']['address2'];
         $billingAddress->setStreet(

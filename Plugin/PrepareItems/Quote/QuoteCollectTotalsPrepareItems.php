@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Plugin\PrepareItems\Quote;
 
 use Avarda\Checkout3\Api\ItemStorageInterface;
@@ -177,7 +178,7 @@ class QuoteCollectTotalsPrepareItems
             $itemAdapter = $this->arrayDataItemAdapterFactory->create([
                 'data' => [
                     'name' => $shippingAddress->getShippingDescription(),
-                    'sku' => $shippingAddress->getShippingMethod(),
+                    'sku'  => $shippingAddress->getShippingMethod(),
                 ],
             ]);
             $itemDataObject = $this->itemDataObjectFactory->create(
@@ -205,7 +206,7 @@ class QuoteCollectTotalsPrepareItems
             $itemAdapter = $this->arrayDataItemAdapterFactory->create([
                 'data' => [
                     'name' => __('Gift Card'),
-                    'sku' => __('giftcard'),
+                    'sku'  => __('giftcard'),
                 ],
             ]);
             $itemDataObject = $this->itemDataObjectFactory->create(

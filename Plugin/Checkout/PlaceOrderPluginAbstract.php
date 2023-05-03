@@ -94,6 +94,7 @@ abstract class PlaceOrderPluginAbstract
         // We don't have customer phone number, so we add dummy here
         // After order is paid it will be updated by status update
         $billingAddress->setTelephone('010123123');
+
         return $billingAddress;
     }
 
@@ -119,6 +120,7 @@ abstract class PlaceOrderPluginAbstract
         if (!$email) {
             $email = $additionalData['email'];
         }
+
         return $email;
     }
 
@@ -136,6 +138,7 @@ abstract class PlaceOrderPluginAbstract
         if ($purchaseId != $data['purchaseId']) {
             throw new LocalizedException(__('Validation error, please try again'));
         }
+
         return true;
     }
 }

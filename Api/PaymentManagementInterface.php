@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+
 namespace Avarda\Checkout3\Api;
 
 use Avarda\Checkout3\Api\Data\ItemDetailsListInterface;
@@ -19,7 +20,7 @@ interface PaymentManagementInterface
     /**
      * Get purchase ID for Avarda payment
      *
-     * @param int  $cartId
+     * @param int $cartId
      * @param bool $renew
      * @return PaymentDetailsInterface
      * @throws PaymentException
@@ -31,8 +32,8 @@ interface PaymentManagementInterface
      * everything is OK.
      *
      * @param int $cartId
-     * @throws PaymentException
      * @return void
+     * @throws PaymentException
      */
     public function freezeCart($cartId);
 
@@ -40,8 +41,8 @@ interface PaymentManagementInterface
      * Get quote items additional information not provided by Magento Webapi
      *
      * @param string $cartId
-     * @throws PaymentException
      * @return ItemDetailsListInterface
+     * @throws PaymentException
      */
     public function getItemDetailsList($cartId);
 }
