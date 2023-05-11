@@ -64,7 +64,7 @@ class AdditionalDataBuilder implements BuilderInterface
 
         $items = $order->getItems();
         if (!$items && $order instanceof QuoteAdapter) {
-            // If cart is not active cart items will not loaded,
+            // If cart is not active cart items will not load,
             // but cartRepository->get calls are cached without items loaded so that doesn't help either and
             // $order is an adapter, so it doesn't have getItemsCollection method
             // thus we load the quote with model so that we get the items loaded properly
@@ -77,7 +77,7 @@ class AdditionalDataBuilder implements BuilderInterface
                 return true;
             }
 
-            if ($item->hasChildren()) {
+            if (is_array($item->getChildren())) {
                 foreach ($item->getChildren() as $childItem) {
                     if (in_array($childItem->getProductType(), $productTypes)) {
                         return true;
