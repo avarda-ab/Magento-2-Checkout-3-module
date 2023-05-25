@@ -40,8 +40,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const KEY_ALTERNATIVE_CLIENT_SECRET = 'payment/avarda_checkout3_checkout/alternative_client_secret';
     const KEY_ALTERNATIVE_PRODUCT_TYPES = 'payment/avarda_checkout3_checkout/alternative_product_types';
 
-    const URL_TEST = 'https://avdonl-s-checkout.avarda.org/';
-    const URL_PRODUCTION = 'https://avdonl-p-checkout.avarda.org/';
+    const URL_TEST = 'https://stage.checkout-api.avarda.com/';
+    const URL_PRODUCTION = 'https://checkout-api.avarda.com/';
     const TOKEN_PATH = 'api/partner/tokens';
 
     /** @var EncryptorInterface */
@@ -207,9 +207,9 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function getCheckoutJsUrl()
     {
         if ($this->getTestMode()) {
-            return 'https://avdonl0s0checkout0fe.blob.core.windows.net/frontend/static/js/main.js';
+            return 'https://stage.checkout-cdn.avarda.com/cdn/static/js/main.js';
         } else {
-            return 'https://avdonl0p0checkout0fe.blob.core.windows.net/frontend/static/js/main.js';
+            return 'https://checkout-cdn.avarda.com/cdn/static/js/main.js';
         }
     }
 
