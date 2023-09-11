@@ -80,12 +80,20 @@ interface QuotePaymentManagementInterface
     public function updateOnlyPaymentStatus($quote);
 
     /**
-     * Update order payment status from Avarda.
+     * Update order payment status and info from Avarda.
      *
      * @param OrderInterface $order
      * @return void
      */
     public function updateOrderPaymentStatus($order);
+
+    /**
+     * Update order payment status from Avarda.
+     *
+     * @param OrderInterface $order
+     * @return void
+     */
+    public function updateOnlyOrderPaymentStatus($order);
 
     /**
      * Get quote ID by Avarda purchase ID

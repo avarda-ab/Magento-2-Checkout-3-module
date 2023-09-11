@@ -36,20 +36,18 @@ class GetOnlyStatusHandler implements HandlerInterface
     public function handle(array $handlingSubject, array $response)
     {
         $paymentDO = SubjectReader::readPayment($handlingSubject);
-        $order = $paymentDO->getOrder();
+        $payment = $paymentDO->getPayment();
 
-        $entityId = $order->getId();
-        $quote = $this->quoteRepository->get($entityId);
         $mode = $response['mode'] == 'B2B' ? 'b2B' : 'b2C';
 
         // Set payment method
         if (isset($response['paymentMethods']['selectedPayment']['type'])) {
             $paymentMethod = $this->methodHelper->getPaymentMethod($response['paymentMethods']['selectedPayment']['type']);
-            $quote->getPayment()->setMethod($paymentMethod);
+            $payment->setMethod($paymentMethod);
         }
 
         // Set payment state
-        $quote->getPayment()->setAdditionalInformation(
+        $payment->setAdditionalInformation(
             PaymentData::STATE,
             $response[$mode]['step']['current']
         )->setAdditionalInformation('renew', false);
