@@ -11,8 +11,6 @@ use Avarda\Checkout3\Helper\PaymentMethod;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
-use Magento\Quote\Api\Data\AddressInterfaceFactory;
-use Magento\Quote\Model\Quote\PaymentFactory;
 
 class GetOnlyStatusHandler implements HandlerInterface
 {
