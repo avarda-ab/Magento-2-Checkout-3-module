@@ -773,4 +773,14 @@
             <argument name="methodCode" xsi:type="const">Avarda\Checkout3\Model\Ui\ConfigProviderZeroAmount::CODE</argument>
         </arguments>
     </virtualType>
+    <type name="Avarda\Checkout3\Plugin\PrepareItems\Quote\QuoteCollectTotalsUpdateItems">
+        <arguments>
+            <argument name="config" xsi:type="object">Avarda\Checkout3\Gateway\Config\Config</argument>
+        </arguments>
+    </type>
+    <type name="Avarda\Checkout3\Plugin\PrepareItems\Quote\QuoteCollectTotalsPrepareItems">
+        <arguments>
+            <argument name="config" xsi:type="object">Avarda\Checkout3\Gateway\Config\Config</argument>
+        </arguments>
+    </type>
 </config>

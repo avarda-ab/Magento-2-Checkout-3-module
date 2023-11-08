@@ -13,19 +13,16 @@ use Exception;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\Exception\PaymentException;
 use Magento\Framework\Webapi\Exception as WebapiException;
+use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote;
 
 class QuoteCollectTotalsUpdateItems
 {
-    /** @var QuotePaymentManagementInterface */
-    protected $quotePaymentManagement;
-
-    /** @var PaymentData */
-    protected $paymentDataHelper;
-
-    /** @var PurchaseState */
-    protected $purchaseStateHelper;
+    protected QuotePaymentManagementInterface $quotePaymentManagement;
+    protected PaymentData $paymentDataHelper;
+    protected PurchaseState $purchaseStateHelper;
+    protected ConfigInterface $config;
 
     /** @var bool */
     static $collectTotalsFlag = false;
@@ -33,16 +30,19 @@ class QuoteCollectTotalsUpdateItems
     /** @var Http */
     protected $request;
 
+
     public function __construct(
         QuotePaymentManagementInterface $quotePaymentManagement,
         PaymentData $paymentDataHelper,
         PurchaseState $purchaseStateHelper,
-        Http $request
+        Http $request,
+        ConfigInterface $config
     ) {
         $this->quotePaymentManagement = $quotePaymentManagement;
         $this->paymentDataHelper = $paymentDataHelper;
         $this->purchaseStateHelper = $purchaseStateHelper;
         $this->request = $request;
+        $this->config = $config;
     }
 
     /**
@@ -56,6 +56,10 @@ class QuoteCollectTotalsUpdateItems
      */
     public function afterCollectTotals(CartInterface $subject, CartInterface $result)
     {
+        if (!$this->config->isActive()) {
+            return $result;
+        }
+
         $payment = $subject->getPayment();
         if (!self::$collectTotalsFlag &&
             $subject->getItemsCount() > 0 &&
