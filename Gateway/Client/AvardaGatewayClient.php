@@ -6,6 +6,7 @@
 
 namespace Avarda\Checkout3\Gateway\Client;
 
+use Laminas\Http\Request;
 use Magento\Framework\Webapi\Exception as WebapiException;
 use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\ConverterInterface;
@@ -50,14 +51,14 @@ class AvardaGatewayClient implements ClientInterface
 
         try {
             switch ($transferObject->getMethod()) {
-                case \Zend_Http_Client::GET:
+                case Request::METHOD_GET:
                     $result = $client->get($uri, $headers);
                     break;
-                case \Zend_Http_Client::POST:
+                case Request::METHOD_POST:
                     $response = $client->post($uri, $body, $headers);
                     $result = $this->converter->convert($response);
                     break;
-                case \Zend_Http_Client::PUT:
+                case Request::METHOD_PUT:
                     $response = $client->put($uri, $body, $headers);
                     $result = $this->converter->convert($response);
                     break;
