@@ -6,6 +6,7 @@
 namespace Avarda\Checkout3\Gateway\Client;
 
 use Avarda\Checkout3\Gateway\Config\Config;
+use Laminas\Http\Request;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Payment\Gateway\Http\TransferBuilder;
 use Magento\Payment\Gateway\Http\TransferFactoryInterface;
@@ -33,7 +34,7 @@ class TransferFactory implements TransferFactoryInterface
         EncryptorInterface $encryptor,
         TransferBuilder $transferBuilder,
         Config $config,
-        $method = \Zend_Http_Client::POST,
+        $method = Request::METHOD_GET,
         $uri = ''
     ) {
         $this->encryptor = $encryptor;

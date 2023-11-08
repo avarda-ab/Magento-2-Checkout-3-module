@@ -313,6 +313,14 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function updateOnlyOrderPaymentStatus($order)
+    {
+        $this->executeCommand('avarda_get_only_status', $order);
+    }
+
+    /**
      * @param $order OrderInterface|Order
      * @return void
      * @throws PaymentException

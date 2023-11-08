@@ -11,6 +11,7 @@ use Avarda\Checkout3\Gateway\Data\ItemAdapter\ArrayDataItemFactory;
 use Avarda\Checkout3\Gateway\Data\ItemAdapter\QuoteItemFactory;
 use Avarda\Checkout3\Gateway\Data\ItemDataObjectFactory;
 use Avarda\Checkout3\Helper\PaymentData;
+use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Psr\Log\LoggerInterface;
 
@@ -46,10 +47,13 @@ class QuoteCollectTotalsPrepareItems
      */
     protected $paymentDataHelper;
 
+    protected ConfigInterface $config;
+
     /**
      * @var bool
      */
     protected $collectTotalsFlag = false;
+
 
     /**
      * QuoteCollectTotals constructor.
@@ -67,7 +71,8 @@ class QuoteCollectTotalsPrepareItems
         ItemDataObjectFactory $itemDataObjectFactory,
         QuoteItemFactory $quoteItemAdapterFactory,
         ArrayDataItemFactory $arrayDataItemAdapterFactory,
-        PaymentData $paymentDataHelper
+        PaymentData $paymentDataHelper,
+        ConfigInterface $config
     ) {
         $this->logger = $logger;
         $this->itemStorage = $itemStorage;
@@ -75,6 +80,7 @@ class QuoteCollectTotalsPrepareItems
         $this->quoteItemAdapterFactory = $quoteItemAdapterFactory;
         $this->arrayDataItemAdapterFactory = $arrayDataItemAdapterFactory;
         $this->paymentDataHelper = $paymentDataHelper;
+        $this->config = $config;
     }
 
     /**
@@ -86,6 +92,10 @@ class QuoteCollectTotalsPrepareItems
      */
     public function afterCollectTotals(CartInterface $subject, CartInterface $result)
     {
+        if (!$this->config->isActive()) {
+            return $result;
+        }
+
         try {
             if (!$this->collectTotalsFlag &&
                 $subject->getItemsCount() > 0 &&

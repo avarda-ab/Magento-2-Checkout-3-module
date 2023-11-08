@@ -11,8 +11,6 @@ use Avarda\Checkout3\Helper\PaymentMethod;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
-use Magento\Quote\Api\Data\AddressInterfaceFactory;
-use Magento\Quote\Model\Quote\PaymentFactory;
 
 class GetOnlyStatusHandler implements HandlerInterface
 {
@@ -36,20 +34,18 @@ class GetOnlyStatusHandler implements HandlerInterface
     public function handle(array $handlingSubject, array $response)
     {
         $paymentDO = SubjectReader::readPayment($handlingSubject);
-        $order = $paymentDO->getOrder();
+        $payment = $paymentDO->getPayment();
 
-        $entityId = $order->getId();
-        $quote = $this->quoteRepository->get($entityId);
         $mode = $response['mode'] == 'B2B' ? 'b2B' : 'b2C';
 
         // Set payment method
         if (isset($response['paymentMethods']['selectedPayment']['type'])) {
             $paymentMethod = $this->methodHelper->getPaymentMethod($response['paymentMethods']['selectedPayment']['type']);
-            $quote->getPayment()->setMethod($paymentMethod);
+            $payment->setMethod($paymentMethod);
         }
 
         // Set payment state
-        $quote->getPayment()->setAdditionalInformation(
+        $payment->setAdditionalInformation(
             PaymentData::STATE,
             $response[$mode]['step']['current']
         )->setAdditionalInformation('renew', false);

@@ -83,11 +83,11 @@ class PaymentData
         $purchaseData = $this->getPurchaseData($payment);
 
         return $purchaseData && count($purchaseData)>=1 && (
-                !$paymentCode ||
-                strpos($paymentCode, 'avarda_checkout3') !== false ||
-                // free method is automatically set in checkout, but it will be changed to avarda zero_sum on status update
-                $paymentCode == Free::PAYMENT_METHOD_FREE_CODE
-            );
+            !$paymentCode ||
+            strpos($paymentCode, 'avarda_checkout3') !== false ||
+            // free method is automatically set in checkout, but it will be changed to avarda zero_sum on status update
+            $paymentCode == Free::PAYMENT_METHOD_FREE_CODE
+        );
     }
 
     /**
