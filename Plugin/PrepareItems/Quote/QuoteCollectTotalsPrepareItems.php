@@ -194,7 +194,7 @@ class QuoteCollectTotalsPrepareItems
             $itemDataObject = $this->itemDataObjectFactory->create(
                 $itemAdapter,
                 1,
-                $shippingAddress->getShippingInclTax(),
+                $shippingAddress->getShippingInclTax() - $shippingAddress->getShippingDiscountAmount(),
                 $shippingAddress->getShippingTaxAmount()
             );
 

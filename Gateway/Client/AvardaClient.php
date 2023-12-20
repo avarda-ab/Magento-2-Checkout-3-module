@@ -140,10 +140,10 @@ class AvardaClient
             case 403:
             case 404:
             case 405:
-                $this->logger->debug([$response->getStatusCode(), $response->getBody()]);
+                $this->logger->debug([$response->getStatusCode(), (string)$response->getBody()]);
                 throw new \RuntimeException('Error in request');
             case 500:
-                $this->logger->debug([$response->getStatusCode(), $response->getBody()]);
+                $this->logger->debug([$response->getStatusCode(), (string)$response->getBody()]);
                 throw new \RuntimeException('Avarda server error');
             default:
                 throw new \RuntimeException('Unhandled response status code: ' . $response->getStatusCode());
