@@ -10,31 +10,23 @@ use Laminas\Http\Request;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Payment\Gateway\Http\TransferBuilder;
 use Magento\Payment\Gateway\Http\TransferFactoryInterface;
+use Magento\Payment\Gateway\Http\TransferInterface;
 
 class TransferFactory implements TransferFactoryInterface
 {
     const BEARER_AUTHENTICATION_FORMAT = 'Bearer %s';
 
-    /** @var EncryptorInterface */
-    protected $encryptor;
-
-    /** @var TransferBuilder */
-    protected $transferBuilder;
-
-    /** @var Config */
-    protected $config;
-
-    /** @var string */
-    protected $method;
-
-    /** @var string */
-    protected $uri;
+    protected EncryptorInterface $encryptor;
+    protected TransferBuilder $transferBuilder;
+    protected Config $config;
+    protected string $method;
+    protected string $uri;
 
     public function __construct(
         EncryptorInterface $encryptor,
         TransferBuilder $transferBuilder,
         Config $config,
-        $method = Request::METHOD_GET,
+        $method = Request::METHOD_POST,
         $uri = ''
     ) {
         $this->encryptor = $encryptor;
@@ -48,7 +40,7 @@ class TransferFactory implements TransferFactoryInterface
      * Builds gateway transfer object
      *
      * @param array $request
-     * @return \Magento\Payment\Gateway\Http\TransferInterface
+     * @return TransferInterface
      */
     public function create(array $request)
     {

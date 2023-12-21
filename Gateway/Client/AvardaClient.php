@@ -18,17 +18,10 @@ use Psr\Http\Message\ResponseInterface;
 
 class AvardaClient
 {
-    /** @var Config */
-    protected $config;
-
-    /** @var FlagManager */
-    protected $flagManager;
-
-    /** @var ResponseInterface */
-    protected $lastResponse;
-
-    /** @var Logger */
-    protected $logger;
+    protected Config $config;
+    protected FlagManager $flagManager;
+    protected Logger $logger;
+    protected ?ResponseInterface $lastResponse = null;
 
     public function __construct(
         Config $config,

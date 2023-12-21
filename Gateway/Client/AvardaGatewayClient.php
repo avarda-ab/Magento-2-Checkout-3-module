@@ -7,7 +7,6 @@
 namespace Avarda\Checkout3\Gateway\Client;
 
 use Laminas\Http\Request;
-use Magento\Framework\Webapi\Exception as WebapiException;
 use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\ConverterInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
@@ -15,19 +14,14 @@ use Magento\Payment\Model\Method\Logger;
 
 class AvardaGatewayClient implements ClientInterface
 {
-    /** @var AvardaClientFactory */
-    private $avardaClient;
-
-    /** @var ConverterInterface|null */
-    private $converter;
-
-    /** @var Logger */
-    private $logger;
+    protected AvardaClientFactory $avardaClient;
+    protected ConverterInterface $converter;
+    protected Logger $logger;
 
     public function __construct(
         AvardaClientFactory $avardaClient,
         Logger $logger,
-        ConverterInterface $converter = null
+        ConverterInterface $converter
     ) {
         $this->avardaClient = $avardaClient;
         $this->converter    = $converter;
