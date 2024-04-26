@@ -19,20 +19,11 @@ use Magento\Sales\Model\Order;
 
 class OrderCancelObserver implements ObserverInterface
 {
-    /** @var PaymentData */
-    protected $paymentDataHelper;
-
-    /** @var PurchaseState */
-    protected $purchaseState;
-
-    /** @var CommandPoolInterface */
-    protected $commandPool;
-
-    /** @var PaymentDataObjectFactoryInterface */
-    protected $paymentDataObjectFactory;
-
-    /** @var AvardaOrderRepositoryInterface */
-    protected $avardaOrderRepository;
+    protected PaymentData $paymentDataHelper;
+    protected PurchaseState $purchaseState;
+    protected CommandPoolInterface $commandPool;
+    protected PaymentDataObjectFactoryInterface $paymentDataObjectFactory;
+    protected AvardaOrderRepositoryInterface $avardaOrderRepository;
 
     public function __construct(
         PaymentData $paymentDataHelper,
@@ -59,15 +50,19 @@ class OrderCancelObserver implements ObserverInterface
 
             // Only cancel online if status is completed
             if ($this->purchaseState->isComplete($state)) {
-
+                $arguments = [];
                 /** @var InfoInterface|null $payment */
                 if ($payment instanceof InfoInterface) {
                     $arguments['payment'] = $this->paymentDataObjectFactory
                         ->create($payment);
                 }
 
-                $arguments['amount'] = $payment->getAmountOrdered();
-                $this->commandPool->get('avarda_cancel')->execute($arguments);
+                // If order is partly invoiced, we need to use refund remaining not cancel
+                if ($order->getBaseTotalInvoiced() > 0) {
+                    $this->commandPool->get('avarda_refund_remaining')->execute($arguments);
+                } else {
+                    $this->commandPool->get('avarda_cancel')->execute($arguments);
+                }
             } else {
                 // If pending payment was canceled delete the order complete row
                 try {

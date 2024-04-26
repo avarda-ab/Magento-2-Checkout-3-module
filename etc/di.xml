@@ -65,9 +65,6 @@
     <type name="Magento\Sales\Api\Data\InvoiceInterface">
         <plugin name="avarda_checkout3_InvoiceCollectTotalsPrepareItems" type="Avarda\Checkout3\Plugin\PrepareItems\Order\InvoiceCollectTotalsPrepareItems" sortOrder="900" />
     </type>
-    <type name="Magento\Sales\Api\Data\CreditmemoInterface">
-        <plugin name="avarda_checkout3_CreditmemoCollectTotalsPrepareItems" type="Avarda\Checkout3\Plugin\PrepareItems\Order\CreditmemoCollectTotalsPrepareItems" sortOrder="900" />
-    </type>
     <type name="Magento\Checkout\Api\GuestPaymentInformationManagementInterface">
         <plugin name="avarda_checkout3_guest_place_order" type="Avarda\Checkout3\Plugin\Checkout\GuestPlaceOrderPlugin" />
     </type>
@@ -98,8 +95,9 @@
                 <item name="avarda_get_jwt_token" xsi:type="string">AvardaCheckout3GetJwtTokenCommand</item>
                 <item name="initialize" xsi:type="string">AvardaCheckout3PendingPaymentCommand</item>
                 <item name="capture" xsi:type="string">AvardaCheckout3PurchaseOrderCommand</item>
-                <item name="refund" xsi:type="string">AvardaCheckout3RefundCommand</item>
-                <item name="avarda_cancel" xsi:type="string">AvardaCheckout3ReturnCommand</item>
+                <item name="refund" xsi:type="string">AvardaCheckout3ReturnCommand</item>
+                <item name="avarda_cancel" xsi:type="string">AvardaCheckout3CancelCommand</item>
+                <item name="avarda_refund_remaining" xsi:type="string">AvardaCheckout3RefundRemainingCommand</item>
             </argument>
         </arguments>
     </virtualType>
@@ -255,17 +253,17 @@
     </virtualType>
 
     <!-- Return order to avarda command -->
-    <virtualType name="AvardaCheckout3RefundCommand" type="AvardaCheckout3Command">
+    <virtualType name="AvardaCheckout3ReturnCommand" type="AvardaCheckout3Command">
         <arguments>
-            <argument name="requestBuilder" xsi:type="object">AvardaCheckout3RefundRequest</argument>
-            <argument name="transferFactory" xsi:type="object">AvardaCheckout3RefundTransferFactory</argument>
+            <argument name="requestBuilder" xsi:type="object">AvardaCheckout3ReturnRequest</argument>
+            <argument name="transferFactory" xsi:type="object">AvardaCheckout3ReturnTransferFactory</argument>
         </arguments>
     </virtualType>
-    <virtualType name="AvardaCheckout3RefundRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+    <virtualType name="AvardaCheckout3ReturnRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
                 <item name="additional" xsi:type="string">Avarda\Checkout3\Gateway\Request\AdditionalDataBuilder</item>
-                <item name="items" xsi:type="string">Avarda\Checkout3\Gateway\Request\ItemsDataBuilder</item>
+                <item name="items" xsi:type="string">Avarda\Checkout3\Gateway\Request\ReturnItemsDataBuilder</item>
                 <item name="order_reference" xsi:type="string">Avarda\Checkout3\Gateway\Request\OrderReferenceDataBuilder</item>
                 <item name="transaction_id" xsi:type="string">Avarda\Checkout3\Gateway\Request\TranIdDataBuilder</item>
                 <item name="reason" xsi:type="string">Avarda\Checkout3\Gateway\Request\OrderCancelReasonBuilder</item>
@@ -273,21 +271,21 @@
             </argument>
         </arguments>
     </virtualType>
-    <virtualType name="AvardaCheckout3RefundTransferFactory" type="Avarda\Checkout3\Gateway\Client\TransferFactory">
+    <virtualType name="AvardaCheckout3ReturnTransferFactory" type="Avarda\Checkout3\Gateway\Client\TransferFactory">
         <arguments>
             <argument name="uri" xsi:type="string">api/partner/payments/{purchaseid}/return</argument>
         </arguments>
     </virtualType>
 
     <!-- Cancel order to avarda command -->
-    <virtualType name="AvardaCheckout3ReturnCommand" type="AvardaCheckout3Command">
+    <virtualType name="AvardaCheckout3CancelCommand" type="AvardaCheckout3Command">
         <arguments>
-            <argument name="requestBuilder" xsi:type="object">AvardaCheckout3ReturnRequest</argument>
-            <argument name="transferFactory" xsi:type="object">AvardaCheckout3ReturnTransferFactory</argument>
-            <argument name="handler" xsi:type="object">Avarda\Checkout3\Gateway\Response\ReturnPaymentHandler</argument>
+            <argument name="requestBuilder" xsi:type="object">AvardaCheckout3CancelRequest</argument>
+            <argument name="transferFactory" xsi:type="object">AvardaCheckout3CancelTransferFactory</argument>
+            <argument name="handler" xsi:type="object">Avarda\Checkout3\Gateway\Response\CancelPaymentHandler</argument>
         </arguments>
     </virtualType>
-    <virtualType name="AvardaCheckout3ReturnRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+    <virtualType name="AvardaCheckout3CancelRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
                 <item name="additional" xsi:type="string">Avarda\Checkout3\Gateway\Request\AdditionalDataBuilder</item>
@@ -295,9 +293,33 @@
             </argument>
         </arguments>
     </virtualType>
-    <virtualType name="AvardaCheckout3ReturnTransferFactory" type="Avarda\Checkout3\Gateway\Client\TransferFactory">
+    <virtualType name="AvardaCheckout3CancelTransferFactory" type="Avarda\Checkout3\Gateway\Client\TransferFactory">
         <arguments>
             <argument name="uri" xsi:type="string">api/partner/payments/{purchaseid}/cancel</argument>
+        </arguments>
+    </virtualType>
+    <!-- END Avarda commands -->
+
+    <!-- Refund remaining order to avarda command -->
+    <virtualType name="AvardaCheckout3RefundRemainingCommand" type="AvardaCheckout3Command">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">AvardaCheckout3RefundRemainingRequest</argument>
+            <argument name="transferFactory" xsi:type="object">AvardaCheckout3RefundRemainingTransferFactory</argument>
+            <argument name="handler" xsi:type="object">Avarda\Checkout3\Gateway\Response\CancelPaymentHandler</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="AvardaCheckout3RefundRemainingRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="additional" xsi:type="string">Avarda\Checkout3\Gateway\Request\AdditionalDataBuilder</item>
+                <item name="order_reference" xsi:type="string">Avarda\Checkout3\Gateway\Request\OrderReferenceDataBuilder</item>
+                <item name="transaction_id" xsi:type="string">Avarda\Checkout3\Gateway\Request\TranIdDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="AvardaCheckout3RefundRemainingTransferFactory" type="Avarda\Checkout3\Gateway\Client\TransferFactory">
+        <arguments>
+            <argument name="uri" xsi:type="string">api/partner/payments/{purchaseid}/refundRemaining</argument>
         </arguments>
     </virtualType>
     <!-- END Avarda commands -->
@@ -339,11 +361,6 @@
         <arguments>
             <argument name="logger" xsi:type="object">AvardaCheckout3Logger</argument>
             <argument name="converter" xsi:type="object">Avarda\Checkout3\Gateway\Client\Converter\JsonConverter</argument>
-        </arguments>
-    </virtualType>
-    <virtualType name="AvardaCheckout3Logger" type="Magento\Payment\Model\Method\Logger">
-        <arguments>
-            <argument name="config" xsi:type="object">AvardaCheckout3GenericConfig</argument>
         </arguments>
     </virtualType>
     <!-- END Avarda HTTP client -->
@@ -773,6 +790,7 @@
             <argument name="methodCode" xsi:type="const">Avarda\Checkout3\Model\Ui\ConfigProviderZeroAmount::CODE</argument>
         </arguments>
     </virtualType>
+
     <type name="Avarda\Checkout3\Plugin\PrepareItems\Quote\QuoteCollectTotalsUpdateItems">
         <arguments>
             <argument name="config" xsi:type="object">Avarda\Checkout3\Gateway\Config\Config</argument>
@@ -781,6 +799,11 @@
     <type name="Avarda\Checkout3\Plugin\PrepareItems\Quote\QuoteCollectTotalsPrepareItems">
         <arguments>
             <argument name="config" xsi:type="object">Avarda\Checkout3\Gateway\Config\Config</argument>
+        </arguments>
+    </type>
+    <type name="Avarda\Checkout3\Controller\Checkout\SaveOrder">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
         </arguments>
     </type>
 </config>
