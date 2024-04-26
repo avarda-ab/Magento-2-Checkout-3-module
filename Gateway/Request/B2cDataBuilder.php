@@ -36,11 +36,8 @@ class B2cDataBuilder implements BuilderInterface
     /** country */
     const COUNTRY = 'country';
 
-    /** @var Session */
-    protected $customerSession;
-
-    /** @var ScopeConfigInterface */
-    protected $config;
+    protected Session $customerSession;
+    protected ScopeConfigInterface $config;
 
     public function __construct(
         Session $customerSession,

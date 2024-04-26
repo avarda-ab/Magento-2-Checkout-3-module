@@ -6,6 +6,7 @@
 
 namespace Avarda\Checkout3\Gateway\Request;
 
+use Avarda\Checkout3\Helper\PaymentData;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 
@@ -19,20 +20,10 @@ class TranIdDataBuilder implements BuilderInterface
      */
     const TRAN_ID = 'tranId';
 
-    /**
-     * Helper for payment info instances, eg. to generate transaction IDs.
-     *
-     * @var \Avarda\Checkout3\Helper\PaymentData
-     */
-    protected $paymentDataHelper;
+    protected PaymentData $paymentDataHelper;
 
-    /**
-     * TranIdDataBuilder constructor.
-     *
-     * @param \Avarda\Checkout3\Helper\PaymentData $paymentDataHelper
-     */
     public function __construct(
-        \Avarda\Checkout3\Helper\PaymentData $paymentDataHelper
+        PaymentData $paymentDataHelper
     ) {
         $this->paymentDataHelper = $paymentDataHelper;
     }

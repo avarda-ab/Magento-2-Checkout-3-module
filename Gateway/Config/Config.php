@@ -9,6 +9,7 @@ namespace Avarda\Checkout3\Gateway\Config;
 use Avarda\Checkout3\Model\Ui\ConfigProviderBase;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\FlagManager;
 use Magento\Framework\Url;
 use Magento\Framework\UrlInterface;
@@ -44,21 +45,11 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const URL_PRODUCTION = 'https://checkout-api.avarda.com/';
     const TOKEN_PATH = 'api/partner/tokens';
 
-    /** @var EncryptorInterface */
-    protected $encryptor;
-
-    /** @var FlagManager */
-    protected $flagManager;
-
-    /** @var Url */
-    protected $url;
-
-    /** @var ScopeConfigInterface */
-    protected $scopeConfig;
-
-    /** @var StoreManagerInterface */
-    protected $storeManager;
-
+    protected EncryptorInterface $encryptor;
+    protected FlagManager $flagManager;
+    protected Url $url;
+    protected ScopeConfigInterface $scopeConfig;
+    protected StoreManagerInterface $storeManager;
     protected $storeId = null;
 
     public function __construct(
@@ -88,7 +79,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     }
 
     /**
-     * @return string|int
+     * @return int
+     * @throws NoSuchEntityException
      */
     public function getStoreId()
     {
@@ -100,8 +92,10 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     /**
      * Get config value in storeCode scope
+     *
      * @param $path
      * @return mixed
+     * @throws NoSuchEntityException
      */
     public function getConfigValue($path)
     {
@@ -132,6 +126,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     /**
      * @return string
+     * @throws NoSuchEntityException
      */
     public function getClientSecret()
     {
@@ -140,6 +135,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     /**
      * @return string
+     * @throws NoSuchEntityException
      */
     public function getClientId()
     {
@@ -190,6 +186,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     /**
      * @return string
+     * @throws NoSuchEntityException
      */
     public function getToken($alternative = false)
     {
@@ -198,6 +195,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     /**
      * @param $token string
+     * @throws NoSuchEntityException
      */
     public function saveNewToken($token, $alternative = false)
     {
@@ -223,6 +221,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     /**
      * @return string
+     * @throws NoSuchEntityException
      */
     public function getCustomCss()
     {
@@ -231,6 +230,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     /**
      * @return bool
+     * @throws NoSuchEntityException
      */
     public function getCountrySelector()
     {
@@ -239,6 +239,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     /**
      * @return bool
+     * @throws NoSuchEntityException
      */
     public function getShowB2Blink()
     {
@@ -247,6 +248,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     /**
      * @return bool
+     * @throws NoSuchEntityException
      */
     public function getShowPostcode()
     {
@@ -255,6 +257,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     /**
      * @return bool
+     * @throws NoSuchEntityException
      */
     public function getAdressChangeCallback()
     {
@@ -263,6 +266,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     /**
      * @return bool
+     * @throws NoSuchEntityException
      */
     public function getOfferLogin()
     {
@@ -271,6 +275,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     /**
      * @return bool
+     * @throws NoSuchEntityException
      */
     public function getShowNewsletter(): bool
     {
@@ -279,6 +284,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     /**
      * @return bool
+     * @throws NoSuchEntityException
      */
     public function getNewsletterSelectedDefault(): bool
     {

@@ -16,8 +16,7 @@ use Magento\Framework\View\Helper\Js;
 
 class Payment extends Fieldset
 {
-    /** @var Config */
-    protected $_backendConfig;
+    protected Config $backendConfig;
 
     public function __construct(
         Context $context,
@@ -27,7 +26,7 @@ class Payment extends Fieldset
         array $data = []
     ) {
         parent::__construct($context, $authSession, $jsHelper, $data);
-        $this->_backendConfig = $backendConfig;
+        $this->backendConfig = $backendConfig;
     }
 
     /**

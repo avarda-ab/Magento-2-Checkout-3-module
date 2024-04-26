@@ -23,11 +23,8 @@ class AdditionalDataBuilder implements BuilderInterface
      */
     const ADDITIONAL = 'additional';
 
-    /** @var Config */
-    private $config;
-
-    /** @var CartInterfaceFactory */
-    private $cartInterfaceFactory;
+    private Config $config;
+    private CartInterfaceFactory $cartInterfaceFactory;
 
     public function __construct(
         Config $config,

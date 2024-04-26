@@ -14,11 +14,8 @@ use Magento\Quote\Api\CartRepositoryInterface;
 
 class GetOnlyStatusHandler implements HandlerInterface
 {
-    /** @var CartRepositoryInterface */
-    protected $quoteRepository;
-
-    /** @var PaymentMethod */
-    protected $methodHelper;
+    protected CartRepositoryInterface $quoteRepository;
+    protected PaymentMethod $methodHelper;
 
     public function __construct(
         CartRepositoryInterface $quoteRepository,

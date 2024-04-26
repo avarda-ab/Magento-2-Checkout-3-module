@@ -18,14 +18,9 @@ use Magento\Sales\Model\Order;
 
 class UpdateOrderStatusHandler implements HandlerInterface
 {
-    /** @var OrderRepositoryInterface */
-    protected $orderRepository;
-
-    /** @var PaymentMethod */
-    protected $methodHelper;
-
-    /** @var SubscriberFactory */
-    protected $subscriberFactory;
+    protected OrderRepositoryInterface $orderRepository;
+    protected PaymentMethod $methodHelper;
+    protected SubscriberFactory $subscriberFactory;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
@@ -72,31 +67,28 @@ class UpdateOrderStatusHandler implements HandlerInterface
         $street2 = $response[$mode]['invoicingAddress']['address2'];
         $billingAddress->setStreet(
             $response[$mode]['invoicingAddress']['address1'] .
-            (isset($street2) && $street2 ? "\n" . $response[$mode]['invoicingAddress']['address2'] : '')
+            (isset($street2) && $street2 ? "\n" . $street2 : '')
         );
         $billingAddress->setPostcode($response[$mode]['invoicingAddress']['zip']);
         $billingAddress->setCity($response[$mode]['invoicingAddress']['city']);
         $billingAddress->setCountryId($response[$mode]['invoicingAddress']['country']);
 
         if ($order->getIsNotVirtual()) {
+            $shippingAddress = $order->getShippingAddress();
+            $shippingAddress->setTelephone($telephone);
+            $shippingAddress->setEmail($email);
             if ($response[$mode]['deliveryAddress']['firstName']) {
-                $shippingAddress = $order->getShippingAddress();
-                $shippingAddress->setTelephone($telephone);
-                $shippingAddress->setEmail($email);
                 $shippingAddress->setFirstname($response[$mode]['deliveryAddress']['firstName']);
                 $shippingAddress->setLastname($response[$mode]['deliveryAddress']['lastName']);
                 $street2 = $response[$mode]['deliveryAddress']['address2'];
                 $shippingAddress->setStreet(
                     $response[$mode]['deliveryAddress']['address1'] .
-                    (isset($street2) && $street2 ? "\n" . $response[$mode]['deliveryAddress']['address2'] : '')
+                    (isset($street2) && $street2 ? "\n" . $street2 : '')
                 );
                 $shippingAddress->setPostcode($response[$mode]['deliveryAddress']['zip'] ?? $response[$mode]['invoicingAddress']['zip']);
                 $shippingAddress->setCity($response[$mode]['deliveryAddress']['city'] ?? $response[$mode]['invoicingAddress']['city']);
                 $shippingAddress->setCountryId($response[$mode]['deliveryAddress']['country'] ?? $response[$mode]['invoicingAddress']['country']);
             } else {
-                $shippingAddress = $order->getShippingAddress();
-                $shippingAddress->setTelephone($telephone);
-                $shippingAddress->setEmail($email);
                 $shippingAddress->setFirstname($billingAddress->getFirstname());
                 $shippingAddress->setLastname($billingAddress->getLastname());
                 $shippingAddress->setCity($billingAddress->getCity());

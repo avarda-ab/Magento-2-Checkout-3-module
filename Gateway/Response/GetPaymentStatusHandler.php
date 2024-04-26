@@ -19,20 +19,11 @@ use Magento\Quote\Model\Quote\PaymentFactory;
 
 class GetPaymentStatusHandler implements HandlerInterface
 {
-    /** @var CartRepositoryInterface */
-    protected $quoteRepository;
-
-    /** @var AddressInterfaceFactory */
-    protected $addressFactory;
-
-    /** @var PaymentFactory */
-    protected $paymentFactory;
-
-    /** @var PaymentMethod */
-    protected $methodHelper;
-
-    /** @var SubscriberFactory */
-    protected $subscriberFactory;
+    protected CartRepositoryInterface $quoteRepository;
+    protected AddressInterfaceFactory $addressFactory;
+    protected PaymentFactory $paymentFactory;
+    protected PaymentMethod $methodHelper;
+    protected SubscriberFactory $subscriberFactory;
 
     public function __construct(
         CartRepositoryInterface $quoteRepository,
@@ -78,7 +69,7 @@ class GetPaymentStatusHandler implements HandlerInterface
         $street2 = $response[$mode]['invoicingAddress']['address2'];
         $billingAddress->setStreet(
             $response[$mode]['invoicingAddress']['address1'] .
-            (isset($street2) && $street2 ? "\n" . $response[$mode]['invoicingAddress']['address2'] : '')
+            (isset($street2) && $street2 ? "\n" . $street2 : '')
         );
         $billingAddress->setPostcode($response[$mode]['invoicingAddress']['zip']);
         $billingAddress->setCity($response[$mode]['invoicingAddress']['city']);
@@ -94,7 +85,7 @@ class GetPaymentStatusHandler implements HandlerInterface
             $street2 = $response[$mode]['deliveryAddress']['address2'];
             $shippingAddress->setStreet(
                 $response[$mode]['deliveryAddress']['address1'] .
-                (isset($street2) && $street2 ? "\n" . $response[$mode]['deliveryAddress']['address2'] : '')
+                (isset($street2) && $street2 ? "\n" . $street2 : '')
             );
             $shippingAddress->setPostcode($response[$mode]['deliveryAddress']['zip'] ?? $response[$mode]['invoicingAddress']['zip']);
             $shippingAddress->setCity($response[$mode]['deliveryAddress']['city'] ?? $response[$mode]['invoicingAddress']['city']);

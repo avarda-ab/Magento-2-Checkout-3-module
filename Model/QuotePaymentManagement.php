@@ -16,7 +16,10 @@ use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Exception\NotFoundException;
 use Magento\Framework\Exception\PaymentException;
+use Magento\Payment\Gateway\Command\CommandException;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectFactoryInterface;
 use Magento\Payment\Model\InfoInterface;
@@ -300,6 +303,9 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
      */
     public function updateOnlyPaymentStatus($quote)
     {
+        if (!$quote instanceof CartInterface) {
+            $quote = $this->getQuote($quote);
+        }
         $this->isAvardaPayment($quote);
         $this->executeCommand('avarda_get_only_status', $quote);
     }
@@ -402,6 +408,8 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
      * @param string $commandCode
      * @param CartInterface|Quote|OrderInterface $quote
      * @return void
+     * @throws NotFoundException
+     * @throws CommandException
      */
     protected function executeCommand($commandCode, $quote)
     {
@@ -423,6 +431,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
      *
      * @param int $cartId
      * @return CartInterface|Quote
+     * @throws NoSuchEntityException
      */
     public function getQuote($cartId)
     {

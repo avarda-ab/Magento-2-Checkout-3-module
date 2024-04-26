@@ -12,11 +12,8 @@ use Magento\Framework\Controller\ResultInterface;
 
 class CheckoutIndex
 {
-    /** @var Config */
-    protected $config;
-
-    /** @var RedirectFactory */
-    protected $redirectFactory;
+    protected Config $config;
+    protected RedirectFactory $redirectFactory;
 
     public function __construct(
         RedirectFactory $redirectFactory,

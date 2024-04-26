@@ -11,60 +11,25 @@ use Avarda\Checkout3\Gateway\Data\ItemAdapter\ArrayDataItemFactory;
 use Avarda\Checkout3\Gateway\Data\ItemAdapter\QuoteItemFactory;
 use Avarda\Checkout3\Gateway\Data\ItemDataObjectFactory;
 use Avarda\Checkout3\Helper\PaymentData;
+use Exception;
 use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Quote\Api\Data\CartInterface;
+use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\Quote\Item;
 use Psr\Log\LoggerInterface;
 
 class QuoteCollectTotalsPrepareItems
 {
-    /**
-     * @var LoggerInterface $logger
-     */
-    protected $logger;
-
-    /**
-     * @var ItemStorageInterface $itemStorage
-     */
-    protected $itemStorage;
-
-    /**
-     * @var ItemDataObjectFactory $itemDataObjectFactory
-     */
-    protected $itemDataObjectFactory;
-
-    /**
-     * @var QuoteItemFactory $quoteItemAdapterFactory
-     */
-    protected $quoteItemAdapterFactory;
-
-    /**
-     * @var ArrayDataItemFactory $arrayDataItemAdapterFactory
-     */
-    protected $arrayDataItemAdapterFactory;
-
-    /**
-     * @var PaymentData
-     */
-    protected $paymentDataHelper;
-
+    protected LoggerInterface $logger;
+    protected ItemStorageInterface $itemStorage;
+    protected ItemDataObjectFactory $itemDataObjectFactory;
+    protected QuoteItemFactory $quoteItemAdapterFactory;
+    protected ArrayDataItemFactory $arrayDataItemAdapterFactory;
+    protected PaymentData $paymentDataHelper;
     protected ConfigInterface $config;
 
-    /**
-     * @var bool
-     */
-    protected $collectTotalsFlag = false;
+    protected bool $collectTotalsFlag = false;
 
-
-    /**
-     * QuoteCollectTotals constructor.
-     *
-     * @param LoggerInterface $logger
-     * @param ItemStorageInterface $itemStorage
-     * @param ItemDataObjectFactory $itemDataObjectFactory,
-     * @param QuoteItemFactory $quoteItemAdapterFactory
-     * @param ArrayDataItemFactory $arrayDataItemAdapterFactory
-     * @param PaymentData $paymentDataHelper
-     */
     public function __construct(
         LoggerInterface $logger,
         ItemStorageInterface $itemStorage,
@@ -104,7 +69,7 @@ class QuoteCollectTotalsPrepareItems
                 $this->prepareItemStorage($subject);
                 $this->collectTotalsFlag = true;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->error($e);
         }
 
@@ -129,14 +94,14 @@ class QuoteCollectTotalsPrepareItems
     /**
      * Create item data objects from quote items
      *
-     * @param CartInterface|\Magento\Quote\Model\Quote $subject
+     * @param CartInterface|Quote $subject
      *
      * @return void
      */
     protected function prepareItems(CartInterface $subject)
     {
         $addedBundleProductIds = [];
-        /** @var \Magento\Quote\Model\Quote\Item $item */
+        /** @var Item $item */
         foreach ($subject->getItemsCollection() as $item) {
             if ($item->getData('product_id') === null ||
                 (
@@ -173,7 +138,7 @@ class QuoteCollectTotalsPrepareItems
     /**
      * Create item data object from shipment information
      *
-     * @param CartInterface|\Magento\Quote\Model\Quote $subject
+     * @param CartInterface|Quote $subject
      *
      * @return void
      */
@@ -205,7 +170,7 @@ class QuoteCollectTotalsPrepareItems
     /**
      * Create item data object from gift card information
      *
-     * @param CartInterface|\Magento\Quote\Model\Quote $subject
+     * @param CartInterface|Quote $subject
      *
      * @return void
      */

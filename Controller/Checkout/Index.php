@@ -26,32 +26,15 @@ use Psr\Log\LoggerInterface;
 
 class Index extends AbstractCheckout
 {
-    /** @var PageFactory */
-    protected $resultPageFactory;
-
-    /** @var Data */
-    protected $checkoutHelper;
-
-    /** @var CustomerSession */
-    protected $customerSession;
-
-    /** @var CheckoutSession */
-    protected $checkoutSession;
-
-    /** @var CartRepositoryInterface */
-    protected $quoteRepository;
-
-    /** @var RequestInterface */
-    protected $request;
-
-    /** @var QuotePaymentManagement */
-    protected $quotePaymentManagement;
-
-    /** @var PurchaseState */
-    protected $purchaseState;
-
-    /** @var PaymentData */
-    protected $paymentData;
+    protected PageFactory $resultPageFactory;
+    protected Data $checkoutHelper;
+    protected CustomerSession $customerSession;
+    protected CheckoutSession $checkoutSession;
+    protected CartRepositoryInterface $quoteRepository;
+    protected RequestInterface $request;
+    protected QuotePaymentManagement $quotePaymentManagement;
+    protected PurchaseState $purchaseState;
+    protected PaymentData $paymentData;
 
     public function __construct(
         Context $context,

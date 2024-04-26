@@ -12,6 +12,7 @@ use Avarda\Checkout3\Api\Data\ItemDetailsListInterface;
 use Avarda\Checkout3\Api\Data\ItemDetailsListInterfaceFactory;
 use Avarda\Checkout3\Api\ItemManagementInterface;
 use Avarda\Checkout3\Api\ItemStorageInterface;
+use Magento\Catalog\Helper\ImageFactory;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 
 /**
@@ -21,39 +22,16 @@ class ItemManagement implements ItemManagementInterface
 {
     const IMAGE_THUMBNAIL = 'cart_page_product_thumbnail';
 
-    /**
-     * @var ItemStorageInterface
-     */
-    protected $itemStorage;
+    protected ItemStorageInterface $itemStorage;
+    protected ItemDetailsInterfaceFactory $itemDetailsFactory;
+    protected ItemDetailsListInterfaceFactory $itemDetailsListFactory;
+    protected ImageFactory $imageHelperFactory;
 
-    /**
-     * @var ItemDetailsInterfaceFactory
-     */
-    protected $itemDetailsFactory;
-
-    /**
-     * @var ItemDetailsListInterfaceFactory
-     */
-    protected $itemDetailsListFactory;
-
-    /**
-     * @var \Magento\Catalog\Helper\ImageFactory
-     */
-    protected $imageHelperFactory;
-
-    /**
-     * ItemManagement constructor.
-     *
-     * @param ItemStorageInterface $itemStorage
-     * @param ItemDetailsInterfaceFactory $itemDetailsFactory
-     * @param ItemDetailsListInterfaceFactory $itemDetailsListFactory
-     * @param \Magento\Catalog\Helper\ImageFactory $imageHelperFactory
-     */
     public function __construct(
         ItemStorageInterface $itemStorage,
         ItemDetailsInterfaceFactory $itemDetailsFactory,
         ItemDetailsListInterfaceFactory $itemDetailsListFactory,
-        \Magento\Catalog\Helper\ImageFactory $imageHelperFactory
+        ImageFactory $imageHelperFactory
     ) {
         $this->itemStorage = $itemStorage;
         $this->itemDetailsFactory = $itemDetailsFactory;

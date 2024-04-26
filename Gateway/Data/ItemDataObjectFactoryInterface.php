@@ -17,7 +17,7 @@ interface ItemDataObjectFactoryInterface
     /**
      * Creates Item Data Object
      *
-     * @param ItemAdapterInterface
+     * @param ItemAdapterInterface $item
      * @param float $qty
      * @param float $amount
      * @param float $taxAmount

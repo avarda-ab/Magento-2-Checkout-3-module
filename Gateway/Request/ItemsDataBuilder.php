@@ -24,22 +24,9 @@ class ItemsDataBuilder implements BuilderInterface
      */
     const ITEMS = 'Items';
 
-    /**
-     * @var ItemStorageInterface
-     */
-    protected $itemStorage;
+    protected ItemStorageInterface $itemStorage;
+    protected BuilderInterface $itemBuilder;
 
-    /**
-     * @var BuilderInterface
-     */
-    protected $itemBuilder;
-
-    /**
-     * ItemsDataBuilder constructor.
-     *
-     * @param ItemStorageInterface $itemStorage
-     * @param BuilderInterface $itemBuilder
-     */
     public function __construct(
         ItemStorageInterface $itemStorage,
         BuilderInterface $itemBuilder

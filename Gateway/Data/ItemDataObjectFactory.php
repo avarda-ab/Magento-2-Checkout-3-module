@@ -6,6 +6,8 @@
 
 namespace Avarda\Checkout3\Gateway\Data;
 
+use Magento\Framework\ObjectManagerInterface;
+
 /**
  * Service for creation transferable item object from model
  *
@@ -14,20 +16,10 @@ namespace Avarda\Checkout3\Gateway\Data;
  */
 class ItemDataObjectFactory implements ItemDataObjectFactoryInterface
 {
-    /**
-     * Object Manager instance
-     *
-     * @var \Magento\Framework\ObjectManagerInterface
-     */
-    private $objectManager;
+    protected ObjectManagerInterface $objectManager;
 
-    /**
-     * Factory constructor
-     *
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
-     */
     public function __construct(
-        \Magento\Framework\ObjectManagerInterface $objectManager
+        ObjectManagerInterface $objectManager
     ) {
         $this->objectManager = $objectManager;
     }

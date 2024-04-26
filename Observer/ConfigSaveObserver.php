@@ -16,17 +16,10 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class ConfigSaveObserver implements ObserverInterface
 {
-    /** @var FlagManager */
-    protected $flagManager;
-
-    /** @var StoreManagerInterface */
-    protected $storeManager;
-
-    /** @var WriterInterface */
-    protected $configWriter;
-
-    /** @var ScopeConfigInterface */
-    protected $config;
+    protected FlagManager $flagManager;
+    protected StoreManagerInterface $storeManager;
+    protected WriterInterface $configWriter;
+    protected ScopeConfigInterface $config;
 
     public function __construct(
         FlagManager $flagManager,

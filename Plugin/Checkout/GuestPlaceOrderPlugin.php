@@ -20,17 +20,10 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 
 class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
 {
-    /** @var CartRepositoryInterface */
-    protected $cartRepository;
-
-    /** @var QuoteIdMaskFactory */
-    protected $quoteIdMaskFactory;
-
-    /** @var PaymentData */
-    protected $paymentDataHelper;
-
-    /** @var OrderRepositoryInterface */
-    protected $orderRepository;
+    protected CartRepositoryInterface $cartRepository;
+    protected QuoteIdMaskFactory $quoteIdMaskFactory;
+    protected PaymentData $paymentDataHelper;
+    protected OrderRepositoryInterface $orderRepository;
 
     public function __construct(
         CartRepositoryInterface $cartRepository,
