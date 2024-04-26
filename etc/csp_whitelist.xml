@@ -17,7 +17,7 @@
                 <value id="avarda-checkout" type="host">*.checkout-api.avarda.com</value>
             </values>
         </policy>
-        <policy id="font-src">
+        <policy id="img-src">
             <values>
                 <value id="avarda-checkout" type="host">*.checkout-api.avarda.com</value>
             </values>
