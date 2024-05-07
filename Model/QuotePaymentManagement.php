@@ -14,11 +14,13 @@ use Avarda\Checkout3\Api\PaymentQueueRepositoryInterface;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
+use Exception;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\NotFoundException;
 use Magento\Framework\Exception\PaymentException;
+use Magento\Framework\Message\ManagerInterface;
 use Magento\Payment\Gateway\Command\CommandException;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectFactoryInterface;
@@ -28,6 +30,7 @@ use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\Quote\AddressFactory;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
@@ -46,99 +49,25 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
 {
     const ERROR_QUOTE_MISSING_PURCHASE = 'Cart ID %cart_id does not have an active Avarda payment.';
 
-    /**
-     * Required for GET /avarda3-items.
-     *
-     * @var ItemManagementInterface $itemManagement
-     */
-    protected $itemManagement;
+    protected ItemManagementInterface $itemManagement;
+    protected ItemStorageInterface $itemStorage;
+    protected PaymentData $paymentDataHelper;
 
-    /**
-     * Required for populating requests with item data.
-     *
-     * @var ItemStorageInterface $itemStorage
-     */
-    protected $itemStorage;
-
-    /**
-     * Helper for reading payment info instances, e.g. getting purchase ID
-     * from quote payment.
-     *
-     * @var PaymentData
-     */
-    protected $paymentDataHelper;
-
-    /**
-     * Helper to determine Avarda's purchase state.
-     *
-     * @var PurchaseState
-     */
-    protected $purchaseStateHelper;
-
-    /**
-     * Command pool for API requests to Avarda.
-     *
-     * @var CommandPoolInterface
-     */
-    protected $commandPool;
-
-    /**
-     * Required for executing API requests from command pool.
-     *
-     * @var PaymentDataObjectFactoryInterface
-     */
-    protected $paymentDataObjectFactory;
-
-    /**
-     * Repository to load quote from database.
-     *
-     * @var CartRepositoryInterface
-     */
-    protected $quoteRepository;
-
-    /**
-     * Repository for Avarda's payment queue which links Avarda's purchase ID to
-     * Magento's quote ID.
-     *
-     * @var PaymentQueueRepositoryInterface
-     */
-    protected $paymentQueueRepository;
-
-    /**
-     * Required to operate with payment queue repository.
-     *
-     * @var PaymentQueueInterfaceFactory
-     */
-    protected $paymentQueueFactory;
-
-    /**
-     * Required for placing order in Magento.
-     *
-     * @var CartManagementInterface
-     */
-    protected $cartManagement;
-
-    /**
-     * Temporary quote object to limit calls to repository.
-     *
-     * @var CartInterface
-     */
-    protected $quote;
-
-    /** @var OrderSender */
-    protected $orderSender;
-
-    /** @var OrderRepositoryInterface */
-    protected $orderRepository;
-
-    /** @var CollectionFactory */
-    protected $statusCollectionFactory;
-
-    /** @var OrderResourceInterface */
-    protected $orderResource;
-
-    /** @var OrderFactory */
-    protected $orderFactory;
+    protected PurchaseState $purchaseStateHelper;
+    protected CommandPoolInterface $commandPool;
+    protected PaymentDataObjectFactoryInterface $paymentDataObjectFactory;
+    protected CartRepositoryInterface $quoteRepository;
+    protected PaymentQueueRepositoryInterface $paymentQueueRepository;
+    protected PaymentQueueInterfaceFactory $paymentQueueFactory;
+    protected CartManagementInterface $cartManagement;
+    protected ?CartInterface $quote = null;
+    protected OrderSender $orderSender;
+    protected OrderRepositoryInterface $orderRepository;
+    protected CollectionFactory $statusCollectionFactory;
+    protected OrderResourceInterface $orderResource;
+    protected OrderFactory $orderFactory;
+    protected AddressFactory $addressFactory;
+    protected ManagerInterface $messageManager;
 
     public function __construct(
         ItemManagementInterface $itemManagement,
@@ -155,7 +84,9 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         OrderRepositoryInterface $orderRepository,
         CollectionFactory $statusCollectionFactory,
         OrderResourceInterface $orderResource,
-        OrderFactory $orderFactory
+        OrderFactory $orderFactory,
+        AddressFactory $addressFactory,
+        ManagerInterface $messageManager
     ) {
         $this->itemManagement = $itemManagement;
         $this->itemStorage = $itemStorage;
@@ -172,6 +103,8 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         $this->statusCollectionFactory = $statusCollectionFactory;
         $this->orderResource = $orderResource;
         $this->orderFactory = $orderFactory;
+        $this->addressFactory = $addressFactory;
+        $this->messageManager = $messageManager;
     }
 
     /**
@@ -223,7 +156,19 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     {
         $quote->reserveOrderId();
 
-        $this->executeCommand('avarda_initialize_payment', $quote);
+        try {
+            $this->executeCommand('avarda_initialize_payment', $quote);
+        } catch (Exception $e) {
+            // If address has invalid data init might fail, so we try again without phone, city and postcode
+            $emptyAddress = $this->addressFactory->create();
+            $emptyAddress->setTelephone('');
+            $emptyAddress->setCity('');
+            $emptyAddress->setPostcode('');
+            $quote->setBillingAddress($emptyAddress);
+            $quote->setShippingAddress($emptyAddress);
+            $this->executeCommand('avarda_initialize_payment', $quote);
+            $this->messageManager->addWarningMessage(__('Address data was invalid, so it was cleared. Please check your saved address.'));
+        }
 
         /**
          * Save the additional data to quote payment and retrieve purchase ID
