@@ -52,7 +52,6 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     protected ItemManagementInterface $itemManagement;
     protected ItemStorageInterface $itemStorage;
     protected PaymentData $paymentDataHelper;
-
     protected PurchaseState $purchaseStateHelper;
     protected CommandPoolInterface $commandPool;
     protected PaymentDataObjectFactoryInterface $paymentDataObjectFactory;
