@@ -58,7 +58,7 @@ class QuoteCollectTotalsUpdateItems
 
         $payment = $subject->getPayment();
         if (!self::$collectTotalsFlag &&
-            $subject->getItemsCount() > 0 &&
+            count($subject->getAllVisibleItems()) > 0 &&
             $this->paymentDataHelper->isAvardaPayment($payment)
         ) {
             // avoid infinite loops, because the calls here might call also collectTotals
