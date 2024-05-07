@@ -14,6 +14,7 @@ use Avarda\Checkout3\Api\ItemManagementInterface;
 use Avarda\Checkout3\Api\ItemStorageInterface;
 use Magento\Catalog\Helper\ImageFactory;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
+use Magento\Quote\Api\Data\CartItemInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -44,24 +45,12 @@ class ItemManagement implements ItemManagementInterface
      */
     public function getItemDetailsList()
     {
-        /**
-         * @var ItemDetailsListInterface $itemDetailsList
-         */
         $itemDetailsList = $this->itemDetailsListFactory->create();
         $items = [];
         foreach ($this->itemStorage->getItems() as $item) {
-            /**
-             * @var ItemDetailsInterface $itemDetails
-             */
             $itemDetails = $this->itemDetailsFactory->create();
             $itemDetails->setItemId($item->getItemId());
             $itemDetails->setProductUrl($this->getProductUrl($item));
-            $itemDetails->setQtyUsesDecimals($this->getQtyUsesDecimals($item));
-
-            //Logics for getting and setting min + max qty and qty increments
-            $itemDetails->setMinSaleQty($this->getMinSaleQty($item));
-            $itemDetails->setMaxSaleQty($this->getMaxSaleQty($item));
-            $itemDetails->setQtyIncrements($this->getQtyIncrements($item));
             $itemDetails->setName($this->getName($item));
             $itemDetails->setItemOptionsText($this->getItemOptionsText($item));
 
@@ -82,7 +71,7 @@ class ItemManagement implements ItemManagementInterface
     /**
      * Get item name
      *
-     * @param \Magento\Quote\Api\Data\CartItemInterface $item
+     * @param CartItemInterface $item
      * @return string
      */
     protected function getName($item)
@@ -93,7 +82,7 @@ class ItemManagement implements ItemManagementInterface
     /**
      * Get options text for item
      *
-     * @param \Magento\Quote\Api\Data\CartItemInterface $item
+     * @param CartItemInterface $item
      * @return string
      */
     protected function getItemOptionsText($item)
@@ -119,7 +108,7 @@ class ItemManagement implements ItemManagementInterface
     /**
      * Retrieve URL to item Product
      *
-     * @param \Magento\Quote\Api\Data\CartItemInterface $item
+     * @param CartItemInterface $item
      * @return string
      */
     protected function getProductUrl($item)
@@ -140,7 +129,7 @@ class ItemManagement implements ItemManagementInterface
     /**
      * Retrieve product image
      *
-     * @param \Magento\Quote\Api\Data\CartItemInterface $item
+     * @param CartItemInterface $item
      * @param string $imageId
      * @param array $attributes
      *
@@ -158,85 +147,5 @@ class ItemManagement implements ItemManagementInterface
             ->init($product, $imageId, $attributes);
 
         return $helper->getUrl();
-    }
-
-    /**
-     * Get if decimals are allowed for product
-     *
-     * @param \Magento\Quote\Api\Data\CartItemInterface $item
-     *
-     * @return boolean
-     */
-    public function getQtyUsesDecimals($item)
-    {
-        $product = $item->getProduct();
-
-        if ($item->getProductType() === Configurable::TYPE_CODE) {
-            $is_qty_decimal = $item->getOptionByCode('simple_product')->getProduct()->getExtensionAttributes()->getStockItem()->getIsQtyDecimal();
-        } else {
-            $is_qty_decimal = $product->getExtensionAttributes()->getStockItem()->getData('is_qty_decimal');
-        }
-
-        return $is_qty_decimal;
-    }
-
-    /**
-     * Get min sale qty for product
-     *
-     * @param \Magento\Quote\Api\Data\CartItemInterface $item
-     *
-     * @return float
-     */
-    public function getMinSaleQty($item)
-    {
-        $product = $item->getProduct();
-
-        if ($item->getProductType() === Configurable::TYPE_CODE) {
-            $minQty = $item->getOptionByCode('simple_product')->getProduct()->getExtensionAttributes()->getStockItem()->getMinSaleQty();
-        } else {
-            $minQty = $product->getExtensionAttributes()->getStockItem()->getMinSaleQty();
-        }
-
-        return $minQty;
-    }
-
-    /**
-     * Get max sale qty for product
-     *
-     * @param \Magento\Quote\Api\Data\CartItemInterface $item
-     *
-     * @return float
-     */
-    public function getMaxSaleQty($item)
-    {
-        $product = $item->getProduct();
-
-        if ($item->getProductType() === Configurable::TYPE_CODE) {
-            $maxQty = $item->getOptionByCode('simple_product')->getProduct()->getExtensionAttributes()->getStockItem()->getMaxSaleQty();
-        } else {
-            $maxQty = $product->getExtensionAttributes()->getStockItem()->getMaxSaleQty();
-        }
-
-        return $maxQty;
-    }
-
-    /**
-     * Get qty increments for product
-     *
-     * @param \Magento\Quote\Api\Data\CartItemInterface $item
-     *
-     * @return float
-     */
-    public function getQtyIncrements($item)
-    {
-        $product = $item->getProduct();
-
-        if ($item->getProductType() === Configurable::TYPE_CODE) {
-            $qtyIncrements = $item->getOptionByCode('simple_product')->getProduct()->getExtensionAttributes()->getStockItem()->getQtyIncrements();
-        } else {
-            $qtyIncrements = $product->getExtensionAttributes()->getStockItem()->getQtyIncrements();
-        }
-
-        return $qtyIncrements;
     }
 }

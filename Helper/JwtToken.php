@@ -43,7 +43,7 @@ class JwtToken
 
         /** @var InfoInterface|null $payment */
         $payment = $quote->getPayment();
-        if ($payment !== null && $payment instanceof InfoInterface) {
+        if ($payment instanceof InfoInterface) {
             $arguments['payment'] = $this->paymentDataObjectFactory
                 ->create($payment);
         }

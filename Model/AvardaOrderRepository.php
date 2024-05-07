@@ -8,17 +8,15 @@ namespace Avarda\Checkout3\Model;
 
 use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
 use Avarda\Checkout3\Api\Data\AvardaOrderInterface;
+use Avarda\Checkout3\Model\ResourceModel\AvardaOrder as AvardaOrderResource;
 
 class AvardaOrderRepository implements AvardaOrderRepositoryInterface
 {
-    /** @var ResourceModel\AvardaOrder */
-    protected $resource;
-
-    /** @var AvardaOrderFactory */
-    protected $avardaOrderFactory;
+    protected AvardaOrderResource $resource;
+    protected AvardaOrderFactory $avardaOrderFactory;
 
     public function __construct(
-        ResourceModel\AvardaOrder $resource,
+        AvardaOrderResource $resource,
         AvardaOrderFactory $avardaOrderFactory
     ) {
         $this->resource = $resource;
@@ -30,7 +28,6 @@ class AvardaOrderRepository implements AvardaOrderRepositoryInterface
      */
     public function save($purchaseId, $orderId)
     {
-        /** @var AvardaOrder|AvardaOrderInterface $avardaOrder */
         $avardaOrder = $this->avardaOrderFactory->create();
         $avardaOrder->setPurchaseId($purchaseId);
         $avardaOrder->setOrderId($orderId);
@@ -45,7 +42,6 @@ class AvardaOrderRepository implements AvardaOrderRepositoryInterface
     public function getByOrderId($orderId)
     {
         $avardaOrder = $this->avardaOrderFactory->create();
-
         return $avardaOrder->load($orderId, 'order_id');
     }
 
@@ -55,7 +51,6 @@ class AvardaOrderRepository implements AvardaOrderRepositoryInterface
     public function getByPurchaseId($purchaseId)
     {
         $avardaOrder = $this->avardaOrderFactory->create();
-
         return $avardaOrder->load($purchaseId, 'purchase_id');
     }
 

@@ -17,26 +17,9 @@ use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
  */
 class PaymentManagement implements PaymentManagementInterface
 {
-    /**
-     * Required to create purchase ID response.
-     *
-     * @var PaymentDetailsInterfaceFactory
-     */
-    protected $paymentDetailsFactory;
+    protected PaymentDetailsInterfaceFactory $paymentDetailsFactory;
+    protected QuotePaymentManagementInterface $quotePaymentManagement;
 
-    /**
-     * A common interface to execute Webapi actions.
-     *
-     * @var QuotePaymentManagementInterface
-     */
-    protected $quotePaymentManagement;
-
-    /**
-     * GuestPaymentManagement constructor.
-     *
-     * @param PaymentDetailsInterfaceFactory $paymentDetailsFactory
-     * @param QuotePaymentManagementInterface $quotePaymentManagement
-     */
     public function __construct(
         PaymentDetailsInterfaceFactory $paymentDetailsFactory,
         QuotePaymentManagementInterface $quotePaymentManagement

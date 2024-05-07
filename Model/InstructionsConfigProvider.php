@@ -11,23 +11,16 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Escaper;
 use Magento\Framework\Url;
 use Magento\Payment\Helper\Data as PaymentHelper;
+use Magento\Payment\Model\MethodInterface;
 use Magento\Store\Model\ScopeInterface;
 
 class InstructionsConfigProvider implements ConfigProviderInterface
 {
-    protected $methodCode;
-
-    /** @var array */
-    protected $methodInstance = [];
-
-    /** @var Escaper */
-    protected $escaper;
-
-    /** @var ScopeConfigInterface */
-    protected $scopeConfig;
-
-    /** @var Url */
-    protected $url;
+    protected Escaper $escaper;
+    protected ScopeConfigInterface $scopeConfig;
+    protected Url $url;
+    protected string $methodCode;
+    protected ?MethodInterface $methodInstance = null;
 
     public function __construct(
         PaymentHelper $paymentHelper,
@@ -38,8 +31,8 @@ class InstructionsConfigProvider implements ConfigProviderInterface
     ) {
         $this->escaper = $escaper;
         $this->scopeConfig = $scopeConfig;
-        $this->methodCode = $methodCode;
         $this->url = $url;
+        $this->methodCode = $methodCode;
         $this->methodInstance = $paymentHelper->getMethodInstance($this->methodCode);
     }
 

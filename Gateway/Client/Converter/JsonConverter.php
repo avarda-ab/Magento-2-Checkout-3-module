@@ -58,12 +58,4 @@ class JsonConverter implements ConverterInterface
 
         return $body;
     }
-
-    /**
-     * @param $response ResponseInterface
-     */
-    public function convertErrorMessage($response)
-    {
-
-    }
 }
