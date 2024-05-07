@@ -14,40 +14,12 @@ use Magento\Framework\Exception\PaymentException;
 use Magento\Quote\Model\QuoteIdMask;
 use Magento\Quote\Model\QuoteIdMaskFactory;
 
-/**
- * GuestPaymentManagement
- * @see \Avarda\Checkout3\Api\GuestPaymentManagementInterface
- */
 class GuestPaymentManagement implements GuestPaymentManagementInterface
 {
-    /**
-     * Required to create purchase ID response.
-     *
-     * @var PaymentDetailsInterfaceFactory
-     */
-    protected $paymentDetailsFactory;
+    protected PaymentDetailsInterfaceFactory $paymentDetailsFactory;
+    protected QuotePaymentManagementInterface $quotePaymentManagement;
+    protected QuoteIdMaskFactory $quoteIdMaskFactory;
 
-    /**
-     * A common interface to execute Webapi actions.
-     *
-     * @var QuotePaymentManagementInterface
-     */
-    protected $quotePaymentManagement;
-
-    /**
-     * Required to get the real quote ID from masked quote ID.
-     *
-     * @var QuoteIdMaskFactory
-     */
-    protected $quoteIdMaskFactory;
-
-    /**
-     * GuestPaymentManagement constructor.
-     *
-     * @param PaymentDetailsInterfaceFactory $paymentDetailsFactory
-     * @param QuotePaymentManagementInterface $quotePaymentManagement
-     * @param QuoteIdMaskFactory $quoteIdMaskFactory
-     */
     public function __construct(
         PaymentDetailsInterfaceFactory $paymentDetailsFactory,
         QuotePaymentManagementInterface $quotePaymentManagement,

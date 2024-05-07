@@ -11,9 +11,6 @@ use Magento\Payment\Model\InfoInterface;
 use Magento\Payment\Model\Method\Free;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 
-/**
- * Class PaymentData
- */
 class PaymentData
 {
     /**

@@ -8,9 +8,6 @@ namespace Avarda\Checkout3\Model\ResourceModel;
 
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
-/**
- * Payment queue resource model
- */
 class PaymentQueue extends AbstractDb
 {
     /**

@@ -16,21 +16,10 @@ use Magento\Framework\Setup\UpgradeDataInterface;
 
 class UpgradeData implements UpgradeDataInterface
 {
-    /** @var CustomerSetupFactory */
-    protected $customerSetupFactory;
+    protected CustomerSetupFactory $customerSetupFactory;
+    protected AttributeSetFactory $attributeSetFactory;
+    protected SalesSetupFactory $salesSetupFactory;
 
-    /** @var AttributeSetFactory */
-    protected $attributeSetFactory;
-
-    /** @var SalesSetupFactory */
-    protected $salesSetupFactory;
-
-    /**
-     * UpgradeData constructor.
-     *
-     * @param CustomerSetupFactory $customerSetupFactory
-     * @param AttributeSetFactory $attributeSetFactory
-     */
     public function __construct(
         CustomerSetupFactory $customerSetupFactory,
         AttributeSetFactory $attributeSetFactory,

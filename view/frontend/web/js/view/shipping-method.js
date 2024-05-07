@@ -297,6 +297,7 @@ define([
                     avardaCheckoutInstance.beforeSubmitAbort();
                     fullScreenLoader.stopLoader();
                 }).done(function () {
+                    history.pushState(null, document.title, options.redirectUrl);
                     fullScreenLoader.startLoader();
                     avardaCheckoutInstance.beforeSubmitContinue();
                     setTimeout(function() {

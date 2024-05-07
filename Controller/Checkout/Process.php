@@ -13,31 +13,19 @@ use Avarda\Checkout3\Gateway\Config\Config;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
 use Exception;
-use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
-use Magento\Framework\Exception\PaymentException;
 use Magento\Framework\View\Result\PageFactory;
-use Magento\Sales\Api\OrderRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
 class Process extends AbstractCheckout
 {
-    /** @var PageFactory */
-    protected $resultPageFactory;
-
-    /** @var QuotePaymentManagementInterface */
-    protected $quotePaymentManagement;
-
-    /** @var PaymentData */
-    protected $paymentData;
-
-    /** @var OrderRepositoryInterface */
-    protected $orderRepository;
-
-    /** @var AvardaOrderRepositoryInterface */
-    protected $avardaOrderRepository;
+    protected PageFactory $resultPageFactory;
+    protected QuotePaymentManagementInterface $quotePaymentManagement;
+    protected PaymentData $paymentData;
+    protected AvardaOrderRepositoryInterface $avardaOrderRepository;
+    protected PurchaseState $purchaseStateHelper;
 
     public function __construct(
         Context $context,
@@ -46,15 +34,15 @@ class Process extends AbstractCheckout
         PageFactory $resultPageFactory,
         QuotePaymentManagementInterface $quotePaymentManagement,
         PaymentData $paymentData,
-        OrderRepositoryInterface $orderRepository,
-        AvardaOrderRepositoryInterface $avardaOrderRepository
+        AvardaOrderRepositoryInterface $avardaOrderRepository,
+        PurchaseState $purchaseStateHelper,
     ) {
         parent::__construct($context, $logger, $config);
         $this->resultPageFactory = $resultPageFactory;
         $this->quotePaymentManagement = $quotePaymentManagement;
         $this->paymentData = $paymentData;
-        $this->orderRepository = $orderRepository;
         $this->avardaOrderRepository = $avardaOrderRepository;
+        $this->purchaseStateHelper = $purchaseStateHelper;
     }
 
     /**
@@ -77,17 +65,22 @@ class Process extends AbstractCheckout
             }
 
             $quoteId = $this->quotePaymentManagement->getQuoteIdByPurchaseId($purchaseId);
-            $this->quotePaymentManagement->updatePaymentStatus($quoteId);
+            $this->quotePaymentManagement->updateOnlyPaymentStatus($quoteId);
+            $quote = $this->quotePaymentManagement->getQuote($quoteId);
+            $state = $this->paymentData->getState($quote->getPayment());
+
+            // If purchase is complete, redirect straight to save order
+            if ($this->purchaseStateHelper->isComplete($state)) {
+                return $this->resultRedirectFactory->create()
+                    ->setPath('avarda3/checkout/saveOrder/purchase/' . $purchaseId);
+            }
 
             return $this->resultPageFactory->create();
         } catch (Exception $e) {
             $this->logger->error($e);
-            $message = $e->getMessage();
+            $this->messageManager->addErrorMessage($e->getMessage());
         }
 
-        $this->messageManager->addErrorMessage($message);
-
-        return $this->resultRedirectFactory
-            ->create()->setPath('avarda3/checkout');
+        return $this->resultRedirectFactory->create()->setPath('avarda3/checkout');
     }
 }

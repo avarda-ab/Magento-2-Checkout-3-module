@@ -50,9 +50,7 @@ class PaymentQueueRepository implements PaymentQueueRepositoryInterface
                 $this->getById($paymentQueueId);
             }
             $this->resource->save($paymentQueue);
-        } catch (AlreadyExistsException $e) {
-            throw $e;
-        } catch (NoSuchEntityException $e) {
+        } catch (AlreadyExistsException|NoSuchEntityException $e) {
             throw $e;
         } catch (LocalizedException $e) {
             throw new CouldNotSaveException(__($e->getMessage()));

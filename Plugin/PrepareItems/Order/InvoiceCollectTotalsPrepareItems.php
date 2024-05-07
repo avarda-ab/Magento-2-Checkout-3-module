@@ -20,26 +20,13 @@ use Psr\Log\LoggerInterface;
 
 class InvoiceCollectTotalsPrepareItems
 {
-    /** @var LoggerInterface */
-    protected $logger;
-
-    /** @var ItemStorageInterface */
-    protected $itemStorage;
-
-    /** @var ItemDataObjectFactory */
-    protected $itemDataObjectFactory;
-
-    /** @var OrderItemFactory */
-    protected $orderItemAdapterFactory;
-
-    /** @var ArrayDataItemFactory */
-    protected $arrayDataItemAdapterFactory;
-
-    /** @var PaymentData */
-    protected $paymentDataHelper;
-
-    /** @var array */
-    protected $collectTotalsFlag = [];
+    protected LoggerInterface $logger;
+    protected ItemStorageInterface $itemStorage;
+    protected ItemDataObjectFactory $itemDataObjectFactory;
+    protected OrderItemFactory $orderItemAdapterFactory;
+    protected ArrayDataItemFactory $arrayDataItemAdapterFactory;
+    protected PaymentData $paymentDataHelper;
+    protected array $collectTotalsFlag = [];
 
     public function __construct(
         LoggerInterface $logger,

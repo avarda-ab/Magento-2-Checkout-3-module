@@ -14,9 +14,8 @@ use Avarda\Checkout3\Helper\PaymentData;
 use Exception;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Context;
-use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
-use Magento\Framework\Exception\AlreadyExistsException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\PaymentException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -25,26 +24,13 @@ use Psr\Log\LoggerInterface;
 
 class SaveOrder extends AbstractCheckout
 {
-    /** @var QuotePaymentManagementInterface */
-    protected $quotePaymentManagement;
-
-    /** @var AvardaOrderRepositoryInterface */
-    protected $avardaOrderRepository;
-
-    /** @var CartRepositoryInterface */
-    protected $cartRepository;
-
-    /** @var PaymentData */
-    protected $paymentData;
-
-    /** @var Session */
-    protected $checkoutSession;
-
-    /** @var OrderFactory */
-    protected $orderFactory;
-
-    /** @var OrderRepositoryInterface */
-    protected $orderRepository;
+    protected QuotePaymentManagementInterface $quotePaymentManagement;
+    protected AvardaOrderRepositoryInterface $avardaOrderRepository;
+    protected CartRepositoryInterface $cartRepository;
+    protected PaymentData $paymentData;
+    protected Session $checkoutSession;
+    protected OrderFactory $orderFactory;
+    protected OrderRepositoryInterface $orderRepository;
 
     public function __construct(
         Context $context,
@@ -71,7 +57,8 @@ class SaveOrder extends AbstractCheckout
     /**
      * Order success action or if user canceled payment
      *
-     * @return ResultInterface|ResponseInterface
+     * @return ResultInterface
+     * @throws NoSuchEntityException
      */
     public function execute()
     {

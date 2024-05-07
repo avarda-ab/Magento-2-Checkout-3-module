@@ -15,17 +15,10 @@ use Magento\Quote\Api\CartRepositoryInterface;
 
 class JwtToken
 {
-    /** @var CommandPoolInterface */
-    protected $commandPool;
-
-    /** @var PaymentDataObjectFactoryInterface */
-    protected $paymentDataObjectFactory;
-
-    /** @var PaymentQueueRepositoryInterface */
-    protected $paymentQueueRepository;
-
-    /** @var CartRepositoryInterface */
-    protected $quoteRepository;
+    protected CommandPoolInterface $commandPool;
+    protected PaymentDataObjectFactoryInterface $paymentDataObjectFactory;
+    protected PaymentQueueRepositoryInterface $paymentQueueRepository;
+    protected CartRepositoryInterface $quoteRepository;
 
     public function __construct(
         CommandPoolInterface $commandPool,
@@ -50,7 +43,7 @@ class JwtToken
 
         /** @var InfoInterface|null $payment */
         $payment = $quote->getPayment();
-        if ($payment !== null && $payment instanceof InfoInterface) {
+        if ($payment instanceof InfoInterface) {
             $arguments['payment'] = $this->paymentDataObjectFactory
                 ->create($payment);
         }

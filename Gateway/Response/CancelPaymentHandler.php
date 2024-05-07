@@ -11,7 +11,7 @@ use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Sales\Model\Order\Payment\Transaction;
 
-class ReturnPaymentHandler implements HandlerInterface
+class CancelPaymentHandler implements HandlerInterface
 {
     protected PaymentData $paymentDataHelper;
 

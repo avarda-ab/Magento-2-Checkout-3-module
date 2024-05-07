@@ -22,14 +22,10 @@ class QuoteCollectTotalsUpdateItems
     protected QuotePaymentManagementInterface $quotePaymentManagement;
     protected PaymentData $paymentDataHelper;
     protected PurchaseState $purchaseStateHelper;
+    protected Http $request;
     protected ConfigInterface $config;
 
-    /** @var bool */
-    static $collectTotalsFlag = false;
-
-    /** @var Http */
-    protected $request;
-
+    static bool $collectTotalsFlag = false;
 
     public function __construct(
         QuotePaymentManagementInterface $quotePaymentManagement,
@@ -62,7 +58,7 @@ class QuoteCollectTotalsUpdateItems
 
         $payment = $subject->getPayment();
         if (!self::$collectTotalsFlag &&
-            $subject->getItemsCount() > 0 &&
+            count($subject->getAllVisibleItems()) > 0 &&
             $this->paymentDataHelper->isAvardaPayment($payment)
         ) {
             // avoid infinite loops, because the calls here might call also collectTotals
@@ -99,7 +95,7 @@ class QuoteCollectTotalsUpdateItems
      *
      * @param CartInterface|Quote $subject
      *
-     * @return int
+     * @return string
      * @throws PaymentException
      *
      */

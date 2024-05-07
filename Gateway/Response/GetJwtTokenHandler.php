@@ -17,8 +17,7 @@ use Magento\Payment\Gateway\Response\HandlerInterface;
  */
 class GetJwtTokenHandler implements HandlerInterface
 {
-    /** @var PaymentQueueRepositoryInterface */
-    protected $paymentQueueRepository;
+    protected PaymentQueueRepositoryInterface $paymentQueueRepository;
 
     public function __construct(
         PaymentQueueRepositoryInterface $paymentQueueRepository

@@ -10,6 +10,7 @@ use Avarda\Checkout3\Gateway\Config\Config;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Laminas\Http\Request;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\FlagManager;
 use Magento\Payment\Gateway\Http\ClientException;
 use Magento\Payment\Gateway\Http\TransferInterface;
@@ -89,12 +90,12 @@ class AvardaClient
 
     /**
      * @param $url
-     * @param array $json
+     * @param $headers
      * @param array $additionalParameters
      * @return string
      * @throws GuzzleException
      */
-    public function get($url, $headers, $additionalParameters = []): string
+    public function get($url, $headers, array $additionalParameters = []): string
     {
         $client = new Client();
 
@@ -148,6 +149,8 @@ class AvardaClient
      * @param bool $json
      * @param bool $token
      * @return array
+     * @throws ClientException
+     * @throws GuzzleException
      */
     public function buildHeader($transferObject, $json = true, $token = true): array
     {
@@ -178,8 +181,7 @@ class AvardaClient
     /**
      * @param $transferObject TransferInterface
      * @return string
-     * @throws ClientException
-     * @throws GuzzleException
+     * @throws ClientException|GuzzleException|NoSuchEntityException
      */
     private function getToken($transferObject)
     {

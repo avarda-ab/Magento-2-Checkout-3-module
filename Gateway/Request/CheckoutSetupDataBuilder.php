@@ -16,11 +16,8 @@ use Magento\Payment\Gateway\Request\BuilderInterface;
 
 class CheckoutSetupDataBuilder implements BuilderInterface
 {
-    /** @var Resolver */
-    protected $localeResolver;
-
-    /** @var Config */
-    protected $configHelper;
+    protected Resolver $localeResolver;
+    protected Config $configHelper;
 
     public function __construct(
         Resolver $localeResolver,
@@ -47,6 +44,7 @@ class CheckoutSetupDataBuilder implements BuilderInterface
                 'enableB2BLink'             => $this->configHelper->getShowB2Blink(),
                 'enableCountrySelector'     => $this->configHelper->getCountrySelector(),
                 'emailNewsletterSubscription' => $this->getNewsletterSubscription(),
+                'ShowThankYouPage'          => false
             ]
         ];
     }

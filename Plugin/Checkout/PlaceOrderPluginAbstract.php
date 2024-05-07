@@ -19,11 +19,8 @@ use Magento\Sales\Model\Order;
 
 abstract class PlaceOrderPluginAbstract
 {
-    /** @var AvardaOrderRepositoryInterface */
-    protected $avardaOrderRepository;
-
-    /** @var AddressFactory */
-    protected $addressFactory;
+    protected AvardaOrderRepositoryInterface $avardaOrderRepository;
+    protected AddressFactory $addressFactory;
 
     public function __construct(
         AvardaOrderRepositoryInterface $avardaOrderRepository,

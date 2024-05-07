@@ -18,11 +18,8 @@ use Magento\Quote\Model\Quote\AddressFactory;
 
 class PlaceOrderPlugin extends PlaceOrderPluginAbstract
 {
-    /** @var CartRepositoryInterface */
-    protected $cartRepository;
-
-    /** @var PaymentData */
-    protected $paymentDataHelper;
+    protected CartRepositoryInterface $cartRepository;
+    protected PaymentData $paymentDataHelper;
 
     public function __construct(
         CartRepositoryInterface $cartRepository,

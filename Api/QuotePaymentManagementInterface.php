@@ -74,7 +74,7 @@ interface QuotePaymentManagementInterface
     /**
      * Update order (quote) payment status from Avarda.
      *
-     * @param CartInterface $quote
+     * @param CartInterface|string|int $quote
      * @return void
      */
     public function updateOnlyPaymentStatus($quote);
