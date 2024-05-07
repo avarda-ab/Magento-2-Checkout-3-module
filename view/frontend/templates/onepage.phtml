@@ -3,6 +3,7 @@
  * @copyright Copyright © Avarda. All rights reserved.
  * @package   Avarda_Checkout3
  */
+/** @var $escaper \Magento\Framework\Escaper */
 /** @var $block \Avarda\Checkout3\Block\Checkout */
 ?>
 <div id="checkout" data-bind="scope:'checkout'" class="checkout-container">
@@ -34,8 +35,8 @@
         var options = {
             disableFocus: true,
             rootElementId: "avarda-checkout-iframe",
-            redirectUrlBase: '<?= $block->getCallbackUrl() ?>',
-            saveOrderUrl: '<?= $block->getSaveOrderUrl() ?>',
+            redirectUrlBase: '<?= $escaper->escapeUrl($block->getCallbackUrl()) ?>',
+            saveOrderUrl: '<?= $escaper->escapeUrl($block->getSaveOrderUrl()) ?>',
             showPostcode: !!<?= $block->getShowPostcode() ? 1 : 0 ?>,
             addressChangeCallback: !!<?= $block->getAdressChangeCallback() ? 1 : 0 ?>,
             offerLogin: !!<?= $block->getOfferLogin() ? 1 : 0 ?>,
@@ -43,7 +44,7 @@
             styles: <?= $block->getStyles() ?>
         };
         window.checkoutConfig = <?= /* @noEscape */ $block->getSerializedCheckoutConfig() ?>;
-        window.checkoutConfig.checkoutUrl = '<?= $block->getCheckoutUrl() ?>';
+        window.checkoutConfig.checkoutUrl = '<?= $escaper->escapeUrl($block->getCheckoutUrl()) ?>';
         window.isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
         window.customerData = window.checkoutConfig.customerData;
     </script>
