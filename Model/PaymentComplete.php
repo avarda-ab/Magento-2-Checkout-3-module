@@ -9,6 +9,7 @@ namespace Avarda\Checkout3\Model;
 use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
 use Avarda\Checkout3\Api\PaymentCompleteInterface;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\PaymentException;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -35,6 +36,10 @@ class PaymentComplete implements PaymentCompleteInterface
 
     /**
      * Handle serverside order complete handling
+     *
+     * @param $purchaseId
+     * @return string
+     * @throws LocalizedException
      */
     public function execute($purchaseId)
     {
@@ -44,7 +49,6 @@ class PaymentComplete implements PaymentCompleteInterface
                 // No order found
                 if (!$orderId->getOrderId()) {
                     $this->logger->warning("No order found with '{$purchaseId}'");
-
                     return "";
                 }
 
@@ -59,5 +63,6 @@ class PaymentComplete implements PaymentCompleteInterface
         } catch (NoSuchEntityException $noSuchEntityException) {
             // Order is already saved
         }
+        return "";
     }
 }

@@ -39,7 +39,7 @@ use Magento\Sales\Model\Spi\OrderResourceInterface;
 
 /**
  * QuotePaymentManagement
- * @see \Avarda\Checkout3\Api\QuotePaymentManagementInterface
+ * @see QuotePaymentManagementInterface
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class QuotePaymentManagement implements QuotePaymentManagementInterface
@@ -330,8 +330,8 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
      * @param $order OrderInterface|Order
      * @return void
      * @throws PaymentException
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function finalizeOrder($order)
     {
