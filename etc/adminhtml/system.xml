@@ -34,6 +34,12 @@
                         <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                         <config_path>payment/avarda_checkout3_checkout/client_secret</config_path>
                     </field>
+                    <field id="cron_enabled" translate="label" type="select" sortOrder="31" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="1">
+                        <label>Finalize orders in cron</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/avarda_checkout3_checkout/cron_enabled</config_path>
+                        <comment>Set yes on production environment to avoid problems</comment>
+                    </field>
                     <group id="alternative" translate="label comment" sortOrder="35" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Alternative Api Configuration</label>
                         <comment>Alternative api credentials for selected product types. If a selected product type is in the customer's cart then checkout will use the alternative api credentials</comment>

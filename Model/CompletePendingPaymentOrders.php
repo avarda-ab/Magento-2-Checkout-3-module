@@ -1,14 +1,13 @@
 <?php
 
-namespace Avarda\Checkout3\Cron;
+namespace Avarda\Checkout3\Model;
 
 use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
 use Avarda\Checkout3\Api\PaymentCompleteInterface;
-use Avarda\Checkout3\Model\GetPendingPaymentOrders;
 use Magento\Framework\Exception\PaymentException;
 
-class CompletePendingPaymentOrders {
-
+class CompletePendingPaymentOrders
+{
     protected PaymentCompleteInterface $paymentComplete;
     protected GetPendingPaymentOrders $getPendingPaymentOrders;
     protected AvardaOrderRepositoryInterface $avardaOrderRepository;

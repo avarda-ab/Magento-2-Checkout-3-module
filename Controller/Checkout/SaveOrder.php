@@ -7,7 +7,9 @@
 namespace Avarda\Checkout3\Controller\Checkout;
 
 use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
+use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Controller\AbstractCheckout;
+use Avarda\Checkout3\Cron\CompletePendingPaymentOrdersCron;
 use Avarda\Checkout3\Gateway\Config\Config;
 use Avarda\Checkout3\Helper\PaymentData;
 use Exception;
@@ -23,6 +25,7 @@ use Psr\Log\LoggerInterface;
 
 class SaveOrder extends AbstractCheckout
 {
+    protected QuotePaymentManagementInterface $quotePaymentManagement;
     protected AvardaOrderRepositoryInterface $avardaOrderRepository;
     protected CartRepositoryInterface $cartRepository;
     protected PaymentData $paymentData;
@@ -34,6 +37,7 @@ class SaveOrder extends AbstractCheckout
         Context $context,
         LoggerInterface $logger,
         Config $config,
+        QuotePaymentManagementInterface $quotePaymentManagement,
         AvardaOrderRepositoryInterface $avardaOrderRepository,
         CartRepositoryInterface $cartRepository,
         PaymentData $paymentData,
@@ -42,6 +46,7 @@ class SaveOrder extends AbstractCheckout
         OrderRepositoryInterface $orderRepository
     ) {
         parent::__construct($context, $logger, $config);
+        $this->quotePaymentManagement = $quotePaymentManagement;
         $this->avardaOrderRepository = $avardaOrderRepository;
         $this->cartRepository = $cartRepository;
         $this->paymentData = $paymentData;
@@ -67,6 +72,11 @@ class SaveOrder extends AbstractCheckout
 
             $orderId = $this->avardaOrderRepository->getByPurchaseId($purchaseId);
             $order = $this->orderRepository->get($orderId->getOrderId());
+
+            if (!$this->config->getConfigValue(CompletePendingPaymentOrdersCron::XML_PATH_ENABLED)) {
+                $this->quotePaymentManagement->updateOrderPaymentStatus($order);
+                $this->quotePaymentManagement->finalizeOrder($order);
+            }
 
             // Set order and quote information to session, so we can redirect to success page
             $this->checkoutSession
