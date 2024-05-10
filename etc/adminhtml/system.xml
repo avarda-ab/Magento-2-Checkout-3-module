@@ -124,7 +124,7 @@ buttons.primary.fontSize='15'</pre>]]></comment>
                     </field>
                     <field id="debug" sortOrder="500" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Debug Logging</label>
-                        <config_path>payment/avarda_checkout3_checkout/debug</config_path>
+                        <config_path>avarda_checkout3/api/debug</config_path>
                         <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
                         <comment>Should not be enabled in production. Sensitive information is logged.</comment>
                     </field>
