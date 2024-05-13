@@ -98,6 +98,7 @@
                 <item name="refund" xsi:type="string">AvardaCheckout3ReturnCommand</item>
                 <item name="avarda_cancel" xsi:type="string">AvardaCheckout3CancelCommand</item>
                 <item name="avarda_refund_remaining" xsi:type="string">AvardaCheckout3RefundRemainingCommand</item>
+                <item name="update_delivery_address" xsi:type="string">AvardaCheckout3UpdateAddressCommand</item>
             </argument>
         </arguments>
     </virtualType>
@@ -323,7 +324,7 @@
         </arguments>
     </virtualType>
 
-    <!-- Update delivery addresss to avarda command -->
+    <!-- Update delivery address to avarda command -->
     <virtualType name="AvardaCheckout3UpdateAddressCommand" type="AvardaCheckout3Command">
         <arguments>
             <argument name="requestBuilder" xsi:type="object">AvardaCheckout3UpdateAddressRequest</argument>
@@ -340,6 +341,7 @@
     </virtualType>
     <virtualType name="AvardaCheckout3UpdateAddressTransferFactory" type="Avarda\Checkout3\Gateway\Client\TransferFactory">
         <arguments>
+            <argument name="method" xsi:type="string">PUT</argument>
             <argument name="uri" xsi:type="string">api/partner/payments/{purchaseid}/address</argument>
         </arguments>
     </virtualType>
