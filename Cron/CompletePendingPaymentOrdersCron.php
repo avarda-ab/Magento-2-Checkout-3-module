@@ -14,10 +14,10 @@ class CompletePendingPaymentOrdersCron
     protected CompletePendingPaymentOrders $completePendingPaymentOrders;
 
     public function __construct(
-        ScopeConfigInterface $scopeConfig,
+        ScopeConfigInterface $config,
         CompletePendingPaymentOrders $completePendingPaymentOrders,
     ) {
-        $this->config = $scopeConfig;
+        $this->config = $config;
         $this->completePendingPaymentOrders = $completePendingPaymentOrders;
     }
 
