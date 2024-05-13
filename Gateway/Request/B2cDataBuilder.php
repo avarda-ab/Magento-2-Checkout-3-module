@@ -93,7 +93,7 @@ class B2cDataBuilder implements BuilderInterface
      * @param OrderAdapterInterface $order
      * @return array
      */
-    protected function getShippingAddress(OrderAdapterInterface $order)
+    public function getShippingAddress(OrderAdapterInterface $order)
     {
         $address = $order->getShippingAddress();
         if ($address === null) {

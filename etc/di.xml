@@ -322,6 +322,27 @@
             <argument name="uri" xsi:type="string">api/partner/payments/{purchaseid}/refundRemaining</argument>
         </arguments>
     </virtualType>
+
+    <!-- Update delivery addresss to avarda command -->
+    <virtualType name="AvardaCheckout3UpdateAddressCommand" type="AvardaCheckout3Command">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">AvardaCheckout3UpdateAddressRequest</argument>
+            <argument name="transferFactory" xsi:type="object">AvardaCheckout3UpdateAddressTransferFactory</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="AvardaCheckout3UpdateAddressRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="additional" xsi:type="string">Avarda\Checkout3\Gateway\Request\AdditionalDataBuilder</item>
+                <item name="address" xsi:type="string">Avarda\Checkout3\Gateway\Request\AddressUpdateBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="AvardaCheckout3UpdateAddressTransferFactory" type="Avarda\Checkout3\Gateway\Client\TransferFactory">
+        <arguments>
+            <argument name="uri" xsi:type="string">api/partner/payments/{purchaseid}/address</argument>
+        </arguments>
+    </virtualType>
     <!-- END Avarda commands -->
 
     <!-- Avarda items builders -->
