@@ -10,7 +10,6 @@ use Avarda\Checkout3\Api\Data\PaymentQueueInterface;
 use Avarda\Checkout3\Api\Data\PaymentQueueInterfaceFactory;
 use Avarda\Checkout3\Api\PaymentQueueRepositoryInterface;
 use Avarda\Checkout3\Model\ResourceModel\PaymentQueue as PaymentQueueResource;
-use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -21,18 +20,11 @@ use Magento\Framework\Exception\AlreadyExistsException;
  */
 class PaymentQueueRepository implements PaymentQueueRepositoryInterface
 {
-    /**
-     * @var ResourceModel\PaymentQueue
-     */
-    protected $resource;
-
-    /**
-     * @var PaymentQueueInterfaceFactory
-     */
-    protected $paymentQueueFactory;
+    protected PaymentQueueResource $resource;
+    protected PaymentQueueInterfaceFactory $paymentQueueFactory;
 
     public function __construct(
-        ResourceModel\PaymentQueue $resource,
+        PaymentQueueResource $resource,
         PaymentQueueInterfaceFactory $paymentQueueFactory
     ) {
         $this->resource = $resource;

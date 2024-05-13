@@ -9,6 +9,7 @@ namespace Avarda\Checkout3\Controller\Checkout;
 use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Controller\AbstractCheckout;
+use Avarda\Checkout3\Cron\CompletePendingPaymentOrdersCron;
 use Avarda\Checkout3\Gateway\Config\Config;
 use Avarda\Checkout3\Helper\PaymentData;
 use Exception;
@@ -69,20 +70,21 @@ class SaveOrder extends AbstractCheckout
                 );
             }
 
-            $quoteId = $this->quotePaymentManagement->getQuoteIdByPurchaseId($purchaseId);
             $orderId = $this->avardaOrderRepository->getByPurchaseId($purchaseId);
             $order = $this->orderRepository->get($orderId->getOrderId());
 
-            $this->quotePaymentManagement->updateOrderPaymentStatus($order);
-            $this->quotePaymentManagement->finalizeOrder($order);
+            if (!$this->config->getConfigValue(CompletePendingPaymentOrdersCron::XML_PATH_ENABLED)) {
+                $this->quotePaymentManagement->updateOrderPaymentStatus($order);
+                $this->quotePaymentManagement->finalizeOrder($order);
+            }
 
             // Set order and quote information to session, so we can redirect to success page
             $this->checkoutSession
                 ->setLastOrderId($order->getId())
                 ->setLastRealOrderId($order->getIncrementId())
                 ->setLastOrderStatus($order->getStatus())
-                ->setLastQuoteId($quoteId)
-                ->setLastSuccessQuoteId($quoteId);
+                ->setLastQuoteId($order->getQuoteId())
+                ->setLastSuccessQuoteId($order->getQuoteId());
 
             return $this->resultRedirectFactory->create()->setPath(
                 'checkout/onepage/success'
@@ -96,7 +98,7 @@ class SaveOrder extends AbstractCheckout
             $message = __('Failed to save Avarda order. Please try again later.');
         }
 
-        $quote = $this->cartRepository->get($quoteId);
+        $quote = $this->cartRepository->get($order->getQuoteId());
         if ($quote && $quote->getIsActive()) {
             $quote->setIsActive(false);
             $quote->save();
