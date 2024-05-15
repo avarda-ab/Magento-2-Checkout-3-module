@@ -331,7 +331,7 @@ class Checkout extends Template
         $styles = [];
         if ($customCss && count(explode("\n", $customCss)) > 0) {
             foreach (explode("\n", $customCss) as $row) {
-                if (!trim($row) && strpos($row, '=') === false) {
+                if (!trim($row) && !str_contains($row, '=')) {
                     continue;
                 }
                 [$path, $value] = explode('=', $row);
@@ -358,7 +358,7 @@ class Checkout extends Template
                 }
                 $prevKey = is_numeric($value) ? floatval($value) : $value;
 
-                if (str_contains($value, '[') && str_contains($value, ']')) {
+                if (json_decode($value) !== null) {
                     $value = json_decode($value, true);
                     if ($value) {
                         $prevKey = $value;
