@@ -30,7 +30,10 @@ class CompletePendingPaymentOrders
         $orders = $this->getPendingPaymentOrders->execute();
         foreach ($orders as $order) {
             $avardaOrder = $this->avardaOrderRepository->getByOrderId($order->getId());
-            $this->paymentComplete->execute($avardaOrder->getPurchaseId());
+            // Check that purchaseId is set, it means user has been redirected to Avarda
+            if ($avardaOrder->getPurchaseId()) {
+                $this->paymentComplete->execute($avardaOrder->getPurchaseId());
+            }
         }
     }
 }

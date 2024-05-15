@@ -37,7 +37,9 @@ class GetPendingPaymentOrders
         $result = [];
         foreach ($orders->getItems() as $order) {
             $payment = $order->getPayment();
-            if ($this->paymentDataHelper->isAvardaPayment($payment)) {
+            if ($this->paymentDataHelper->isAvardaPayment($payment) &&
+                (time() - strtotime($order->getCreatedAt())) > 120 // check that order is at least 2 minutes old
+            ) {
                 $result[] = $order;
             }
         }
