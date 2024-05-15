@@ -360,9 +360,7 @@ class Checkout extends Template
 
                 if (json_decode($value) !== null) {
                     $value = json_decode($value, true);
-                    if ($value) {
-                        $prevKey = $value;
-                    }
+                    $prevKey = $value;
                 }
 
                 unset($prevKey);
