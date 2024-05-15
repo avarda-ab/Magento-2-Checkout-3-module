@@ -9,6 +9,7 @@ namespace Avarda\Checkout3\Model;
 use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
 use Avarda\Checkout3\Api\PaymentCompleteInterface;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
+use Exception;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\PaymentException;
@@ -68,14 +69,14 @@ class PaymentComplete implements PaymentCompleteInterface
                     return "OK";
                 }
             } catch (PaymentException $e) {
-                $this->logger->critical($e);
+                $this->logger->info("Payment complete handling did not succeed: " . $e->getMessage());
             }
-        } catch (NoSuchEntityException $noSuchEntityException) {
-            // Order is already saved
-        }
-
-        if ($wasLocked) {
-            $this->lockManager->unlock($purchaseId);
+        } catch (Exception $e) {
+            $this->logger->error("Payment complete handling failed with error: " . $e->getMessage());
+        } finally {
+            if ($wasLocked) {
+                $this->lockManager->unlock($purchaseId);
+            }
         }
 
         return "";
