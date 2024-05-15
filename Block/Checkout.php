@@ -357,6 +357,14 @@ class Checkout extends Template
                     }
                 }
                 $prevKey = is_numeric($value) ? floatval($value) : $value;
+
+                if (str_contains($value, '[') && str_contains($value, ']')) {
+                    $value = json_decode($value, true);
+                    if ($value) {
+                        $prevKey = $value;
+                    }
+                }
+
                 unset($prevKey);
             }
         }
