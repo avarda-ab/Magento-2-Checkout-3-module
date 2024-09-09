@@ -131,9 +131,9 @@ abstract class PlaceOrderPluginAbstract
      */
     public function validatePurchase($quote, $data): bool
     {
-        $purchaseId = $quote->getPayment()->getAdditionalInformation(PaymentDetailsInterface::PURCHASE_DATA)['purchaseId'];
+        $purchaseId = $quote->getPayment()->getAdditionalInformation(PaymentDetailsInterface::PURCHASE_DATA)['purchaseId'] ?? '';
         if ($purchaseId != $data['purchaseId']) {
-            throw new LocalizedException(__('Validation error, please try again'));
+            throw new LocalizedException(__('Validation error, please refresh page and try again'));
         }
 
         return true;
