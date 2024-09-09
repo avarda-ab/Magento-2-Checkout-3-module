@@ -59,7 +59,7 @@ class PaymentData
             return $state;
         }
 
-        return PurchaseState::INITIALIZED;
+        return PurchaseState::OUTDATED;
     }
 
     /**
