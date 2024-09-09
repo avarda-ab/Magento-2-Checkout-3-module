@@ -128,7 +128,10 @@ class CheckoutSetupDataBuilder implements BuilderInterface
             $address1->getStreetLine2() != $address2->getStreetLine2() ||
             $address1->getCity() != $address2->getCity() ||
             $address1->getPostcode() != $address2->getPostcode() ||
-            $address1->getCountryId() != $address2->getCountryId()
+            ( 
+                null !== $address1->getCountryId() &&
+                $address1->getCountryId() != $address2->getCountryId()
+            )
         ) {
             return true;
         } else {
