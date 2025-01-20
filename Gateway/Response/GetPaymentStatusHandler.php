@@ -78,8 +78,8 @@ class GetPaymentStatusHandler implements HandlerInterface
 
         if ($response[$mode]['deliveryAddress']['firstName']) {
             $shippingAddress = $this->addressFactory->create();
-            $shippingAddress->setTelephone($telephone);
-            $shippingAddress->setEmail($email);
+            $shippingAddress->setTelephone($response[$mode]['deliveryAddress']['phone'] ?? $telephone);
+            $shippingAddress->setEmail($response[$mode]['deliveryAddress']['email'] ?? $email);
             $shippingAddress->setFirstname($response[$mode]['deliveryAddress']['firstName']);
             $shippingAddress->setLastname($response[$mode]['deliveryAddress']['lastName']);
             $street2 = $response[$mode]['deliveryAddress']['address2'];

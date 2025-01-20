@@ -202,7 +202,7 @@ class AvardaClient
         $tokenValidFlag = 'avarda_checkout3_token_valid_' . $useAltApiFlagPart . $this->config->getStoreId();
         $tokenValid = $this->flagManager->getFlagData($tokenValidFlag);
         if (!$tokenValid || $tokenValid < time()) {
-            $authUrl   = $this->config->getTokenUrl();
+            $authUrl = $this->config->getTokenUrl();
 
             if ($useAltApi) {
                 $authParam = [

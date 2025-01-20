@@ -75,8 +75,6 @@ class UpdateOrderStatusHandler implements HandlerInterface
 
         if ($order->getIsNotVirtual()) {
             $shippingAddress = $order->getShippingAddress();
-            $shippingAddress->setTelephone($telephone);
-            $shippingAddress->setEmail($email);
             if ($response[$mode]['deliveryAddress']['firstName']) {
                 $shippingAddress->setFirstname($response[$mode]['deliveryAddress']['firstName']);
                 $shippingAddress->setLastname($response[$mode]['deliveryAddress']['lastName']);
@@ -85,16 +83,13 @@ class UpdateOrderStatusHandler implements HandlerInterface
                     $response[$mode]['deliveryAddress']['address1'] .
                     (isset($street2) && $street2 ? "\n" . $street2 : '')
                 );
+                $shippingAddress->setEmail($response[$mode]['deliveryAddress']['email'] ?? $email);
+                $shippingAddress->setTelephone($response[$mode]['deliveryAddress']['phone'] ?? $telephone);
                 $shippingAddress->setPostcode($response[$mode]['deliveryAddress']['zip'] ?? $response[$mode]['invoicingAddress']['zip']);
                 $shippingAddress->setCity($response[$mode]['deliveryAddress']['city'] ?? $response[$mode]['invoicingAddress']['city']);
                 $shippingAddress->setCountryId($response[$mode]['deliveryAddress']['country'] ?? $response[$mode]['invoicingAddress']['country']);
             } else {
-                $shippingAddress->setFirstname($billingAddress->getFirstname());
-                $shippingAddress->setLastname($billingAddress->getLastname());
-                $shippingAddress->setCity($billingAddress->getCity());
-                $shippingAddress->setPostcode($billingAddress->getPostcode());
-                $shippingAddress->setStreet($billingAddress->getStreet());
-                $shippingAddress->setCountryId($billingAddress->getCountryId());
+                $order->setShippingAddress($billingAddress);
             }
         }
 
@@ -114,5 +109,8 @@ class UpdateOrderStatusHandler implements HandlerInterface
             PaymentData::STATE,
             $response[$mode]['step']['current']
         );
+
+        // Make sure state and new addresses info is saved db
+        $this->orderRepository->save($order);
     }
 }
