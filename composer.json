@@ -2,7 +2,7 @@
     "name": "avarda/checkout3",
     "description": "Avarda Checkout V3 module for Magento 2 module.",
     "type": "magento2-module",
-    "version": "1.4.5",
+    "version": "1.4.6",
     "require": {
         "php": ">=8.1",
         "ext-json": "*",
