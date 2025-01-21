@@ -89,7 +89,14 @@ class UpdateOrderStatusHandler implements HandlerInterface
                 $shippingAddress->setCity($response[$mode]['deliveryAddress']['city'] ?? $response[$mode]['invoicingAddress']['city']);
                 $shippingAddress->setCountryId($response[$mode]['deliveryAddress']['country'] ?? $response[$mode]['invoicingAddress']['country']);
             } else {
-                $order->setShippingAddress($billingAddress);
+                $shippingAddress->setEmail($billingAddress->getEmail());
+                $shippingAddress->setTelephone($billingAddress->getTelephone());
+                $shippingAddress->setFirstname($billingAddress->getFirstname());
+                $shippingAddress->setLastname($billingAddress->getLastname());
+                $shippingAddress->setCity($billingAddress->getCity());
+                $shippingAddress->setPostcode($billingAddress->getPostcode());
+                $shippingAddress->setStreet($billingAddress->getStreet());
+                $shippingAddress->setCountryId($billingAddress->getCountryId());
             }
         }
 
