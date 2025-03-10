@@ -72,9 +72,9 @@ class SaveOrder extends AbstractCheckout
 
             $orderId = $this->avardaOrderRepository->getByPurchaseId($purchaseId);
             $order = $this->orderRepository->get($orderId->getOrderId());
+            $this->quotePaymentManagement->updateOrderPaymentStatus($order);
 
             if (!$this->config->getConfigValue(CompletePendingPaymentOrdersCron::XML_PATH_ENABLED)) {
-                $this->quotePaymentManagement->updateOrderPaymentStatus($order);
                 $this->quotePaymentManagement->finalizeOrder($order);
             }
 
