@@ -61,6 +61,7 @@ define([
         postalCode: ko.observable(),
         showNext: ko.observable(0),
         offerLogin: ko.observable(null),
+        currentStep: ko.observable(0),
 
         initialize: function () {
             let self = this;
@@ -86,7 +87,7 @@ define([
                         self.postalCode(quote.shippingAddress().postcode);
                     }
                     self.email.subscribe(function (latest) {
-                        if (quote.shippingAddress().email != latest) {
+                        if (quote.shippingAddress().email != latest && self.currentStep() === 0) {
                             self.forceRenew(true);
                         }
                         quote.guestEmail = latest;
@@ -96,7 +97,8 @@ define([
                         }
                     });
                     self.postalCode.subscribe(function (latest) {
-                        if (quote.shippingAddress().postcode != latest) {
+                        // Force renew only if changed from postcode step
+                        if (quote.shippingAddress().postcode != latest && self.currentStep() === 0) {
                             self.forceRenew(true);
                         }
                         quote.shippingAddress().postcode = latest;
@@ -180,12 +182,14 @@ define([
         },
 
         postCodeStep: function () {
+            this.currentStep(0);
             $("#checkout-step-postalcode").show();
             $("#checkout-step-shipping_method").hide();
             $("#checkout-step-iframe").hide();
         },
 
         postCodeNext: function () {
+            this.currentStep(1);
             if ($('#customer-password').val() == '') {
                 this.showNext(0);
             }
