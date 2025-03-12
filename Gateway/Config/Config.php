@@ -36,6 +36,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const KEY_OFFER_LOGIN = 'avarda_checkout3/api/offer_login';
     const KEY_SHOW_NEWSLETTER = 'avarda_checkout3/api/show_newsletter';
     const KEY_NEWSLETTER_DEFAULT = 'avarda_checkout3/api/newsletter_default';
+    const KEY_SELECT_SHIPPING_METHOD = 'avarda_checkout3/api/select_shipping_method';
 
     const KEY_ALTERNATIVE_CLIENT_ID = 'payment/avarda_checkout3_checkout/alternative_client_id';
     const KEY_ALTERNATIVE_CLIENT_SECRET = 'payment/avarda_checkout3_checkout/alternative_client_secret';
@@ -289,5 +290,14 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function getNewsletterSelectedDefault(): bool
     {
         return (bool)$this->getConfigValue(self::KEY_NEWSLETTER_DEFAULT);
+    }
+
+    /**
+     * @return bool
+     * @throws NoSuchEntityException
+     */
+    public function getSelectShippingMethod(): bool
+    {
+        return (bool)$this->getConfigValue(self::KEY_SELECT_SHIPPING_METHOD);
     }
 }

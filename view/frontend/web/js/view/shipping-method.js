@@ -111,7 +111,9 @@ define([
                     if (!quote.shippingMethod()) {
                         let rates = shippingService.getShippingRates()();
                         if (rates.length > 0) {
-                            self.selectShippingMethod(rates[0])
+                            if (self.getSelectShippingMethod()) {
+                                self.selectShippingMethod(rates[0])
+                            }
                         }
                     } else {
                         // This is needed when shippingMethod is already selected, but it might not be saved properly
@@ -149,6 +151,10 @@ define([
 
         getSubscribeAddressChangeCallback: function () {
             return !!options.addressChangeCallback;
+        },
+
+        getSelectShippingMethod: function () {
+            return options.selectShippingMethod;
         },
 
         getPostCodeTitle: function () {
@@ -197,7 +203,9 @@ define([
                 this.reloadShippingMethods();
                 let rates = shippingService.getShippingRates()();
                 if (rates.length > 0 && !quote.shippingMethod()) {
-                    this.selectShippingMethod(rates[0])
+                    if (this.getSelectShippingMethod()) {
+                        this.selectShippingMethod(rates[0])
+                    }
                 } else {
                     setShippingInformationAction();
                 }

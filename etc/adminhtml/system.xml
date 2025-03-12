@@ -128,6 +128,11 @@ buttons.primary.fontSize='15'</pre>]]></comment>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <comment>When not subscribed there will not be, save address button in iframe</comment>
                     </field>
+                    <field id="select_shipping_method" sortOrder="130" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Select Shipping Method</label>
+                        <config_path>avarda_checkout3/api/select_shipping_method</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
                     <field id="debug" sortOrder="500" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Debug Logging</label>
                         <config_path>avarda_checkout3/api/debug</config_path>

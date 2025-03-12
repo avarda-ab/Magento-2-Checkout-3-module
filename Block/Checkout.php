@@ -216,6 +216,11 @@ class Checkout extends Template
         return $this->config->getOfferLogin();
     }
 
+    public function getSelectShippingMethod()
+    {
+        return $this->config->getSelectShippingMethod();
+    }
+
     /**
      * @return array
      */

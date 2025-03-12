@@ -10,6 +10,7 @@
         <avarda_checkout3>
             <api>
                 <address_change>1</address_change>
+                <select_shipping_method>1</select_shipping_method>
             </api>
         </avarda_checkout3>
         <payment>
