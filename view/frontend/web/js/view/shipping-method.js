@@ -135,7 +135,7 @@ define([
              * Triggers iframe initialization when totals change
              */
             quote.totals.subscribe(function () {
-                if (quote.shippingMethod() || quote.isVirtual()) {
+                if (typeof avardaCheckout != "undefined" || quote.shippingMethod() || quote.isVirtual()) {
                     // Avoid duplicate and same time initialization, which can cause
                     // problems on backend if run too simultaneously
                     clearTimeout(self.initializeTimeout);
