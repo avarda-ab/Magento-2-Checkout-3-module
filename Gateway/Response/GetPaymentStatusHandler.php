@@ -78,8 +78,8 @@ class GetPaymentStatusHandler implements HandlerInterface
 
         if ($response[$mode]['deliveryAddress']['firstName']) {
             $shippingAddress = $this->addressFactory->create();
-            $shippingAddress->setTelephone($response[$mode]['deliveryAddress']['phone'] ?? $telephone);
-            $shippingAddress->setEmail($response[$mode]['deliveryAddress']['email'] ?? $email);
+            $shippingAddress->setTelephone($response[$mode]['deliveryAddress']['phone'] ?: $telephone);
+            $shippingAddress->setEmail($response[$mode]['deliveryAddress']['email'] ?: $email);
             $shippingAddress->setFirstname($response[$mode]['deliveryAddress']['firstName']);
             $shippingAddress->setLastname($response[$mode]['deliveryAddress']['lastName']);
             $street2 = $response[$mode]['deliveryAddress']['address2'];
@@ -87,9 +87,9 @@ class GetPaymentStatusHandler implements HandlerInterface
                 $response[$mode]['deliveryAddress']['address1'] .
                 (isset($street2) && $street2 ? "\n" . $street2 : '')
             );
-            $shippingAddress->setPostcode($response[$mode]['deliveryAddress']['zip'] ?? $response[$mode]['invoicingAddress']['zip']);
-            $shippingAddress->setCity($response[$mode]['deliveryAddress']['city'] ?? $response[$mode]['invoicingAddress']['city']);
-            $shippingAddress->setCountryId($response[$mode]['deliveryAddress']['country'] ?? $response[$mode]['invoicingAddress']['country']);
+            $shippingAddress->setPostcode($response[$mode]['deliveryAddress']['zip'] ?: $response[$mode]['invoicingAddress']['zip']);
+            $shippingAddress->setCity($response[$mode]['deliveryAddress']['city'] ?: $response[$mode]['invoicingAddress']['city']);
+            $shippingAddress->setCountryId($response[$mode]['deliveryAddress']['country'] ?: $response[$mode]['invoicingAddress']['country']);
             $quote->setShippingAddress($shippingAddress);
         } else {
             $quote->setShippingAddress($billingAddress);

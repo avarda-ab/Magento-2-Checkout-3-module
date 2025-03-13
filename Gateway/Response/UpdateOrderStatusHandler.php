@@ -83,11 +83,11 @@ class UpdateOrderStatusHandler implements HandlerInterface
                     $response[$mode]['deliveryAddress']['address1'] .
                     (isset($street2) && $street2 ? "\n" . $street2 : '')
                 );
-                $shippingAddress->setEmail($response[$mode]['deliveryAddress']['email'] ?? $email);
-                $shippingAddress->setTelephone($response[$mode]['deliveryAddress']['phone'] ?? $telephone);
-                $shippingAddress->setPostcode($response[$mode]['deliveryAddress']['zip'] ?? $response[$mode]['invoicingAddress']['zip']);
-                $shippingAddress->setCity($response[$mode]['deliveryAddress']['city'] ?? $response[$mode]['invoicingAddress']['city']);
-                $shippingAddress->setCountryId($response[$mode]['deliveryAddress']['country'] ?? $response[$mode]['invoicingAddress']['country']);
+                $shippingAddress->setEmail($response[$mode]['deliveryAddress']['email'] ?: $email);
+                $shippingAddress->setTelephone($response[$mode]['deliveryAddress']['phone'] ?: $telephone);
+                $shippingAddress->setPostcode($response[$mode]['deliveryAddress']['zip'] ?: $response[$mode]['invoicingAddress']['zip']);
+                $shippingAddress->setCity($response[$mode]['deliveryAddress']['city'] ?: $response[$mode]['invoicingAddress']['city']);
+                $shippingAddress->setCountryId($response[$mode]['deliveryAddress']['country'] ?: $response[$mode]['invoicingAddress']['country']);
             } else {
                 $shippingAddress->setEmail($billingAddress->getEmail());
                 $shippingAddress->setTelephone($billingAddress->getTelephone());
