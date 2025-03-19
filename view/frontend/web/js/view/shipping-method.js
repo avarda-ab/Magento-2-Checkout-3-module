@@ -61,6 +61,7 @@ define([
         postalCode: ko.observable(),
         showNext: ko.observable(0),
         offerLogin: ko.observable(null),
+        currentStep: ko.observable(0),
 
         initialize: function () {
             let self = this;
@@ -86,7 +87,7 @@ define([
                         self.postalCode(quote.shippingAddress().postcode);
                     }
                     self.email.subscribe(function (latest) {
-                        if (quote.shippingAddress().email != latest) {
+                        if (quote.shippingAddress().email != latest && self.currentStep() === 0) {
                             self.forceRenew(true);
                         }
                         quote.guestEmail = latest;
@@ -96,7 +97,8 @@ define([
                         }
                     });
                     self.postalCode.subscribe(function (latest) {
-                        if (quote.shippingAddress().postcode != latest) {
+                        // Force renew only if changed from postcode step
+                        if (quote.shippingAddress().postcode != latest && self.currentStep() === 0) {
                             self.forceRenew(true);
                         }
                         quote.shippingAddress().postcode = latest;
@@ -111,7 +113,9 @@ define([
                     if (!quote.shippingMethod()) {
                         let rates = shippingService.getShippingRates()();
                         if (rates.length > 0) {
-                            self.selectShippingMethod(rates[0])
+                            if (self.getSelectShippingMethod()) {
+                                self.selectShippingMethod(rates[0])
+                            }
                         }
                     } else {
                         // This is needed when shippingMethod is already selected, but it might not be saved properly
@@ -131,7 +135,7 @@ define([
              * Triggers iframe initialization when totals change
              */
             quote.totals.subscribe(function () {
-                if (quote.shippingMethod() || quote.isVirtual()) {
+                if (typeof avardaCheckout != "undefined" || quote.shippingMethod() || quote.isVirtual()) {
                     // Avoid duplicate and same time initialization, which can cause
                     // problems on backend if run too simultaneously
                     clearTimeout(self.initializeTimeout);
@@ -149,6 +153,10 @@ define([
 
         getSubscribeAddressChangeCallback: function () {
             return !!options.addressChangeCallback;
+        },
+
+        getSelectShippingMethod: function () {
+            return options.selectShippingMethod;
         },
 
         getPostCodeTitle: function () {
@@ -174,12 +182,14 @@ define([
         },
 
         postCodeStep: function () {
+            this.currentStep(0);
             $("#checkout-step-postalcode").show();
             $("#checkout-step-shipping_method").hide();
             $("#checkout-step-iframe").hide();
         },
 
         postCodeNext: function () {
+            this.currentStep(1);
             if ($('#customer-password').val() == '') {
                 this.showNext(0);
             }
@@ -197,7 +207,9 @@ define([
                 this.reloadShippingMethods();
                 let rates = shippingService.getShippingRates()();
                 if (rates.length > 0 && !quote.shippingMethod()) {
-                    this.selectShippingMethod(rates[0])
+                    if (this.getSelectShippingMethod()) {
+                        this.selectShippingMethod(rates[0])
+                    }
                 } else {
                     setShippingInformationAction();
                 }
