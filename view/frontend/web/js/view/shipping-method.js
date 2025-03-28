@@ -341,6 +341,16 @@ define([
         },
 
         /**
+         * This is called initially when iframe is initialized
+         * Purpose is to allow modifying via plugin the options before initializing iframe
+         *
+         * @param options
+         */
+        avardaCheckoutInitOptions: function (options) {
+            return options;
+        },
+
+        /**
          * Initializes checkout iframe
          *
          * @returns {boolean}
@@ -398,7 +408,10 @@ define([
                         window.location.href = options.saveOrderUrl + options.purchaseId;
                     };
 
-                    // Reinitialize checkout iframe
+                    // Allow other modules modify options before initializing iframe
+                    self.avardaCheckoutInitOptions(options);
+
+                    // (Re)Initialize checkout iframe
                     avardaCheckoutInit(options);
                 } else {
                     // Update items to update visible price
