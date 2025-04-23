@@ -62,6 +62,7 @@ define([
         showNext: ko.observable(0),
         offerLogin: ko.observable(null),
         currentStep: ko.observable(0),
+        shippingSelecting: ko.observable(false),
 
         initialize: function () {
             let self = this;
@@ -227,10 +228,25 @@ define([
         },
 
         selectShippingMethod: function (shippingMethod) {
+            let self = this;
+
+            // Set selected shipping method
             selectShippingMethodAction(shippingMethod);
             checkoutData.setSelectedShippingRate(shippingMethod['carrier_code'] + '_' + shippingMethod['method_code']);
+
+            // Depending on the shipping method this might be a separate instance which would cause multiple saves
+            // at the same time and cause issues the separate instance doesn't have the shippingSelecting variable
+            // so we check if it exists
+            if (typeof self.shippingSelecting == 'undefined' || self.shippingSelecting()) {
+                return false;
+            }
+            self.shippingSelecting(true);
+
             // Save selection
-            setShippingInformationAction();
+            setShippingInformationAction()
+                .always(function () {
+                    self.shippingSelecting(false);
+                });
             return true;
         },
 
