@@ -243,5 +243,12 @@
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
             </avarda_checkout3_zero_amount>
         </payment>
+        <csp>
+            <mode>
+                <storefront_avarda3_checkout_index>
+                    <report_only>0</report_only>
+                </storefront_avarda3_checkout_index>
+            </mode>
+        </csp>
     </default>
 </config>
