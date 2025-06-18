@@ -83,7 +83,7 @@ class QuoteCollectTotalsPrepareItems
      *
      * @return void
      */
-    protected function prepareItemStorage(CartInterface $subject)
+    public function prepareItemStorage(CartInterface $subject)
     {
         $this->itemStorage->reset();
         $this->prepareItems($subject);
@@ -98,7 +98,7 @@ class QuoteCollectTotalsPrepareItems
      *
      * @return void
      */
-    protected function prepareItems(CartInterface $subject)
+    public function prepareItems(CartInterface $subject)
     {
         $addedBundleProductIds = [];
         /** @var Item $item */
@@ -142,7 +142,7 @@ class QuoteCollectTotalsPrepareItems
      *
      * @return void
      */
-    protected function prepareShipment(CartInterface $subject)
+    public function prepareShipment(CartInterface $subject)
     {
         if ($subject->isVirtual()) {
             return;
@@ -174,7 +174,7 @@ class QuoteCollectTotalsPrepareItems
      *
      * @return void
      */
-    protected function prepareGiftCards(CartInterface $subject)
+    public function prepareGiftCards(CartInterface $subject)
     {
         $giftCardsAmountUsed = $subject->getData('gift_cards_amount_used');
         if ($giftCardsAmountUsed !== null && $giftCardsAmountUsed > 0) {
