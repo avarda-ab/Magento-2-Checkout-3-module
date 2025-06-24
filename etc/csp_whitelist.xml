@@ -14,6 +14,7 @@
                 <value id="avarda-checkout" type="host">*.checkout-api.avarda.com</value>
                 <value id="avarda-checkout-google-pay" type="host">google.com</value>
                 <value id="avarda-checkout-google-pay-2" type="host">www.google.com</value>
+                <value id="avarda-checkout-google-pay-3" type="host">pay.google.com</value>
             </values>
         </policy>
         <policy id="font-src">
