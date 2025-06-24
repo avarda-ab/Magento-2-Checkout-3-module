@@ -20,46 +20,26 @@ use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\View\Asset\Repository;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
+use Magento\Framework\View\Helper\Js;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\QuoteIdMaskFactory;
 
 class Checkout extends Template
 {
-    /** @var Config */
-    protected $config;
-
-    /** @var CompositeConfigProvider */
-    protected $configProvider;
-
-    /** @var Session */
-    protected $checkoutSession;
-
-    /** @var Data */
-    protected $directoryHelper;
-
-    /** @var QuoteIdMaskFactory */
-    protected $quoteIdMaskFactory;
-
-    /** @var RequestInterface */
-    protected $request;
-
-    /** @var Repository */
-    protected $assetRepo;
-
-    /** @var CartInterface */
-    protected $quote;
-
-    /** @var LocaleResolver */
-    protected $localeResolver;
-
+    protected Config $config;
+    protected CompositeConfigProvider $configProvider;
+    protected Session $checkoutSession;
+    protected Data $directoryHelper;
+    protected QuoteIdMaskFactory $quoteIdMaskFactory;
+    protected RequestInterface $request;
+    protected Repository $assetRepo;
+    protected CartInterface $quote;
+    protected LocaleResolver $localeResolver;
     /** @var array|LayoutProcessorInterface[] */
-    protected $layoutProcessors;
-
-    /** @var JwtToken */
-    protected $jwtTokenHelper;
-
-    /** @var SerializerInterface|mixed */
-    private $serializer;
+    protected array $layoutProcessors;
+    protected JwtToken $jwtTokenHelper;
+    protected SerializerInterface $serializer;
+    protected Js $jsHelper;
 
     public function __construct(
         Context $context,
@@ -72,9 +52,10 @@ class Checkout extends Template
         RequestInterface $request,
         LocaleResolver $localeResolver,
         JwtToken $jwtTokenHelper,
+        SerializerInterface $serializerInterface,
+        Js $jsHelper,
         array $layoutProcessors = [],
         array $data = [],
-        SerializerInterface $serializerInterface = null
     ) {
         parent::__construct($context, $data);
 
@@ -88,8 +69,8 @@ class Checkout extends Template
         $this->localeResolver = $localeResolver;
         $this->layoutProcessors = $layoutProcessors;
         $this->jwtTokenHelper = $jwtTokenHelper;
-        $this->serializer = $serializerInterface ?: \Magento\Framework\App\ObjectManager::getInstance()
-            ->get(\Magento\Framework\Serialize\Serializer\JsonHexTag::class);
+        $this->serializer = $serializerInterface;
+        $this->jsHelper = $jsHelper;
 
         if ($productMetadata->getEdition() === 'Enterprise') {
             $this->jsLayout = array_merge_recursive([
@@ -100,11 +81,11 @@ class Checkout extends Template
                             'errors' => [
                                 'sortOrder' => 0,
                                 'component' => 'Magento_GiftCardAccount/js/view/payment/gift-card-messages',
-                                'displayArea' => 'messages'
-                            ]
-                        ]
-                    ]
-                ]
+                                'displayArea' => 'messages',
+                            ],
+                        ],
+                    ],
+                ],
             ], $this->jsLayout);
         }
     }
@@ -310,6 +291,17 @@ class Checkout extends Template
     public function getBaseUrl()
     {
         return $this->_storeManager->getStore()->getBaseUrl();
+    }
+
+    /**
+     * Csp safe inline js
+     *
+     * @param $scriptString
+     * @return string
+     */
+    public function getInlineJs($scriptString)
+    {
+        return $this->jsHelper->getScript($scriptString);
     }
 
     /**

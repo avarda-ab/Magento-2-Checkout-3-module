@@ -15,15 +15,16 @@
         </div>
     </div>
     <!-- ko template: getTemplate() --><!-- /ko -->
-    <script>
-        const CHECKOUT3_JS_BUNDLE = '<?= $block->getCheckOutClientScriptPath(); ?>';
+    <?php
+    echo $block->getInlineJs('
+        const CHECKOUT3_JS_BUNDLE = "' . $block->getCheckOutClientScriptPath() . '";
         (function(e,t,n,a,s,c,o,i,r){e[a]=e[a]||function(){(e[a].q=e[a].q||[
         ]).push(arguments)};e[a].i=s;i=t.createElement(n);i.async=1
         ;i.src=o+"?v="+c+"&ts="+1*new Date;r=t.getElementsByTagName(n)[0]
         ;r.parentNode.insertBefore(i,r)})(window,document,"script",
             "avardaCheckoutInit","avardaCheckout","1.0.0",CHECKOUT3_JS_BUNDLE
-        );
-    </script>
+        );');
+    ?>
     <script type="text/x-magento-init">
         {
             "#checkout": {
@@ -31,22 +32,24 @@
             }
         }
     </script>
-    <script>
-        var options = {
+    <?php
+    echo $block->getInlineJs('
+        window.options = {
             disableFocus: true,
             rootElementId: "avarda-checkout-iframe",
-            redirectUrlBase: '<?= $escaper->escapeUrl($block->getCallbackUrl()) ?>',
-            saveOrderUrl: '<?= $escaper->escapeUrl($block->getSaveOrderUrl()) ?>',
-            showPostcode: !!<?= $block->getShowPostcode() ? 1 : 0 ?>,
-            addressChangeCallback: !!<?= $block->getAdressChangeCallback() ? 1 : 0 ?>,
-            offerLogin: !!<?= $block->getOfferLogin() ? 1 : 0 ?>,
-            selectShippingMethod: !!<?= $block->getSelectShippingMethod() ? 1 : 0 ?>,
-            redirectUrl: '',
-            styles: <?= $block->getStyles() ?>
+            redirectUrlBase: "' . $escaper->escapeUrl($block->getCallbackUrl()) . '",
+            saveOrderUrl: "' . $escaper->escapeUrl($block->getSaveOrderUrl()) . '",
+            showPostcode: !!'. ($block->getShowPostcode() ? 1 : 0) . ',
+            addressChangeCallback: !!'. ($block->getAdressChangeCallback() ? 1 : 0) . ',
+            offerLogin: !!'. ($block->getOfferLogin() ? 1 : 0) . ',
+            selectShippingMethod: !!'. ($block->getSelectShippingMethod() ? 1 : 0) . ',
+            redirectUrl: "",
+            styles: ' . $block->getStyles() . '
         };
-        window.checkoutConfig = <?= /* @noEscape */ $block->getSerializedCheckoutConfig() ?>;
-        window.checkoutConfig.checkoutUrl = '<?= $escaper->escapeUrl($block->getCheckoutUrl()) ?>';
+        window.checkoutConfig = ' . $block->getSerializedCheckoutConfig() . ';
+        window.checkoutConfig.checkoutUrl = "' . $escaper->escapeUrl($block->getCheckoutUrl()) . '";
         window.isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
         window.customerData = window.checkoutConfig.customerData;
-    </script>
+    ');
+    ?>
 </div>
