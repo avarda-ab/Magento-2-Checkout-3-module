@@ -22,7 +22,7 @@ define([
     'Magento_Customer/js/customer-data',
     'Magento_Checkout/js/action/place-order',
     'Magento_Checkout/js/model/checkout-data-resolver',
-    'mage/translate'
+    'mage/translate',
 ], function (
     $,
     ko,
@@ -42,7 +42,7 @@ define([
     shippingService,
     customerData,
     placeOrderAction,
-    checkoutDataResolver
+    checkoutDataResolver,
 ) {
     'use strict';
 
@@ -228,25 +228,23 @@ define([
         },
 
         selectShippingMethod: function (shippingMethod) {
-            let self = this;
+            let self = requirejs('uiRegistry').get('checkout.steps.avarda-shipping');
 
             // Set selected shipping method
             selectShippingMethodAction(shippingMethod);
             checkoutData.setSelectedShippingRate(shippingMethod['carrier_code'] + '_' + shippingMethod['method_code']);
 
-            // Depending on the shipping method this might be a separate instance which would cause multiple saves
-            // at the same time and cause issues the separate instance doesn't have the shippingSelecting variable
-            // so we check if it exists
-            if (typeof self.shippingSelecting == 'undefined' || self.shippingSelecting()) {
-                return false;
+            // Depending on the shipping method, this might be called many times which would cause multiple saves at
+            // the same time so we make sure no duplicate save happening
+            if (self.shippingSelecting()) {
+                return true;
             }
             self.shippingSelecting(true);
 
             // Save selection
-            setShippingInformationAction()
-                .always(function () {
-                    self.shippingSelecting(false);
-                });
+            setShippingInformationAction().always(function () {
+                self.shippingSelecting(false);
+            });
             return true;
         },
 
