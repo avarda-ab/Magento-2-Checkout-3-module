@@ -249,6 +249,14 @@
                     <report_only>0</report_only>
                 </storefront_avarda3_checkout_index>
             </mode>
+            <policies>
+                <storefront_avarda3_checkout_index>
+                    <scripts>
+                        <inline>0</inline>
+                        <event_handlers>1</event_handlers>
+                    </scripts>
+                </storefront_avarda3_checkout_index>
+            </policies>
         </csp>
     </default>
 </config>
