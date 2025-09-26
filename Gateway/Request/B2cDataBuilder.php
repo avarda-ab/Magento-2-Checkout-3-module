@@ -36,6 +36,9 @@ class B2cDataBuilder implements BuilderInterface
     /** country */
     const COUNTRY = 'country';
 
+    /** phone */
+    const PHONE = 'phone';
+
     protected Session $customerSession;
     protected ScopeConfigInterface $config;
 
@@ -86,7 +89,10 @@ class B2cDataBuilder implements BuilderInterface
             self::COUNTRY    => $address->getCountryId() ?: $this->getDefaultCountry($order),
         ];
 
-        return $this->checkAddressData($addressData);
+        $addressData = $this->checkAddressData($addressData);
+        // Make sure an empty phone field is not added, because the billing address does not have a phone field
+        unset($addressData[self::PHONE]);
+        return $addressData;
     }
 
     /**
@@ -97,7 +103,7 @@ class B2cDataBuilder implements BuilderInterface
     {
         $address = $order->getShippingAddress();
         if ($address === null) {
-            // If it's virtual order it doesn't have shipping address
+            // If it's a virtual order, it doesn't have a shipping address
             return $this->getBillingAddress($order);
         }
 
@@ -109,6 +115,7 @@ class B2cDataBuilder implements BuilderInterface
             self::ZIP        => $address->getPostcode(),
             self::CITY       => $address->getCity(),
             self::COUNTRY    => $address->getCountryId() ?: $this->getDefaultCountry($order),
+            self::PHONE      => $address->getTelephone(),
         ];
 
         return $this->checkAddressData($addressData);
@@ -145,7 +152,7 @@ class B2cDataBuilder implements BuilderInterface
     }
 
     /**
-     * If after saving the order for pending payment there is an error dummy number is saved to cart as well,
+     * If after saving the order for pending payment, there is an error dummy number is saved to cart as well,
      * but we don't want to do new initialization with dummy phone number
      *
      * @param $address
@@ -161,17 +168,17 @@ class B2cDataBuilder implements BuilderInterface
     }
 
     /**
-     * Check that address doesn't have masked data, which could be caused by same error why we check telephone
+     * Check that the address doesn't have masked data, which could be caused by same error why we check telephone
      *
      * @param array $addressData
      * @return array
      */
     public function checkAddressData($addressData)
     {
-        foreach ($addressData as $key => $value) {
-            // Asterisk is not allowed in any address field so if there is
-            // then user is recognized and address filled by avarda, and we should send empty address
-            if (strpos($addressData[$key] ?? '', '*') !== false) {
+        foreach ($addressData as $value) {
+            // Asterisk is not allowed in any address field, so if there is
+            // then user is recognized and the address filled by avarda, and we should send an empty address
+            if (str_contains($value ?: '', '*')) {
                 return [
                     self::FIRST_NAME => '',
                     self::LAST_NAME  => '',
@@ -180,6 +187,7 @@ class B2cDataBuilder implements BuilderInterface
                     self::ZIP        => '',
                     self::CITY       => '',
                     self::COUNTRY    => '',
+                    self::PHONE      => '',
                 ];
             }
         }
