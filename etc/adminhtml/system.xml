@@ -64,6 +64,14 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/avarda_checkout3_checkout/onepage_redirect_active</config_path>
                     </field>
+                    <field id="hide_avarda_checkout_shipping_fields" translate="label" type="select" sortOrder="41" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Hide Avarda Checkout Shipping Fields</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/avarda_checkout3_checkout/hide_avarda_checkout_shipping_fields</config_path>
+                        <depends>
+                            <field id="onepage_redirect_active">0</field>
+                        </depends>
+                    </field>
                     <field id="order_status" translate="label" type="select" sortOrder="45" showInDefault="1" showInWebsite="0"  showInStore="0">
                         <label>Order Status</label>
                         <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>

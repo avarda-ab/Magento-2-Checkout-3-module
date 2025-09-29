@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * @var $block \Magento\Framework\View\Element\Template
+ */
+
+$layout = $block->getLayout()->getUpdate()->getPageLayout();
+
+$paymentStep = $block->getData('avardaPage');
+
+?>
+
+<ul class="opc-progress-bar">
+    <li class="opc-progress-bar-item <?= $paymentStep ? '_complete' : '_active' ?>">
+        <span><?= __('Shipping') ?></span>
+    </li>
+    <li class="opc-progress-bar-item <?= $paymentStep ? '_complete' : '' ?>">
+        <span><?= __('Review & Payments') ?></span>
+    </li>
+    <li class="opc-progress-bar-item <?= $paymentStep ? '_active' : '' ?>">
+        <span><?= __('Avarda') ?></span>
+    </li>
+</ul>
+
+<script>
+    require([
+        'jquery'
+    ], function ($) {
+        "use strict";
+
+        $(document).ready(function () {
+            const shippingUrl = '<?= $block->getUrl('checkout', ['_secure' => true]) ?>';
+            const paymentUrl = '<?= $block->getUrl('checkout', ['_secure' => true]) ?>' + '#payment';
+            const progressBarItem = $('.opc-progress-bar-item');
+
+            progressBarItem.eq(0).on('click', function () {
+                window.location.href = shippingUrl;
+            });
+
+            progressBarItem.eq(1).on('click', function () {
+                window.location.href = paymentUrl;
+            });
+        });
+    });
+</script>
