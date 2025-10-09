@@ -63,6 +63,7 @@ class SaveOrder extends AbstractCheckout
      */
     public function execute()
     {
+        $order = null;
         try {
             if (($purchaseId = $this->getPurchaseId()) === null) {
                 throw new Exception(
@@ -71,6 +72,12 @@ class SaveOrder extends AbstractCheckout
             }
 
             $orderId = $this->avardaOrderRepository->getByPurchaseId($purchaseId);
+            if (!$orderId || !$orderId->getOrderId()) {
+                throw new Exception(
+                    __('No order found for purchase ID "%purchase_id"', ['purchase_id' => $purchaseId])
+                );
+            }
+
             $order = $this->orderRepository->get($orderId->getOrderId());
             $this->quotePaymentManagement->updateOrderPaymentStatus($order);
 
@@ -78,7 +85,7 @@ class SaveOrder extends AbstractCheckout
                 $this->quotePaymentManagement->finalizeOrder($order);
             }
 
-            // Set order and quote information to session, so we can redirect to success page
+            // Set order and quote information to the session, so we can redirect to the success page
             $this->checkoutSession
                 ->setLastOrderId($order->getId())
                 ->setLastRealOrderId($order->getIncrementId())
@@ -98,10 +105,12 @@ class SaveOrder extends AbstractCheckout
             $message = __('Failed to save Avarda order. Please try again later.');
         }
 
-        $quote = $this->cartRepository->get($order->getQuoteId());
-        if ($quote && $quote->getIsActive()) {
-            $quote->setIsActive(false);
-            $quote->save();
+        if ($order) {
+            $quote = $this->cartRepository->get($order->getQuoteId());
+            if ($quote && $quote->getIsActive()) {
+                $quote->setIsActive(false);
+                $quote->save();
+            }
         }
 
         $this->messageManager->addErrorMessage($message);
