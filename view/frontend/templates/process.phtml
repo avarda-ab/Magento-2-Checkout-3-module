@@ -9,24 +9,25 @@ $purchaseId = $block->getPurchaseId();
 $jwtToken = $block->getJwtToken($purchaseId);
 ?>
 <div id="avarda-checkout-iframe"></div>
-<script>
-    const CHECKOUT3_JS_BUNDLE = '<?= $block->getCheckOutClientScriptPath(); ?>';
+<?php
+echo $block->getInlineJs('
+    const CHECKOUT3_JS_BUNDLE = "' . $block->getCheckOutClientScriptPath() . '";
     (function(e,t,n,a,s,c,o,i,r){e[a]=e[a]||function(){(e[a].q=e[a].q||[
     ]).push(arguments)};e[a].i=s;i=t.createElement(n);i.async=1
     ;i.src=o+"?v="+c+"&ts="+1*new Date;r=t.getElementsByTagName(n)[0]
     ;r.parentNode.insertBefore(i,r)})(window,document,"script",
         "avardaCheckoutInit","avardaCheckout","1.0.0",CHECKOUT3_JS_BUNDLE
-    );
-</script>
-<script>
+    );');
+
+echo $block->getInlineJs('
     let options = {
         rootElementId: "avarda-checkout-iframe",
-        purchaseId: "<?= $purchaseId ?>",
-        purchaseJwt: "<?= $jwtToken ?>",
-        redirectUrl: '<?= $block->getCallbackUrl() . $purchaseId ?>',
+        purchaseId: "' . $purchaseId . '",
+        purchaseJwt: "' . $jwtToken . '",
+        redirectUrl: "' . $block->getCallbackUrl() . $purchaseId . '",
         completedPurchaseCallback: function (avardaCheckoutInstance) {
             avardaCheckoutInstance.unmount();
-            window.location.href = "<?= $escaper->escapeUrl($block->getSaveOrderUrl() . $purchaseId) ?>";
+            window.location.href = "' . $escaper->escapeUrl($block->getSaveOrderUrl() . $purchaseId) . '";
         },
         beforeSubmitCallback: function (data, avardaCheckoutInstance) {
             history.pushState(null, document.title, options.redirectUrl);
@@ -35,9 +36,9 @@ $jwtToken = $block->getJwtToken($purchaseId);
         sessionTimedOutCallback: function (avardaCheckoutInstance) {
             avardaCheckoutInstance.unmount();
             options.purchaseId = undefined;
-            window.location.href = "<?= $escaper->escapeUrl($block->getCheckoutUrl()) ?>";
+            window.location.href = "' . $escaper->escapeUrl($block->getCheckoutUrl()) . '";
         },
-        styles: <?= $block->getStyles() ?>
+        styles: ' . $block->getStyles() . '
     };
     avardaCheckoutInit(options);
-</script>
+');
