@@ -24,7 +24,7 @@
         ;r.parentNode.insertBefore(i,r)})(window,document,"script",
             "avardaCheckoutInit","avardaCheckout","1.0.0",CHECKOUT3_JS_BUNDLE
         );');
-    ?>
+?>
     <script type="text/x-magento-init">
         {
             "#checkout": {
@@ -33,16 +33,16 @@
         }
     </script>
     <?php
-    echo $block->getInlineJs('
+echo $block->getInlineJs('
         window.options = {
             disableFocus: true,
             rootElementId: "avarda-checkout-iframe",
             redirectUrlBase: "' . $escaper->escapeUrl($block->getCallbackUrl()) . '",
             saveOrderUrl: "' . $escaper->escapeUrl($block->getSaveOrderUrl()) . '",
-            showPostcode: !!'. ($block->getShowPostcode() ? 1 : 0) . ',
-            addressChangeCallback: !!'. ($block->getAdressChangeCallback() ? 1 : 0) . ',
-            offerLogin: !!'. ($block->getOfferLogin() ? 1 : 0) . ',
-            selectShippingMethod: !!'. ($block->getSelectShippingMethod() ? 1 : 0) . ',
+            showPostcode: !!' . ($block->getShowPostcode() ? 1 : 0) . ',
+            addressChangeCallback: !!' . ($block->getAdressChangeCallback() ? 1 : 0) . ',
+            offerLogin: !!' . ($block->getOfferLogin() ? 1 : 0) . ',
+            selectShippingMethod: !!' . ($block->getSelectShippingMethod() ? 1 : 0) . ',
             redirectUrl: "",
             styles: ' . $block->getStyles() . '
         };
@@ -51,5 +51,5 @@
         window.isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
         window.customerData = window.checkoutConfig.customerData;
     ');
-    ?>
+?>
 </div>

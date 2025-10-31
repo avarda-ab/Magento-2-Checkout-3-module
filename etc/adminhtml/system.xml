@@ -80,7 +80,8 @@
                     <field id="custom_css" translate="label" type="textarea" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Custom Css</label>
                         <config_path>avarda_checkout3/api/custom_css</config_path>
-                        <comment><![CDATA[<a target="_blank" rel="noopener" href="https://docs.avarda.com/checkout-3/more-features/custom-css-styles/">See documentation here</a>, add each config as one row for example:
+                        <frontend_model>Avarda\Checkout3\Model\Config\Backend\CspUrlCheck</frontend_model>
+                        <comment><![CDATA[<a target="_blank" rel="noopener" href="https://docs.avarda.com/checkout-3/custom-css-styles/">See documentation here</a>, add each config as one row for example:
                     <pre class="code-example">buttons.primary.base.backgroundColor='#fff'
 buttons.primary.fontSize='15'</pre>]]></comment>
                     </field>

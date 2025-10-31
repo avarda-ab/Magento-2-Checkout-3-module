@@ -829,4 +829,9 @@
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
         </arguments>
     </type>
+    <type name="Avarda\Checkout3\Block\Adminhtml\System\Config\Field\CspUrlCheck">
+        <arguments>
+            <argument name="cspWhitelistCollector" xsi:type="object">Magento\Csp\Model\Collector\CspWhitelistXmlCollector</argument>
+        </arguments>
+    </type>
 </config>
