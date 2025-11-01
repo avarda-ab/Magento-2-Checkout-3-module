@@ -5,6 +5,7 @@
             <values>
                 <value id="avarda" type="host">*.core.windows.net</value>
                 <value id="avarda-checkout" type="host">*.checkout-cdn.avarda.com</value>
+                <value id="avarda-checkout-cdn-base" type="host">checkout-cdn.avarda.com</value>
                 <value id="avarda-checkout-stage" type="host">*.stage.avarda.com</value>
                 <value id="avarda-checkout-google-pay" type="host">pay.google.com</value>
             </values>
@@ -12,6 +13,7 @@
         <policy id="connect-src">
             <values>
                 <value id="avarda-checkout" type="host">*.checkout-api.avarda.com</value>
+                <value id="avarda-checkout-cdn-base" type="host">checkout-cdn.avarda.com</value>
                 <value id="avarda-checkout-google-pay" type="host">google.com</value>
                 <value id="avarda-checkout-google-pay-2" type="host">www.google.com</value>
                 <value id="avarda-checkout-google-pay-3" type="host">pay.google.com</value>
@@ -21,6 +23,7 @@
             <values>
                 <value id="avarda-checkout" type="host">*.checkout-api.avarda.com</value>
                 <value id="avarda-checkout-cdn" type="host">*.checkout-cdn.avarda.com</value>
+                <value id="avarda-checkout-cdn-base" type="host">checkout-cdn.avarda.com</value>
             </values>
         </policy>
         <policy id="img-src">
@@ -28,11 +31,13 @@
                 <value id="avarda" type="host">*.core.windows.net</value>
                 <value id="avarda-checkout" type="host">*.checkout-api.avarda.com</value>
                 <value id="avarda-checkout-cdn" type="host">*.checkout-cdn.avarda.com</value>
+                <value id="avarda-checkout-cdn-base" type="host">checkout-cdn.avarda.com</value>
             </values>
         </policy>
         <policy id="frame-src">
             <values>
                 <value id="avarda-checkout" type="host">*.checkout-cdn.avarda.com</value>
+                <value id="avarda-checkout-cdn-base" type="host">checkout-cdn.avarda.com</value>
                 <value id="avarda-checkout-stage" type="host">*.stage.avarda.com</value>
                 <value id="avarda-checkout-google-pay" type="host">pay.google.com</value>
             </values>
