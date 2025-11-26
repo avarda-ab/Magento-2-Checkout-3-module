@@ -58,16 +58,21 @@ class CheckoutSetupDataBuilder implements BuilderInterface
     public function getLanguage(): int
     {
         $recognizedLocales = [
-            "en" => 0,
-            "sv" => 1,
-            "fi" => 2,
-            "no" => 3,
-            "et" => 4,
-            "dk" => 5,
-            "cz" => 6,
-            "lt" => 7,
-            "sk" => 9,
-            "pl" => 10,
+            "en" => 0,  // English
+            "sv" => 1,  // Swedish
+            "fi" => 2,  // Finnish
+            "no" => 3,  // Norwegian
+            "et" => 4,  // Estonian
+            "dk" => 5,  // Danish
+            "cz" => 6,  // Czech
+            "lt" => 7,  // Latvian
+            "sk" => 9,  // Slovak
+            "pl" => 10, // Polish
+            "de" => 11, // German
+            "at" => 12, // Austrian
+            "ru" => 13, // Russian
+            "es" => 14, // Spanish
+            "it" => 15, // Italian
         ];
 
         $localeCode = $this->localeResolver->getLocale();
