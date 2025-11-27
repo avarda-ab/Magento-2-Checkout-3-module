@@ -8,23 +8,29 @@ namespace Avarda\Checkout3\Gateway\Request;
 
 use Avarda\Checkout3\Gateway\Config\Config;
 use Avarda\Checkout3\Helper\AvardaCheckBoxTypeValues;
+use Avarda\Checkout3\Model\Data\AddressBuilder;
 use Magento\Framework\Locale\Resolver;
+use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Payment\Gateway\Data\AddressAdapterInterface;
 use Magento\Payment\Gateway\Data\OrderAdapterInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
+use Magento\Quote\Model\Quote\Item;
 
 class CheckoutSetupDataBuilder implements BuilderInterface
 {
     protected Resolver $localeResolver;
-    protected Config $configHelper;
+    protected ConfigInterface $configHelper;
+    protected AddressBuilder $addressBuilder;
 
     public function __construct(
         Resolver $localeResolver,
-        Config $configHelper
+        ConfigInterface $configHelper,
+        AddressBuilder $addressBuilder,
     ) {
         $this->localeResolver = $localeResolver;
         $this->configHelper = $configHelper;
+        $this->addressBuilder = $addressBuilder;
     }
 
     /**
@@ -80,7 +86,7 @@ class CheckoutSetupDataBuilder implements BuilderInterface
         $isVirtual = true;
         $countItems = 0;
         foreach ($order->getItems() as $item) {
-            /* @var $item \Magento\Quote\Model\Quote\Item */
+            /* @var $item Item */
             if ($item->isDeleted() || $item->getParentItemId()) {
                 continue;
             }
@@ -94,7 +100,7 @@ class CheckoutSetupDataBuilder implements BuilderInterface
 
         if ($isVirtual) {
             return AvardaCheckBoxTypeValues::VALUE_HIDDEN;
-        } elseif ($this->isAddressDifferent($order->getBillingAddress(), $order->getShippingAddress())) {
+        } elseif ($this->addressBuilder->isAddressDifferent($order->getBillingAddress(), $order->getShippingAddress())) {
             return AvardaCheckBoxTypeValues::VALUE_CHECKED;
         } else {
             return AvardaCheckBoxTypeValues::VALUE_UNCHECKED;
@@ -111,31 +117,6 @@ class CheckoutSetupDataBuilder implements BuilderInterface
             }
         } else {
             return AvardaCheckBoxTypeValues::VALUE_HIDDEN;
-        }
-    }
-
-    /**
-     * @param $address1 AddressAdapterInterface
-     * @param $address2 AddressAdapterInterface
-     * @return bool
-     */
-    protected function isAddressDifferent($address1, $address2): bool
-    {
-        if (
-            $address1->getFirstname() != $address2->getFirstname() ||
-            $address1->getLastname() != $address2->getLastname() ||
-            $address1->getStreetLine1() != $address2->getStreetLine1() ||
-            $address1->getStreetLine2() != $address2->getStreetLine2() ||
-            $address1->getCity() != $address2->getCity() ||
-            $address1->getPostcode() != $address2->getPostcode() ||
-            ( 
-                null !== $address1->getCountryId() &&
-                $address1->getCountryId() != $address2->getCountryId()
-            )
-        ) {
-            return true;
-        } else {
-            return false;
         }
     }
 }
