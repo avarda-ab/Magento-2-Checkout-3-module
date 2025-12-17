@@ -11,29 +11,32 @@ namespace Avarda\Checkout3\Helper;
  */
 class PaymentMethod
 {
-    const INVOICE = "Invoice";
-    const LOAN = "Loan";
-    const CARD = "Card";
-    const DIRECT_PAYMENT = "DirectPayment";
-    const PART_PAYMENT = "PartPayment";
-    const SWISH = "Swish";
-    const HIGH_AMOUNT_LOAN = "HighAmountLoan";
-    const PAYPAL = "PayPal";
-    const PAY_ON_DELIVERY = "PayOnDelivery";
-    const B2B_INVOICE = "B2BInvoice";
-    const DIRECT_INVOICE = "DirectInvoice";
-    const MASTERPASS = "Masterpass";
-    const MOBILE_PAY = "MobilePay";
-    const VIPPS = "Vipps";
-    const ZERO_AMOUNT = "ZeroAmount";
-    const UNKNOWN = "Unknown";
+    const string INVOICE = "Invoice";
+    const string LOAN = "Loan";
+    const string CARD = "Card";
+    const string DIRECT_PAYMENT = "DirectPayment";
+    const string PART_PAYMENT = "PartPayment";
+    const string SWISH = "Swish";
+    const string HIGH_AMOUNT_LOAN = "HighAmountLoan";
+    const string PAYPAL = "PayPal";
+    const string PAY_ON_DELIVERY = "PayOnDelivery";
+    const string B2B_INVOICE = "B2BInvoice";
+    const string DIRECT_INVOICE = "DirectInvoice";
+    const string MASTERPASS = "Masterpass";
+    const string MOBILE_PAY = "MobilePay";
+    const string VIPPS = "Vipps";
+    const string CARD_CHECKOUT = "CardViaCheckoutCom";
+    const string APPLE_PAY = "ApplePayViaCheckoutCom";
+    const string GOOGLE_PAY = "GooglePayViaCheckoutCom";
+    const string ZERO_AMOUNT = "ZeroAmount";
+    const string UNKNOWN = "Unknown";
 
     /**
      * PaymentMethod payment codes
      *
      * @var array
      */
-    public static $codes = [
+    public static array $codes = [
         self::INVOICE          => "avarda_checkout3_invoice",
         self::LOAN             => "avarda_checkout3_loan",
         self::CARD             => "avarda_checkout3_card",
@@ -48,13 +51,17 @@ class PaymentMethod
         self::MASTERPASS       => "avarda_checkout3_masterpass",
         self::MOBILE_PAY       => "avarda_checkout3_mobile_pay",
         self::VIPPS            => "avarda_checkout3_vipps",
+        self::CARD_CHECKOUT    => "avarda_checkout3_card_checkout",
+        self::APPLE_PAY        => "avarda_checkout3_apple_pay",
+        self::GOOGLE_PAY       => "avarda_checkout3_google_pay",
         self::ZERO_AMOUNT      => "avarda_checkout3_zero_amount",
+        self::UNKNOWN          => "avarda_checkout3_unknown",
     ];
 
     /**
      * Get payment method code for Magento order
      *
-     * @param int $paymentMethod
+     * @param string $paymentMethod
      * @return string
      */
     public function getPaymentMethod($paymentMethod)
@@ -62,7 +69,6 @@ class PaymentMethod
         if (array_key_exists($paymentMethod, self::$codes)) {
             return self::$codes[$paymentMethod];
         }
-
         return self::$codes[self::UNKNOWN];
     }
 }

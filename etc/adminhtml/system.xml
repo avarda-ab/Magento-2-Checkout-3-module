@@ -204,6 +204,22 @@ buttons.primary.fontSize='15'</pre>]]></comment>
                         <label>ZeroAmount Title</label>
                         <config_path>payment/avarda_checkout3_zero_amount/title</config_path>
                     </field>
+                    <field id="avarda_checkout3_card_checkout_title" translate="label" type="text" sortOrder="145" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>CardCheckout Title</label>
+                        <config_path>payment/avarda_checkout3_card_checkout/title</config_path>
+                    </field>
+                    <field id="avarda_checkout3_apple_pay_title" translate="label" type="text" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>ApplePay Title</label>
+                        <config_path>payment/avarda_checkout3_apple_pay/title</config_path>
+                    </field>
+                    <field id="avarda_checkout3_google_pay_title" translate="label" type="text" sortOrder="170" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>GooglePay Title</label>
+                        <config_path>payment/avarda_checkout3_google_pay/title</config_path>
+                    </field>
+                    <field id="avarda_checkout3_unknown_title" translate="label" type="text" sortOrder="180" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Unknown Title</label>
+                        <config_path>payment/avarda_checkout3_unknown/title</config_path>
+                    </field>
                 </group>
             </group>
         </section>

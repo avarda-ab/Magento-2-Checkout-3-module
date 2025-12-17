@@ -60,6 +60,18 @@
         <method name="avarda_checkout3_zero_amount">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
+        <method name="avarda_checkout3_card_checkout">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="avarda_checkout3_apple_pay">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="avarda_checkout3_google_pay">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="avarda_checkout3_unknown">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
     </methods>
 </payment>
 

@@ -814,6 +814,114 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="AvardaCheckout3CardCheckoutFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">Avarda\Checkout3\Model\Ui\ConfigProviderCardCheckout::CODE</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Magento\Payment\Block\Info</argument>
+            <argument name="valueHandlerPool" xsi:type="object">AvardaCheckout3CardCheckoutValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">AvardaCheckout3CommandPool</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="AvardaCheckout3CardCheckoutValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">AvardaCheckout3CardCheckoutConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="AvardaCheckout3CardCheckoutConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">AvardaCheckout3CardCheckoutGenericConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="AvardaCheckout3CardCheckoutGenericConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Avarda\Checkout3\Model\Ui\ConfigProviderCardCheckout::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="AvardaCheckout3ApplePayFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">Avarda\Checkout3\Model\Ui\ConfigProviderApplePay::CODE</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Magento\Payment\Block\Info</argument>
+            <argument name="valueHandlerPool" xsi:type="object">AvardaCheckout3ApplePayValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">AvardaCheckout3CommandPool</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="AvardaCheckout3ApplePayValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">AvardaCheckout3ApplePayConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="AvardaCheckout3ApplePayConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">AvardaCheckout3ApplePayGenericConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="AvardaCheckout3ApplePayGenericConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Avarda\Checkout3\Model\Ui\ConfigProviderApplePay::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="AvardaCheckout3GooglePayFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">Avarda\Checkout3\Model\Ui\ConfigProviderGooglePay::CODE</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Magento\Payment\Block\Info</argument>
+            <argument name="valueHandlerPool" xsi:type="object">AvardaCheckout3GooglePayValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">AvardaCheckout3CommandPool</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="AvardaCheckout3GooglePayValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">AvardaCheckout3GooglePayConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="AvardaCheckout3GooglePayConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">AvardaCheckout3GooglePayGenericConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="AvardaCheckout3GooglePayGenericConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Avarda\Checkout3\Model\Ui\ConfigProviderGooglePay::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="AvardaCheckout3UnknownFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">Avarda\Checkout3\Model\Ui\ConfigProviderUnknown::CODE</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Magento\Payment\Block\Info</argument>
+            <argument name="valueHandlerPool" xsi:type="object">AvardaCheckout3UnknownValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">AvardaCheckout3CommandPool</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="AvardaCheckout3UnknownValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">AvardaCheckout3UnknownConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="AvardaCheckout3UnknownConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">AvardaCheckout3UnknownGenericConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="AvardaCheckout3UnknownGenericConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Avarda\Checkout3\Model\Ui\ConfigProviderUnknown::CODE</argument>
+        </arguments>
+    </virtualType>
+
     <type name="Avarda\Checkout3\Plugin\PrepareItems\Quote\QuoteCollectTotalsUpdateItems">
         <arguments>
             <argument name="config" xsi:type="object">Avarda\Checkout3\Gateway\Config\Config</argument>
@@ -829,7 +937,7 @@
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
         </arguments>
     </type>
-    <type name="Avarda\Checkout3\Block\Adminhtml\System\Config\Field\CspUrlCheck">
+    <type name="Avarda\Checkout3\Model\Config\Backend\CspUrlCheck">
         <arguments>
             <argument name="cspWhitelistCollector" xsi:type="object">Magento\Csp\Model\Collector\CspWhitelistXmlCollector</argument>
         </arguments>
