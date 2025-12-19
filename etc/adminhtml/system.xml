@@ -221,6 +221,21 @@ buttons.primary.fontSize='15'</pre>]]></comment>
                         <config_path>payment/avarda_checkout3_unknown/title</config_path>
                     </field>
                 </group>
+                <group id="certificate" translate="label comment" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Apple Pay Certificate</label>
+                    <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable Certificate</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="content" translate="label" type="textarea" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Apple Certificate</label>
+                        <frontend_model>Avarda\Checkout3\Model\Config\Backend\CspUrlCheck</frontend_model>
+                        <comment><![CDATA[This will then be available on yourdomain.com/.well-known/apple-developer-merchantid-domain-association.txt]]></comment>
+                        <depends>
+                            <field id="*/*/*/active">1</field>
+                        </depends>
+                    </field>
+                </group>
             </group>
         </section>
     </system>

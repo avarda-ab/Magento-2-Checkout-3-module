@@ -1,11 +1,23 @@
 <?xml version="1.0"?>
 <!--
 /**
- * @copyright   Copyright © Avarda. All rights reserved.
- * @package     Avarda_Checkout3
+ * @copyright Copyright © Avarda. All rights reserved.
+ * @package   Avarda_Checkout3
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\App\RouterList">
+        <arguments>
+            <argument name="routerList" xsi:type="array">
+                <item name="drupal" xsi:type="array">
+                    <item name="class" xsi:type="string">Avarda\Checkout3\Controller\Router</item>
+                    <item name="disable" xsi:type="boolean">false</item>
+                    <item name="sortOrder" xsi:type="string">0</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
     <virtualType name="AvardaCheckout3InstructionProvider" type="Avarda\Checkout3\Model\InstructionsConfigProvider">
         <arguments>
             <argument name="methodCode" xsi:type="const">Avarda\Checkout3\Model\Ui\ConfigProviderBase::CODE</argument>
