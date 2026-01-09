@@ -242,6 +242,62 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
             </avarda_checkout3_zero_amount>
+            <avarda_checkout3_card_checkout>
+                <title>Card Payment</title>
+                <group>avarda_checkout3</group>
+                <model>AvardaCheckout3CardCheckoutFacade</model>
+                <active>1</active>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <can_initialize>1</can_initialize>
+                <can_cancel>1</can_cancel>
+                <can_capture>1</can_capture>
+                <can_capture_partial>1</can_capture_partial>
+                <can_refund>1</can_refund>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+            </avarda_checkout3_card_checkout>
+            <avarda_checkout3_apple_pay>
+                <title>Apple Pay</title>
+                <group>avarda_checkout3</group>
+                <model>AvardaCheckout3ApplePayFacade</model>
+                <active>1</active>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <can_initialize>1</can_initialize>
+                <can_cancel>1</can_cancel>
+                <can_capture>1</can_capture>
+                <can_capture_partial>1</can_capture_partial>
+                <can_refund>1</can_refund>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+            </avarda_checkout3_apple_pay>
+            <avarda_checkout3_google_pay>
+                <title>Google Pay</title>
+                <group>avarda_checkout3</group>
+                <model>AvardaCheckout3GooglePayFacade</model>
+                <active>1</active>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <can_initialize>1</can_initialize>
+                <can_cancel>1</can_cancel>
+                <can_capture>1</can_capture>
+                <can_capture_partial>1</can_capture_partial>
+                <can_refund>1</can_refund>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+            </avarda_checkout3_google_pay>
+            <avarda_checkout3_unknown>
+                <title>Avarda Checkout</title>
+                <group>avarda_checkout3</group>
+                <model>AvardaCheckout3UnknownFacade</model>
+                <active>1</active>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <can_initialize>1</can_initialize>
+                <can_cancel>1</can_cancel>
+                <can_capture>1</can_capture>
+                <can_capture_partial>1</can_capture_partial>
+                <can_refund>1</can_refund>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+            </avarda_checkout3_unknown>
         </payment>
         <csp>
             <mode>

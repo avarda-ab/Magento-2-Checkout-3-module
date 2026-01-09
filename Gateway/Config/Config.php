@@ -21,37 +21,37 @@ use Magento\Store\Model\StoreManagerInterface;
  */
 class Config extends \Magento\Payment\Gateway\Config\Config
 {
-    const KEY_ACTIVE = 'active';
-    const KEY_TEST_MODE = 'test_mode';
-    const KEY_CLIENT_SECRET = 'client_secret';
-    const KEY_CLIENT_ID = 'client_id';
+    const string KEY_ACTIVE = 'active';
+    const string KEY_TEST_MODE = 'test_mode';
+    const string KEY_CLIENT_SECRET = 'client_secret';
+    const string KEY_CLIENT_ID = 'client_id';
 
-    const KEY_TOKEN_FLAG = 'avarda_checkout3_api_token';
-    const KEY_ONEPAGE_REDIRECT_ACTIVE = 'onepage_redirect_active';
-    const KEY_CUSTOM_CSS = 'avarda_checkout3/api/custom_css';
-    const KEY_COUNTRY_SELECTOR = 'avarda_checkout3/api/country_selector';
-    const KEY_SHOW_B2B_LINK = 'avarda_checkout3/api/show_b2b_link';
-    const KEY_SHOW_POSTCODE = 'avarda_checkout3/api/show_postcode';
-    const KEY_ADDRESS_CHANGE = 'avarda_checkout3/api/address_change';
-    const KEY_OFFER_LOGIN = 'avarda_checkout3/api/offer_login';
-    const KEY_SHOW_NEWSLETTER = 'avarda_checkout3/api/show_newsletter';
-    const KEY_NEWSLETTER_DEFAULT = 'avarda_checkout3/api/newsletter_default';
-    const KEY_SELECT_SHIPPING_METHOD = 'avarda_checkout3/api/select_shipping_method';
+    const string KEY_TOKEN_FLAG = 'avarda_checkout3_api_token';
+    const string KEY_ONEPAGE_REDIRECT_ACTIVE = 'onepage_redirect_active';
+    const string KEY_CUSTOM_CSS = 'avarda_checkout3/api/custom_css';
+    const string KEY_COUNTRY_SELECTOR = 'avarda_checkout3/api/country_selector';
+    const string KEY_SHOW_B2B_LINK = 'avarda_checkout3/api/show_b2b_link';
+    const string KEY_SHOW_POSTCODE = 'avarda_checkout3/api/show_postcode';
+    const string KEY_ADDRESS_CHANGE = 'avarda_checkout3/api/address_change';
+    const string KEY_OFFER_LOGIN = 'avarda_checkout3/api/offer_login';
+    const string KEY_SHOW_NEWSLETTER = 'avarda_checkout3/api/show_newsletter';
+    const string KEY_NEWSLETTER_DEFAULT = 'avarda_checkout3/api/newsletter_default';
+    const string KEY_SELECT_SHIPPING_METHOD = 'avarda_checkout3/api/select_shipping_method';
 
-    const KEY_ALTERNATIVE_CLIENT_ID = 'payment/avarda_checkout3_checkout/alternative_client_id';
-    const KEY_ALTERNATIVE_CLIENT_SECRET = 'payment/avarda_checkout3_checkout/alternative_client_secret';
-    const KEY_ALTERNATIVE_PRODUCT_TYPES = 'payment/avarda_checkout3_checkout/alternative_product_types';
+    const string KEY_ALTERNATIVE_CLIENT_ID = 'payment/avarda_checkout3_checkout/alternative_client_id';
+    const string KEY_ALTERNATIVE_CLIENT_SECRET = 'payment/avarda_checkout3_checkout/alternative_client_secret';
+    const string KEY_ALTERNATIVE_PRODUCT_TYPES = 'payment/avarda_checkout3_checkout/alternative_product_types';
 
-    const URL_TEST = 'https://stage.checkout-api.avarda.com/';
-    const URL_PRODUCTION = 'https://checkout-api.avarda.com/';
-    const TOKEN_PATH = 'api/partner/tokens';
+    const string URL_TEST = 'https://stage.checkout-api.avarda.com/';
+    const string URL_PRODUCTION = 'https://checkout-api.avarda.com/';
+    const string TOKEN_PATH = 'api/partner/tokens';
 
     protected EncryptorInterface $encryptor;
     protected FlagManager $flagManager;
     protected Url $url;
     protected ScopeConfigInterface $scopeConfig;
     protected StoreManagerInterface $storeManager;
-    protected $storeId = null;
+    protected ?string $storeId = null;
 
     public function __construct(
         ScopeConfigInterface $scopeConfig,

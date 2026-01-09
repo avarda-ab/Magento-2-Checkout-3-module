@@ -50,7 +50,7 @@ class ConfigSaveObserver implements ObserverInterface
                 break;
             }
         }
-        // If api keys or api url is changed remove current api token data
+        // If api keys or api url is changed, remove current api token data
         if ($hasChanged) {
             foreach ($this->storeManager->getStores() as $store) {
                 $this->flagManager->deleteFlag('avarda_checkout3_api_token' . $store->getId());
