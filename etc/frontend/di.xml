@@ -9,7 +9,7 @@
     <type name="Magento\Framework\App\RouterList">
         <arguments>
             <argument name="routerList" xsi:type="array">
-                <item name="drupal" xsi:type="array">
+                <item name="avarda" xsi:type="array">
                     <item name="class" xsi:type="string">Avarda\Checkout3\Controller\Router</item>
                     <item name="disable" xsi:type="boolean">false</item>
                     <item name="sortOrder" xsi:type="string">0</item>
@@ -23,6 +23,7 @@
             <argument name="methodCode" xsi:type="const">Avarda\Checkout3\Model\Ui\ConfigProviderBase::CODE</argument>
         </arguments>
     </virtualType>
+
     <type name="Magento\Checkout\Model\CompositeConfigProvider">
         <arguments>
             <argument name="configProviders" xsi:type="array">
