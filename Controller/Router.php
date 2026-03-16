@@ -13,10 +13,10 @@ use Magento\Store\Model\ScopeInterface;
 
 class Router implements RouterInterface
 {
-    protected const string MODULE_NAME = 'avarda3';
-    protected const string CONTROLLER_NAME = 'certificate';
-    protected const string ACTION_NAME = 'index';
-    protected const string PATH = '/.well-known/apple-developer-merchantid-domain-association.txt';
+    protected const MODULE_NAME = 'avarda3';
+    protected const CONTROLLER_NAME = 'certificate';
+    protected const ACTION_NAME = 'index';
+    protected const PATH = '/.well-known/apple-developer-merchantid-domain-association.txt';
 
     protected ActionFactory $actionFactory;
     protected ScopeConfigInterface $scopeConfig;

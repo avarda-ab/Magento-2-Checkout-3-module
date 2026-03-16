@@ -17,28 +17,28 @@ use Magento\Store\Model\ScopeInterface;
 class B2cDataBuilder implements BuilderInterface
 {
     /** The first name value must be less than or equal to 40 characters. */
-    const string FIRST_NAME = 'firstName';
+    const FIRST_NAME = 'firstName';
 
     /** The last name value must be less than or equal to 40 characters. */
-    const string LAST_NAME = 'lastName';
+    const LAST_NAME = 'lastName';
 
     /** The street address line 1. Maximum 40 characters. */
-    const string STREET_1 = 'address1';
+    const STREET_1 = 'address1';
 
     /** The street address line 2. Maximum 40 characters. */
-    const string STREET_2 = 'address2';
+    const STREET_2 = 'address2';
 
     /** The Zip/Postal code. Maximum 6 characters. */
-    const string ZIP = 'zip';
+    const ZIP = 'zip';
 
     /** The locality/city. 30 character maximum. */
-    const string CITY = 'city';
+    const CITY = 'city';
 
     /** country */
-    const string COUNTRY = 'country';
+    const COUNTRY = 'country';
 
     /** phone */
-    const string PHONE = 'phone';
+    const PHONE = 'phone';
 
     protected Session $customerSession;
     protected ScopeConfigInterface $config;

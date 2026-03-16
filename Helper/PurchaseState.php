@@ -11,25 +11,25 @@ namespace Avarda\Checkout3\Helper;
  */
 class PurchaseState
 {
-    const string INITIALIZED = 'Initialized';
-    const string EMAIL_ZIP_ENTRY = 'EmailZipEntry';
-    const string SSN_ENTRY = 'SsnEntry';
-    const string PHONE_NUMBER_ENTRY = 'PhoneNumberEntry';
-    const string PHONE_NUMBER_ENTRY_FOR_KNOWN_CUSTOMER = 'PhoneNumberEntryForKnownCustomer';
-    const string PERSONAL_INFO = 'PersonalInfo';
-    const string PERSONAL_INFO_WITHOUT_SSN = 'PersonalInfoWithoutSsn';
-    const string WAITING_FOR_SWISH = 'WaitingForSwish';
-    const string REDIRECTED_TO_DIRECT_PAYMENT_BANK = 'RedirectedToDirectPaymentBank';
-    const string REDIRECTED_TO_NETS = 'RedirectedToNets';
-    const string WAITING_FOR_BANK_ID = 'WaitingForBankId';
-    const string REDIRECTED_TO_TUPAS = 'RedirectedToTupas';
-    const string COMPLETED = 'Completed';
-    const string TIMED_OUT = 'TimedOut';
-    const string OUTDATED = 'Outdated';
-    const string CANCELED = 'Canceled';
-    const string HANDLED_BY_MERCHANT = 'HandledByMerchant';
-    const string AWAITING_CREDIT_APPROVAL = 'AwaitingCreditApproval';
-    const string UNKNOWN = 'Unknown';
+    const INITIALIZED = 'Initialized';
+    const EMAIL_ZIP_ENTRY = 'EmailZipEntry';
+    const SSN_ENTRY = 'SsnEntry';
+    const PHONE_NUMBER_ENTRY = 'PhoneNumberEntry';
+    const PHONE_NUMBER_ENTRY_FOR_KNOWN_CUSTOMER = 'PhoneNumberEntryForKnownCustomer';
+    const PERSONAL_INFO = 'PersonalInfo';
+    const PERSONAL_INFO_WITHOUT_SSN = 'PersonalInfoWithoutSsn';
+    const WAITING_FOR_SWISH = 'WaitingForSwish';
+    const REDIRECTED_TO_DIRECT_PAYMENT_BANK = 'RedirectedToDirectPaymentBank';
+    const REDIRECTED_TO_NETS = 'RedirectedToNets';
+    const WAITING_FOR_BANK_ID = 'WaitingForBankId';
+    const REDIRECTED_TO_TUPAS = 'RedirectedToTupas';
+    const COMPLETED = 'Completed';
+    const TIMED_OUT = 'TimedOut';
+    const OUTDATED = 'Outdated';
+    const CANCELED = 'Canceled';
+    const HANDLED_BY_MERCHANT = 'HandledByMerchant';
+    const AWAITING_CREDIT_APPROVAL = 'AwaitingCreditApproval';
+    const UNKNOWN = 'Unknown';
 
     public static array $stateIds = [
         0  => self::INITIALIZED,
