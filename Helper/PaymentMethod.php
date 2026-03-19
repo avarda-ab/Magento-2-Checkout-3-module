@@ -11,25 +11,25 @@ namespace Avarda\Checkout3\Helper;
  */
 class PaymentMethod
 {
-    const string INVOICE = "Invoice";
-    const string LOAN = "Loan";
-    const string CARD = "Card";
-    const string DIRECT_PAYMENT = "DirectPayment";
-    const string PART_PAYMENT = "PartPayment";
-    const string SWISH = "Swish";
-    const string HIGH_AMOUNT_LOAN = "HighAmountLoan";
-    const string PAYPAL = "PayPal";
-    const string PAY_ON_DELIVERY = "PayOnDelivery";
-    const string B2B_INVOICE = "B2BInvoice";
-    const string DIRECT_INVOICE = "DirectInvoice";
-    const string MASTERPASS = "Masterpass";
-    const string MOBILE_PAY = "MobilePay";
-    const string VIPPS = "Vipps";
-    const string CARD_CHECKOUT = "CardViaCheckoutCom";
-    const string APPLE_PAY = "ApplePayViaCheckoutCom";
-    const string GOOGLE_PAY = "GooglePayViaCheckoutCom";
-    const string ZERO_AMOUNT = "ZeroAmount";
-    const string UNKNOWN = "Unknown";
+    const INVOICE = "Invoice";
+    const LOAN = "Loan";
+    const CARD = "Card";
+    const DIRECT_PAYMENT = "DirectPayment";
+    const PART_PAYMENT = "PartPayment";
+    const SWISH = "Swish";
+    const HIGH_AMOUNT_LOAN = "HighAmountLoan";
+    const PAYPAL = "PayPal";
+    const PAY_ON_DELIVERY = "PayOnDelivery";
+    const B2B_INVOICE = "B2BInvoice";
+    const DIRECT_INVOICE = "DirectInvoice";
+    const MASTERPASS = "Masterpass";
+    const MOBILE_PAY = "MobilePay";
+    const VIPPS = "Vipps";
+    const CARD_CHECKOUT = "CardViaCheckoutCom";
+    const APPLE_PAY = "ApplePayViaCheckoutCom";
+    const GOOGLE_PAY = "GooglePayViaCheckoutCom";
+    const ZERO_AMOUNT = "ZeroAmount";
+    const UNKNOWN = "Unknown";
 
     /**
      * PaymentMethod payment codes
