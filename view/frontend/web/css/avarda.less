@@ -98,6 +98,43 @@
         }
     }
 
+    #checkout-step-store-selector .primary button[data-role="opc-continue"] {
+        display: none;
+    }
+
+    #delivery-method-selector .action,
+    #checkout-step-store-selector .form-continue .action {
+        background-color: transparent;
+        border: 2px solid #202020;
+        border-radius: 200px;
+        color: #202020;
+        font-size: 16px;
+        font-weight: 400;
+        padding: 10px 16px;
+        transition: background-color 200ms;
+
+        &:hover {
+            background-color: #F0F0F0;
+        }
+    }
+
+    #delivery-method-selector .action {
+        min-height: 50px;
+
+        &.selected {
+            background-color: #F0F0F0;
+        }
+
+        &.action-select-shipping {
+            border-radius: 200px 0 0 200px;
+        }
+
+        &.action-select-store-pickup {
+            border-left: 0;
+            border-radius: 0 200px 200px 0;
+        }
+    }
+
     @media (max-width: 767px) {
         .authentication-wrapper {
             width: auto;

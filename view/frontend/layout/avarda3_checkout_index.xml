@@ -55,6 +55,12 @@
                                             </item>
                                         </item>
                                         <!-- Create custom checkout steps -->
+                                        <!-- In-store pickup -->
+                                        <item name="store-pickup" xsi:type="array">
+                                            <item name="deps" xsi:type="array">
+                                                <item name="0" xsi:type="string">checkout.steps.avarda-shipping</item>
+                                            </item>
+                                        </item>
                                         <!-- Shipping step -->
                                         <item name="avarda-shipping" xsi:type="array">
                                             <item name="component" xsi:type="string">Avarda_Checkout3/js/view/shipping-method</item>

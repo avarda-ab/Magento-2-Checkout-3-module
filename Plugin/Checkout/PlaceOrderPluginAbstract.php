@@ -38,6 +38,7 @@ abstract class PlaceOrderPluginAbstract
     public function setShippingAddress($quote, $additionalData)
     {
         $shippingAddress = $quote->getShippingAddress();
+        $isInStorePickup = $shippingAddress->getShippingMethod() === 'instore_pickup';
 
         // If b2b address there should be company name,
         // but if no delivery address given it might not be there
@@ -50,10 +51,12 @@ abstract class PlaceOrderPluginAbstract
             $shippingAddress->setLastname($additionalData['deliveryAddress']['lastName']);
         }
 
-        $shippingAddress->setStreet([$additionalData['deliveryAddress']['address1'], $additionalData['deliveryAddress']['address2']]);
-        $shippingAddress->setCity($additionalData['deliveryAddress']['city']);
-        $shippingAddress->setPostcode($additionalData['deliveryAddress']['zip']);
-        $shippingAddress->setCountryId($additionalData['deliveryAddress']['country']);
+        if (!$isInStorePickup) {
+            $shippingAddress->setStreet([$additionalData['deliveryAddress']['address1'], $additionalData['deliveryAddress']['address2']]);
+            $shippingAddress->setCity($additionalData['deliveryAddress']['city']);
+            $shippingAddress->setPostcode($additionalData['deliveryAddress']['zip']);
+            $shippingAddress->setCountryId($additionalData['deliveryAddress']['country']);
+        }
 
         // @todo fix this when phone number is available
         // We don't have customer phone number, so we add dummy here
