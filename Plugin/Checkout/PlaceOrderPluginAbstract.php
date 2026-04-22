@@ -10,6 +10,7 @@ use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
 use Avarda\Checkout3\Api\Data\PaymentDetailsInterface;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\InventoryInStorePickupShippingApi\Model\Carrier\InStorePickup;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote;
@@ -38,7 +39,7 @@ abstract class PlaceOrderPluginAbstract
     public function setShippingAddress($quote, $additionalData)
     {
         $shippingAddress = $quote->getShippingAddress();
-        $isInStorePickup = $shippingAddress->getShippingMethod() === 'instore_pickup';
+        $isInStorePickup = $shippingAddress->getShippingMethod() === InStorePickup::DELIVERY_METHOD;
 
         // If b2b address there should be company name,
         // but if no delivery address given it might not be there
