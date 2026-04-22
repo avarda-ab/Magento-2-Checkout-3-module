@@ -3,9 +3,13 @@
  * @package   Avarda_Checkout3
  */
 define([
-    'Magento_Checkout/js/action/set-shipping-information'
+    'underscore',
+    'Magento_Checkout/js/action/set-shipping-information',
+    'Magento_Checkout/js/model/step-navigator'
 ], function (
-    setShippingInformationAction
+    _,
+    setShippingInformationAction,
+    stepNavigator
 ) {
     'use strict';
 
@@ -17,6 +21,18 @@ define([
                 if (shippingMethod) {
                     setShippingInformationAction();
                 }
+            },
+
+            // Fix bug in Magento_InventoryInStorePickupFrontend/js/view/store-pickup.js syncWithShipping isAvailable used without ()
+            syncWithShipping: function () {
+                var shippingStep = _.findWhere(stepNavigator.steps(), {
+                    code: 'shipping'
+                });
+
+                shippingStep.isVisible.subscribe(function (isShippingVisible) {
+                    this.isVisible(this.isAvailable() && isShippingVisible);
+                }, this);
+                this.isVisible(this.isAvailable() && shippingStep.isVisible());
             }
         });
     };
