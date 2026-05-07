@@ -33,6 +33,18 @@ define([
                     this.isVisible(this.isAvailable() && isShippingVisible);
                 }, this);
                 this.isVisible(this.isAvailable() && shippingStep.isVisible());
+
+                this.isAvailable.subscribe(function (isAvailable) {
+                    this.isVisible(isAvailable && shippingStep.isVisible());
+                }, this);
+
+                // In the Avarda single-page checkout shippingStep.isVisible never changes,
+                // so restore it explicitly when switching back from store pickup to shipping
+                this.isStorePickupSelected.subscribe(function (isPickup) {
+                    if (!isPickup) {
+                        shippingStep.isVisible(true);
+                    }
+                });
             }
         });
     };
