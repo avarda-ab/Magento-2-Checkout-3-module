@@ -17,7 +17,6 @@ define([
     "Magento_Checkout/js/model/payment-service",
     "Magento_Checkout/js/model/error-processor",
     'Magento_Customer/js/model/customer',
-    'Magento_Checkout/js/model/full-screen-loader',
     'Magento_Checkout/js/model/shipping-service',
     'Magento_Customer/js/customer-data',
     'Magento_Checkout/js/action/place-order',
@@ -38,7 +37,6 @@ define([
     paymentService,
     errorProcessor,
     customer,
-    fullScreenLoader,
     shippingService,
     customerData,
     placeOrderAction,
@@ -276,10 +274,6 @@ define([
             // if cart is locked don't try to lock it again
             if (self.cartLocked()) {
                 avardaCheckoutInstance.beforeSubmitContinue();
-                setTimeout(function () {
-                    // Remove loader, if avarda validation fails user will not be forwarded
-                    fullScreenLoader.stopLoader();
-                }, 1000);
             } else if (quote.shippingMethod() || quote.isVirtual()) {
                 self.cartLocked(true);
 
@@ -321,15 +315,9 @@ define([
                             }]
                         }).modal('openModal');
                     avardaCheckoutInstance.beforeSubmitAbort();
-                    fullScreenLoader.stopLoader();
                 }).done(function () {
                     history.pushState(null, document.title, options.redirectUrl);
-                    fullScreenLoader.startLoader();
                     avardaCheckoutInstance.beforeSubmitContinue();
-                    setTimeout(function() {
-                        // Remove loader, if avarda validation fails user will not be forwarded
-                        fullScreenLoader.stopLoader();
-                    }, 1000);
                 });
             } else {
                 avardaCheckoutInstance.beforeSubmitAbort();
@@ -377,7 +365,6 @@ define([
             let renewParam = (self.forceRenew() || renew) ? 1 : 0;
             self.forceRenew(false);
 
-            fullScreenLoader.startLoader();
             self.initializing(true);
             let serviceUrl = '';
 
@@ -431,11 +418,9 @@ define([
                     // Update items to update visible price
                     avardaCheckout.refreshForm();
                 }
-                fullScreenLoader.stopLoader();
                 self.initializing(false);
             }).fail(function (response) {
                 errorProcessor.process(response);
-                fullScreenLoader.stopLoader();
                 self.initializing(false);
             });
 
