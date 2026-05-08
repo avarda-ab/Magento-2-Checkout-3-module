@@ -60,6 +60,17 @@
                                             <item name="deps" xsi:type="array">
                                                 <item name="0" xsi:type="string">checkout.steps.avarda-shipping</item>
                                             </item>
+                                            <item name="children" xsi:type="array">
+                                                <item name="store-selector" xsi:type="array">
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="customer-email" xsi:type="array">
+                                                            <item name="config" xsi:type="array">
+                                                                <item name="componentDisabled" xsi:type="boolean">true</item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
                                         </item>
                                         <!-- Shipping step -->
                                         <item name="avarda-shipping" xsi:type="array">
