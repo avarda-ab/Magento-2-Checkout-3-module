@@ -89,6 +89,29 @@ class QuoteCollectTotalsPrepareItems
         $this->prepareItems($subject);
         $this->prepareShipment($subject);
         $this->prepareGiftCards($subject);
+        $this->prepareRoundingCorrection($subject);
+    }
+
+    // Reconcile in cents so Avarda matches Magento's total.
+    public function prepareRoundingCorrection(CartInterface $subject)
+    {
+        $itemTotalCents = 0;
+        foreach ($this->itemStorage->getItems() as $entry) {
+            $sub = $entry->getSubject();
+            $itemTotalCents += (int) round(sprintf('%.2F', $sub['amount']) * 100);
+        }
+
+        $diffCents = (int) round($subject->getGrandTotal() * 100) - $itemTotalCents;
+        if ($diffCents === 0) {
+            return;
+        }
+
+        $itemAdapter = $this->arrayDataItemAdapterFactory->create([
+            'data' => ['name' => __('Rounding'), 'sku' => 'rounding'],
+        ]);
+        $this->itemStorage->addItem(
+            $this->itemDataObjectFactory->create($itemAdapter, 1, $diffCents / 100, 0)
+        );
     }
 
     /**
