@@ -9,7 +9,9 @@ namespace Avarda\Checkout3\Gateway\Request;
 use Avarda\Checkout3\Gateway\Config\Config;
 use Avarda\Checkout3\Helper\AvardaCheckBoxTypeValues;
 use Avarda\Checkout3\Model\Data\AddressBuilder;
+use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Locale\Resolver;
+use Magento\InventoryInStorePickupShippingApi\Model\Carrier\InStorePickup;
 use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Payment\Gateway\Data\AddressAdapterInterface;
 use Magento\Payment\Gateway\Data\OrderAdapterInterface;
@@ -22,15 +24,18 @@ class CheckoutSetupDataBuilder implements BuilderInterface
     protected Resolver $localeResolver;
     protected ConfigInterface $configHelper;
     protected AddressBuilder $addressBuilder;
+    protected CheckoutSession $checkoutSession;
 
     public function __construct(
         Resolver $localeResolver,
         ConfigInterface $configHelper,
         AddressBuilder $addressBuilder,
+        CheckoutSession $checkoutSession,
     ) {
         $this->localeResolver = $localeResolver;
         $this->configHelper = $configHelper;
         $this->addressBuilder = $addressBuilder;
+        $this->checkoutSession = $checkoutSession;
     }
 
     /**
@@ -103,13 +108,19 @@ class CheckoutSetupDataBuilder implements BuilderInterface
         }
         $isVirtual = !($countItems == 0) && $isVirtual;
 
-        if ($isVirtual) {
+        if ($isVirtual || $this->isInStorePickup()) {
             return AvardaCheckBoxTypeValues::VALUE_HIDDEN;
         } elseif ($this->addressBuilder->isAddressDifferent($order->getBillingAddress(), $order->getShippingAddress())) {
             return AvardaCheckBoxTypeValues::VALUE_CHECKED;
         } else {
             return AvardaCheckBoxTypeValues::VALUE_UNCHECKED;
         }
+    }
+
+    protected function isInStorePickup(): bool
+    {
+        $shippingAddress = $this->checkoutSession->getQuote()->getShippingAddress();
+        return $shippingAddress && $shippingAddress->getShippingMethod() === InStorePickup::DELIVERY_METHOD;
     }
 
     protected function getNewsletterSubscription(): string

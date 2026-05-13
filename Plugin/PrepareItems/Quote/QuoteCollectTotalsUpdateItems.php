@@ -13,6 +13,7 @@ use Exception;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\Exception\PaymentException;
 use Magento\Framework\Webapi\Exception as WebapiException;
+use Magento\InventoryInStorePickupShippingApi\Model\Carrier\InStorePickup;
 use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote;
@@ -75,6 +76,9 @@ class QuoteCollectTotalsUpdateItems
                 if (($renew = $this->purchaseStateHelper->isDead($state)) === false) {
                     try {
                         $this->quotePaymentManagement->updateItems($subject);
+                        if ($this->pickupStateChanged($subject)) {
+                            $this->quotePaymentManagement->updateDeliveryAddress($subject);
+                        }
                     } catch (WebapiException $e) {
                         $renew = true;
                     }
@@ -89,6 +93,19 @@ class QuoteCollectTotalsUpdateItems
         }
 
         return $result;
+    }
+
+    protected function pickupStateChanged(CartInterface $subject): bool
+    {
+        $shippingAddress = $subject->getShippingAddress();
+        if (!$shippingAddress) {
+            return false;
+        }
+
+        $currentIsPickup = $shippingAddress->getShippingMethod() === InStorePickup::DELIVERY_METHOD;
+        $origIsPickup = $shippingAddress->getOrigData('shipping_method') === InStorePickup::DELIVERY_METHOD;
+
+        return $currentIsPickup !== $origIsPickup;
     }
 
     /**
