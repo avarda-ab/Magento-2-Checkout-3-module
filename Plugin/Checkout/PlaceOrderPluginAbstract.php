@@ -10,6 +10,7 @@ use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
 use Avarda\Checkout3\Api\Data\PaymentDetailsInterface;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\InventoryInStorePickupShippingApi\Model\Carrier\InStorePickup;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote;
@@ -38,6 +39,7 @@ abstract class PlaceOrderPluginAbstract
     public function setShippingAddress($quote, $additionalData)
     {
         $shippingAddress = $quote->getShippingAddress();
+        $isInStorePickup = $shippingAddress->getShippingMethod() === InStorePickup::DELIVERY_METHOD;
 
         // If b2b address there should be company name,
         // but if no delivery address given it might not be there
@@ -50,10 +52,12 @@ abstract class PlaceOrderPluginAbstract
             $shippingAddress->setLastname($additionalData['deliveryAddress']['lastName']);
         }
 
-        $shippingAddress->setStreet([$additionalData['deliveryAddress']['address1'], $additionalData['deliveryAddress']['address2']]);
-        $shippingAddress->setCity($additionalData['deliveryAddress']['city']);
-        $shippingAddress->setPostcode($additionalData['deliveryAddress']['zip']);
-        $shippingAddress->setCountryId($additionalData['deliveryAddress']['country']);
+        if (!$isInStorePickup) {
+            $shippingAddress->setStreet([$additionalData['deliveryAddress']['address1'], $additionalData['deliveryAddress']['address2']]);
+            $shippingAddress->setCity($additionalData['deliveryAddress']['city']);
+            $shippingAddress->setPostcode($additionalData['deliveryAddress']['zip']);
+            $shippingAddress->setCountryId($additionalData['deliveryAddress']['country']);
+        }
 
         // @todo fix this when phone number is available
         // We don't have customer phone number, so we add dummy here
