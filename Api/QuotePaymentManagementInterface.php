@@ -53,6 +53,14 @@ interface QuotePaymentManagementInterface
     public function updateItems(CartInterface $quote);
 
     /**
+     * Push current delivery address visibility to Avarda
+     *
+     * @param CartInterface|Quote $quote
+     * @return void
+     */
+    public function updateDeliveryAddress(CartInterface $quote);
+
+    /**
      * Setting the quote is_active to false hides it from the frontend and
      * renders the customer unable to manipulate the cart while payment is
      * processed.
