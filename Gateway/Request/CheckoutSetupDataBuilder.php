@@ -10,11 +10,13 @@ use Avarda\Checkout3\Gateway\Config\Config;
 use Avarda\Checkout3\Helper\AvardaCheckBoxTypeValues;
 use Avarda\Checkout3\Model\Data\AddressBuilder;
 use Magento\Framework\Locale\Resolver;
+use Magento\InventoryInStorePickupShippingApi\Model\Carrier\InStorePickup;
 use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Payment\Gateway\Data\AddressAdapterInterface;
 use Magento\Payment\Gateway\Data\OrderAdapterInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
+use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote\Item;
 
 class CheckoutSetupDataBuilder implements BuilderInterface
@@ -40,13 +42,14 @@ class CheckoutSetupDataBuilder implements BuilderInterface
     {
         $paymentDO = SubjectReader::readPayment($buildSubject);
         $order = $paymentDO->getOrder();
+        $quote = $paymentDO->getPayment()->getQuote();
 
         return [
             'checkoutSetup' => [
                 'language'                  => $this->getLanguage(),
                 'mode'                      => 'B2C',
                 'completedNotificationUrl'  => $this->configHelper->getNotificationUrl(),
-                'differentDeliveryAddress'  => $this->showDeliveryAddress($order),
+                'differentDeliveryAddress'  => $this->showDeliveryAddress($order, $quote),
                 'enableB2BLink'             => $this->configHelper->getShowB2Blink(),
                 'enableCountrySelector'     => $this->configHelper->getCountrySelector(),
                 'emailNewsletterSubscription' => $this->getNewsletterSubscription(),
@@ -86,7 +89,7 @@ class CheckoutSetupDataBuilder implements BuilderInterface
         return 0;
     }
 
-    protected function showDeliveryAddress(OrderAdapterInterface $order): string
+    protected function showDeliveryAddress(OrderAdapterInterface $order, CartInterface $quote): string
     {
         $isVirtual = true;
         $countItems = 0;
@@ -103,13 +106,19 @@ class CheckoutSetupDataBuilder implements BuilderInterface
         }
         $isVirtual = !($countItems == 0) && $isVirtual;
 
-        if ($isVirtual) {
+        if ($isVirtual || $this->isInStorePickup($quote)) {
             return AvardaCheckBoxTypeValues::VALUE_HIDDEN;
         } elseif ($this->addressBuilder->isAddressDifferent($order->getBillingAddress(), $order->getShippingAddress())) {
             return AvardaCheckBoxTypeValues::VALUE_CHECKED;
         } else {
             return AvardaCheckBoxTypeValues::VALUE_UNCHECKED;
         }
+    }
+
+    protected function isInStorePickup(CartInterface $quote): bool
+    {
+        $shippingAddress = $quote->getShippingAddress();
+        return $shippingAddress && $shippingAddress->getShippingMethod() === InStorePickup::DELIVERY_METHOD;
     }
 
     protected function getNewsletterSubscription(): string

@@ -212,6 +212,14 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     /**
      * {@inheritdoc}
      */
+    public function updateDeliveryAddress(CartInterface $quote)
+    {
+        $this->executeCommand('update_delivery_address', $quote);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setQuoteIsActive($cartId, $isActive)
     {
         $quote = $this->getQuote($cartId);
