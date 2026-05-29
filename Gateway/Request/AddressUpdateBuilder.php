@@ -35,7 +35,9 @@ class AddressUpdateBuilder implements BuilderInterface
 
         return [
             "differentDeliveryAddress" => $this->getDifferentDeliveryAddressValue($order, $quote),
-            "deliveryAddress" => $this->b2cDataBuilder->getShippingAddress($order),
+            "deliveryAddress" => $this->hasStalePickupAddress($quote)
+                ? $this->b2cDataBuilder->emptyAddress()
+                : $this->b2cDataBuilder->getShippingAddress($order),
         ];
     }
 
@@ -43,6 +45,9 @@ class AddressUpdateBuilder implements BuilderInterface
     {
         if ($this->isInStorePickup($quote)) {
             return AvardaCheckBoxTypeValues::VALUE_HIDDEN;
+        }
+        if ($this->hasStalePickupAddress($quote)) {
+            return AvardaCheckBoxTypeValues::VALUE_UNCHECKED;
         }
         if ($this->addressBuilder->isAddressDifferent($order->getBillingAddress(), $order->getShippingAddress())) {
             return AvardaCheckBoxTypeValues::VALUE_CHECKED;
@@ -54,5 +59,15 @@ class AddressUpdateBuilder implements BuilderInterface
     {
         $shippingAddress = $quote->getShippingAddress();
         return $shippingAddress && $shippingAddress->getShippingMethod() === InStorePickup::DELIVERY_METHOD;
+    }
+
+    protected function hasStalePickupAddress(CartInterface $quote): bool
+    {
+        $shippingAddress = $quote->getShippingAddress();
+        if (!$shippingAddress || $shippingAddress->getShippingMethod() === InStorePickup::DELIVERY_METHOD) {
+            return false;
+        }
+        $ext = $shippingAddress->getExtensionAttributes();
+        return $ext && $ext->getPickupLocationCode();
     }
 }

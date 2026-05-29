@@ -9,6 +9,7 @@ namespace Avarda\Checkout3\Gateway\Request;
 use Avarda\Checkout3\Model\Data\AddressBuilder;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\InventoryInStorePickupShippingApi\Model\Carrier\InStorePickup;
 use Magento\Payment\Gateway\Data\OrderAdapterInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
@@ -58,12 +59,26 @@ class B2cDataBuilder implements BuilderInterface
     {
         $paymentDO = SubjectReader::readPayment($buildSubject);
         $order = $paymentDO->getOrder();
+        $quote = $paymentDO->getPayment()->getQuote();
+        $shippingAddress = $quote->getShippingAddress();
+        $hasStalePickup = $shippingAddress
+            && $shippingAddress->getShippingMethod() !== InStorePickup::DELIVERY_METHOD
+            && ($ext = $shippingAddress->getExtensionAttributes())
+            && $ext->getPickupLocationCode();
+
+        if ($hasStalePickup) {
+            $emptyDeliveryAddress = $this->emptyAddress();
+            $emptyDeliveryAddress[self::COUNTRY] = $this->getDefaultCountry($order);
+            $deliveryAddress = $emptyDeliveryAddress;
+        } else {
+            $deliveryAddress = $this->getShippingAddress($order);
+        }
 
         return [
             "b2C" => [
                 "customerToken" => $this->getCustomerToken(),
                 "invoicingAddress" => $this->getBillingAddress($order),
-                "deliveryAddress" => $this->getShippingAddress($order),
+                "deliveryAddress" => $deliveryAddress,
                 "userInputs" => [
                     "phone" => $this->getTelephone($order->getBillingAddress()),
                     "email" => $order->getBillingAddress()->getEmail(),

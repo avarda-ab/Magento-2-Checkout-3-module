@@ -108,6 +108,8 @@ class CheckoutSetupDataBuilder implements BuilderInterface
 
         if ($isVirtual || $this->isInStorePickup($quote)) {
             return AvardaCheckBoxTypeValues::VALUE_HIDDEN;
+        } elseif ($this->hasStalePickupAddress($quote)) {
+            return AvardaCheckBoxTypeValues::VALUE_UNCHECKED;
         } elseif ($this->addressBuilder->isAddressDifferent($order->getBillingAddress(), $order->getShippingAddress())) {
             return AvardaCheckBoxTypeValues::VALUE_CHECKED;
         } else {
@@ -119,6 +121,16 @@ class CheckoutSetupDataBuilder implements BuilderInterface
     {
         $shippingAddress = $quote->getShippingAddress();
         return $shippingAddress && $shippingAddress->getShippingMethod() === InStorePickup::DELIVERY_METHOD;
+    }
+
+    protected function hasStalePickupAddress(CartInterface $quote): bool
+    {
+        $shippingAddress = $quote->getShippingAddress();
+        if (!$shippingAddress || $shippingAddress->getShippingMethod() === InStorePickup::DELIVERY_METHOD) {
+            return false;
+        }
+        $ext = $shippingAddress->getExtensionAttributes();
+        return $ext && $ext->getPickupLocationCode();
     }
 
     protected function getNewsletterSubscription(): string

@@ -41,22 +41,27 @@ abstract class PlaceOrderPluginAbstract
         $shippingAddress = $quote->getShippingAddress();
         $isInStorePickup = $shippingAddress->getShippingMethod() === InStorePickup::DELIVERY_METHOD;
 
+        $deliverySource = $additionalData['deliveryAddress'];
+        if (empty($deliverySource['firstName']) && empty($deliverySource['address1'])) {
+            $deliverySource = $additionalData['invoicingAddress'];
+        }
+
         // If b2b address there should be company name,
         // but if no delivery address given it might not be there
-        if ($additionalData['mode'] == 'B2B' && isset($additionalData['deliveryAddress']['name'])) {
-            $shippingAddress->setFirstname($additionalData['deliveryAddress']['name']);
-            $shippingAddress->setLastname($additionalData['deliveryAddress']['name']);
-            $shippingAddress->setCompany($additionalData['deliveryAddress']['name']);
+        if ($additionalData['mode'] == 'B2B' && isset($deliverySource['name'])) {
+            $shippingAddress->setFirstname($deliverySource['name']);
+            $shippingAddress->setLastname($deliverySource['name']);
+            $shippingAddress->setCompany($deliverySource['name']);
         } else {
-            $shippingAddress->setFirstname($additionalData['deliveryAddress']['firstName']);
-            $shippingAddress->setLastname($additionalData['deliveryAddress']['lastName']);
+            $shippingAddress->setFirstname($deliverySource['firstName']);
+            $shippingAddress->setLastname($deliverySource['lastName']);
         }
 
         if (!$isInStorePickup) {
-            $shippingAddress->setStreet([$additionalData['deliveryAddress']['address1'], $additionalData['deliveryAddress']['address2']]);
-            $shippingAddress->setCity($additionalData['deliveryAddress']['city']);
-            $shippingAddress->setPostcode($additionalData['deliveryAddress']['zip']);
-            $shippingAddress->setCountryId($additionalData['deliveryAddress']['country']);
+            $shippingAddress->setStreet([$deliverySource['address1'], $deliverySource['address2']]);
+            $shippingAddress->setCity($deliverySource['city']);
+            $shippingAddress->setPostcode($deliverySource['zip']);
+            $shippingAddress->setCountryId($deliverySource['country']);
         }
 
         // @todo fix this when phone number is available
