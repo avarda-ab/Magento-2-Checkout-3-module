@@ -5,20 +5,30 @@
 define([
     'underscore',
     'Magento_Checkout/js/action/set-shipping-information',
-    'Magento_Checkout/js/model/step-navigator'
+    'Magento_Checkout/js/model/step-navigator',
+    'Magento_Checkout/js/model/quote'
 ], function (
     _,
     setShippingInformationAction,
-    stepNavigator
+    stepNavigator,
+    quote
 ) {
     'use strict';
 
     return function (Component) {
         return Component.extend({
             // Trigger Avarda iframe reinitialization after store-pickup component select
+            initialize: function () {
+                this._super();
+                quote.shippingAddress.subscribe(function (address) {
+                    if (this.isStorePickupSelected() && this.isStorePickupAddress(address)) {
+                        setShippingInformationAction();
+                    }
+                }, this);
+            },
             selectShippingMethod: function (shippingMethod) {
                 this._super(shippingMethod);
-                if (shippingMethod) {
+                if (shippingMethod && !this.isStorePickupSelected()) {
                     setShippingInformationAction();
                 }
             },
