@@ -9,6 +9,7 @@ namespace Avarda\Checkout3\Gateway\Response;
 use Avarda\Checkout3\Helper\AvardaCheckBoxTypeValues;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PaymentMethod;
+use Magento\InventoryInStorePickupShippingApi\Model\Carrier\InStorePickup;
 use Magento\Newsletter\Model\SubscriberFactory;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
@@ -73,7 +74,8 @@ class UpdateOrderStatusHandler implements HandlerInterface
         $billingAddress->setCity($response[$mode]['invoicingAddress']['city']);
         $billingAddress->setCountryId($response[$mode]['invoicingAddress']['country']);
 
-        if ($order->getIsNotVirtual()) {
+        $isInStorePickup = $order->getShippingMethod() === InStorePickup::DELIVERY_METHOD;
+        if ($order->getIsNotVirtual() && !$isInStorePickup) {
             $shippingAddress = $order->getShippingAddress();
             if ($response[$mode]['deliveryAddress']['firstName']) {
                 $shippingAddress->setFirstname($response[$mode]['deliveryAddress']['firstName']);
