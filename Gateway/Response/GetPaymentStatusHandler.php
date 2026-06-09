@@ -9,9 +9,7 @@ namespace Avarda\Checkout3\Gateway\Response;
 use Avarda\Checkout3\Helper\AvardaCheckBoxTypeValues;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PaymentMethod;
-use Magento\InventoryInStorePickupShippingApi\Model\Carrier\InStorePickup;
 use Magento\Newsletter\Model\SubscriberFactory;
-use Magento\Newsletter\Model\SubscriptionManagerInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
@@ -77,27 +75,23 @@ class GetPaymentStatusHandler implements HandlerInterface
         $billingAddress->setCountryId($response[$mode]['invoicingAddress']['country']);
         $quote->setBillingAddress($billingAddress);
 
-        $isInStorePickup = $quote->getShippingAddress()
-            && $quote->getShippingAddress()->getShippingMethod() === InStorePickup::DELIVERY_METHOD;
-        if (!$isInStorePickup) {
-            if ($response[$mode]['deliveryAddress']['firstName']) {
-                $shippingAddress = $this->addressFactory->create();
-                $shippingAddress->setTelephone($response[$mode]['deliveryAddress']['phone'] ?: $telephone);
-                $shippingAddress->setEmail($response[$mode]['deliveryAddress']['email'] ?: $email);
-                $shippingAddress->setFirstname($response[$mode]['deliveryAddress']['firstName']);
-                $shippingAddress->setLastname($response[$mode]['deliveryAddress']['lastName']);
-                $street2 = $response[$mode]['deliveryAddress']['address2'];
-                $shippingAddress->setStreet(
-                    $response[$mode]['deliveryAddress']['address1'] .
-                    (isset($street2) && $street2 ? "\n" . $street2 : '')
-                );
-                $shippingAddress->setPostcode($response[$mode]['deliveryAddress']['zip'] ?: $response[$mode]['invoicingAddress']['zip']);
-                $shippingAddress->setCity($response[$mode]['deliveryAddress']['city'] ?: $response[$mode]['invoicingAddress']['city']);
-                $shippingAddress->setCountryId($response[$mode]['deliveryAddress']['country'] ?: $response[$mode]['invoicingAddress']['country']);
-                $quote->setShippingAddress($shippingAddress);
-            } else {
-                $quote->setShippingAddress($billingAddress);
-            }
+        if ($response[$mode]['deliveryAddress']['firstName']) {
+            $shippingAddress = $this->addressFactory->create();
+            $shippingAddress->setTelephone($response[$mode]['deliveryAddress']['phone'] ?: $telephone);
+            $shippingAddress->setEmail($response[$mode]['deliveryAddress']['email'] ?: $email);
+            $shippingAddress->setFirstname($response[$mode]['deliveryAddress']['firstName']);
+            $shippingAddress->setLastname($response[$mode]['deliveryAddress']['lastName']);
+            $street2 = $response[$mode]['deliveryAddress']['address2'];
+            $shippingAddress->setStreet(
+                $response[$mode]['deliveryAddress']['address1'] .
+                (isset($street2) && $street2 ? "\n" . $street2 : '')
+            );
+            $shippingAddress->setPostcode($response[$mode]['deliveryAddress']['zip'] ?: $response[$mode]['invoicingAddress']['zip']);
+            $shippingAddress->setCity($response[$mode]['deliveryAddress']['city'] ?: $response[$mode]['invoicingAddress']['city']);
+            $shippingAddress->setCountryId($response[$mode]['deliveryAddress']['country'] ?: $response[$mode]['invoicingAddress']['country']);
+            $quote->setShippingAddress($shippingAddress);
+        } else {
+            $quote->setShippingAddress($billingAddress);
         }
 
         // Set payment method
