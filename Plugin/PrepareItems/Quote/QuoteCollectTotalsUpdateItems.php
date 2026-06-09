@@ -13,6 +13,7 @@ use Exception;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\Exception\PaymentException;
 use Magento\Framework\Webapi\Exception as WebapiException;
+use Magento\InventoryInStorePickupQuote\Model\ResourceModel\GetPickupLocationCodeByQuoteAddressId;
 use Magento\InventoryInStorePickupShippingApi\Model\Carrier\InStorePickup;
 use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Quote\Api\Data\CartInterface;
@@ -25,6 +26,7 @@ class QuoteCollectTotalsUpdateItems
     protected PurchaseState $purchaseStateHelper;
     protected Http $request;
     protected ConfigInterface $config;
+    protected GetPickupLocationCodeByQuoteAddressId $getPickupLocationCodeByQuoteAddressId;
 
     static bool $collectTotalsFlag = false;
 
@@ -33,13 +35,15 @@ class QuoteCollectTotalsUpdateItems
         PaymentData $paymentDataHelper,
         PurchaseState $purchaseStateHelper,
         Http $request,
-        ConfigInterface $config
+        ConfigInterface $config,
+        GetPickupLocationCodeByQuoteAddressId $getPickupLocationCodeByQuoteAddressId,
     ) {
         $this->quotePaymentManagement = $quotePaymentManagement;
         $this->paymentDataHelper = $paymentDataHelper;
         $this->purchaseStateHelper = $purchaseStateHelper;
         $this->request = $request;
         $this->config = $config;
+        $this->getPickupLocationCodeByQuoteAddressId = $getPickupLocationCodeByQuoteAddressId;
     }
 
     /**
@@ -76,7 +80,7 @@ class QuoteCollectTotalsUpdateItems
                 if (($renew = $this->purchaseStateHelper->isDead($state)) === false) {
                     try {
                         $this->quotePaymentManagement->updateItems($subject);
-                        if ($this->pickupStateChanged($subject)) {
+                        if ($this->shouldResendPickupAddress($subject)) {
                             $this->quotePaymentManagement->updateDeliveryAddress($subject);
                         }
                     } catch (WebapiException $e) {
@@ -95,7 +99,7 @@ class QuoteCollectTotalsUpdateItems
         return $result;
     }
 
-    protected function pickupStateChanged(CartInterface $subject): bool
+    public function shouldResendPickupAddress(CartInterface $subject): bool
     {
         $shippingAddress = $subject->getShippingAddress();
         if (!$shippingAddress) {
@@ -105,7 +109,22 @@ class QuoteCollectTotalsUpdateItems
         $currentIsPickup = $shippingAddress->getShippingMethod() === InStorePickup::DELIVERY_METHOD;
         $origIsPickup = $shippingAddress->getOrigData('shipping_method') === InStorePickup::DELIVERY_METHOD;
 
-        return $currentIsPickup !== $origIsPickup;
+        if ($currentIsPickup !== $origIsPickup) {
+            return true;
+        }
+
+        return $currentIsPickup && $this->pickupLocationChanged($shippingAddress);
+    }
+
+    public function pickupLocationChanged($shippingAddress): bool
+    {
+        $extensionAttributes = $shippingAddress->getExtensionAttributes();
+        $currentCode = $extensionAttributes ? $extensionAttributes->getPickupLocationCode() : null;
+
+        $addressId = (int)$shippingAddress->getId();
+        $savedCode = $addressId ? $this->getPickupLocationCodeByQuoteAddressId->execute($addressId) : null;
+
+        return $currentCode !== $savedCode;
     }
 
     /**
