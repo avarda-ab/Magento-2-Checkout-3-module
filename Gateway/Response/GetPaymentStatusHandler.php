@@ -10,7 +10,6 @@ use Avarda\Checkout3\Helper\AvardaCheckBoxTypeValues;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PaymentMethod;
 use Magento\Newsletter\Model\SubscriberFactory;
-use Magento\Newsletter\Model\SubscriptionManagerInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
