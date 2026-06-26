@@ -13,7 +13,7 @@ jobs:
     name: Unit tests (PHP 8.2, Magento 2.4.7-p10)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: extdn/github-actions-m2/magento-unit-tests/8.2@master
         env:
           MAGENTO_VERSION: '2.4.7-p10'
@@ -24,7 +24,7 @@ jobs:
     name: Unit tests (PHP 8.3, Magento 2.4.8-p5)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: extdn/github-actions-m2/magento-unit-tests/8.3@master
         env:
           MAGENTO_VERSION: '2.4.8-p5'

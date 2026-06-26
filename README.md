@@ -1,5 +1,7 @@
 # Avarda Checkout V3
 
+[![Unit tests](https://github.com/avarda-ab/Magento-2-Checkout-3-module/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/avarda-ab/Magento-2-Checkout-3-module/actions/workflows/unit-tests.yml)
+
 Module adds Avarda Checkout v3 solutions as payment method and separate Checkout to Magento 2.
 
 ## Module Installation
