@@ -34,6 +34,12 @@ define([
         },
 
         getPaymentStepTitle: function () {
+            var avardaConfig = window.checkoutConfig.payment['avarda_checkout3_checkout'];
+
+            // The Magento steps already show on top, so the in-iframe step title is redundant.
+            if (avardaConfig && avardaConfig.useAsPaymentStep) {
+                return '';
+            }
             if (this.isVirtual()) {
                 return $t("1. Select payment");
             } else if (options.showPostcode) {

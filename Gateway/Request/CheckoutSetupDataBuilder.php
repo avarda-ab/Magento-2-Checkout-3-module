@@ -106,6 +106,11 @@ class CheckoutSetupDataBuilder implements BuilderInterface
         }
         $isVirtual = !($countItems == 0) && $isVirtual;
 
+        // The delivery address is managed by Magento, so it must not be editable in the iframe.
+        if ($this->configHelper->useAvardaAsPaymentStep()) {
+            return AvardaCheckBoxTypeValues::VALUE_HIDDEN;
+        }
+
         if ($isVirtual || $this->isInStorePickup($quote)) {
             return AvardaCheckBoxTypeValues::VALUE_HIDDEN;
         } elseif ($this->hasStalePickupAddress($quote)) {

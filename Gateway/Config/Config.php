@@ -28,6 +28,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     const KEY_TOKEN_FLAG = 'avarda_checkout3_api_token';
     const KEY_ONEPAGE_REDIRECT_ACTIVE = 'onepage_redirect_active';
+    const KEY_AVARDA_PAYMENT_STEP = 'avarda_payment_step';
     const KEY_CUSTOM_CSS = 'avarda_checkout3/api/custom_css';
     const KEY_COUNTRY_SELECTOR = 'avarda_checkout3/api/country_selector';
     const KEY_SHOW_B2B_LINK = 'avarda_checkout3/api/show_b2b_link';
@@ -183,6 +184,13 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function isOnepageRedirectActive()
     {
         return (bool) $this->getValue(self::KEY_ONEPAGE_REDIRECT_ACTIVE);
+    }
+
+    public function useAvardaAsPaymentStep(): bool
+    {
+        // With the onepage redirect active Avarda is the full checkout and keeps its own steps.
+        return !$this->isOnepageRedirectActive()
+            && (bool) $this->getValue(self::KEY_AVARDA_PAYMENT_STEP);
     }
 
     /**

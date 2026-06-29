@@ -2,35 +2,29 @@
 
 namespace Avarda\Checkout3\Plugin\Controller\Checkout;
 
+use Avarda\Checkout3\Gateway\Config\Config;
 use Magento\Framework\App\RequestInterface;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\View\LayoutInterface;
-use Magento\Store\Model\ScopeInterface;
 
 class UpdateCheckoutLayoutHandle
 {
     protected RequestInterface $request;
-    protected ScopeConfigInterface $scopeConfig;
+    protected Config $config;
     protected LayoutInterface $layout;
 
     public function __construct(
         RequestInterface $request,
-        ScopeConfigInterface $scopeConfig,
+        Config $config,
         LayoutInterface $layout,
     ) {
         $this->request = $request;
-        $this->scopeConfig = $scopeConfig;
+        $this->config = $config;
         $this->layout = $layout;
     }
 
     public function beforeExecute($subject)
     {
-        $fromCheckout = $this->request->getParam('fromCheckout');
-        $isEnabled = $this->scopeConfig->isSetFlag(
-            'payment/avarda_checkout3_checkout/hide_avarda_checkout_shipping_fields',
-            ScopeInterface::SCOPE_STORE
-        );
-        if ($fromCheckout == 1 && $isEnabled) {
+        if ($this->request->getParam('fromCheckout') == 1 && $this->config->useAvardaAsPaymentStep()) {
             $this->layout->getUpdate()->addHandle('avarda3_checkout_index_fromcheckout');
         }
     }

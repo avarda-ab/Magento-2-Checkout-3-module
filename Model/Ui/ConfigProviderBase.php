@@ -36,6 +36,7 @@ class ConfigProviderBase implements ConfigProviderInterface
             'payment' => [
                 self::CODE => [
                     'isActive' => $active,
+                    'useAsPaymentStep' => $this->config->useAvardaAsPaymentStep(),
                 ],
             ],
         ];

@@ -10,6 +10,9 @@ var config = {
             },
             'Magento_InventoryInStorePickupFrontend/js/view/store-pickup': {
                 'Avarda_Checkout3/js/mixins/store-pickup-mixin': true
+            },
+            'Magento_Checkout/js/view/shipping': {
+                'Avarda_Checkout3/js/mixins/shipping-redirect-mixin': true
             }
         }
     }
