@@ -5,9 +5,6 @@ on:
     branches: [ dev, master, main ]
   pull_request:
 
-env:
-  COMPOSER_AUTH: '{"http-basic":{"repo.magento.com":{"username":"${{ secrets.MAGENTO_PUBLIC_KEY }}","password":"${{ secrets.MAGENTO_PRIVATE_KEY }}"}}}'
-
 jobs:
   lint:
     name: PHP syntax (${{ matrix.php }})
