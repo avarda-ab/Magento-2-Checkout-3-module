@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="checkout" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="main">
+            <block name="product.shipping.info" class="Magento\Framework\View\Element\Template" template="Avarda_Checkout3::bar.phtml" before="-">
+                <arguments>
+                    <argument name="avardaPage" xsi:type="boolean">1</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <referenceBlock class="Avarda\Checkout3\Block\Checkout" name="checkout.root">
+            <arguments>
+                <argument name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="checkout" xsi:type="array">
+                            <item name="children" xsi:type="array">
+                                <item name="steps" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <!-- Disable avarda shipping step -->
+                                        <item name="avarda-shipping" xsi:type="array">
+                                            <item name="config" xsi:type="array">
+                                                <item name="componentDisabled" xsi:type="boolean">true</item>
+                                            </item>
+                                        </item>
+                                        <!-- Add avarda-payment step -->
+                                        <item name="avarda-payment" xsi:type="array">
+                                            <item name="component" xsi:type="string">Avarda_Checkout3/js/checkout/avarda-payment</item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>
+

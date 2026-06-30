@@ -64,6 +64,15 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/avarda_checkout3_checkout/onepage_redirect_active</config_path>
                     </field>
+                    <field id="avarda_payment_step" translate="label comment" type="select" sortOrder="41" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Use Avarda Checkout as payment step</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/avarda_checkout3_checkout/avarda_payment_step</config_path>
+                        <comment>Magento handles the shipping step, then redirects to the Avarda Checkout for billing and payment.</comment>
+                        <depends>
+                            <field id="onepage_redirect_active">0</field>
+                        </depends>
+                    </field>
                     <field id="order_status" translate="label" type="select" sortOrder="45" showInDefault="1" showInWebsite="0"  showInStore="0">
                         <label>Order Status</label>
                         <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>

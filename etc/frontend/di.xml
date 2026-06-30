@@ -28,7 +28,19 @@
         <arguments>
             <argument name="configProviders" xsi:type="array">
                 <item name="avarda_checkout3_instructions_config_provider" xsi:type="object">AvardaCheckout3InstructionProvider</item>
+                <item name="avarda_checkout3_config_provider" xsi:type="object">Avarda\Checkout3\Model\Ui\ConfigProviderBase</item>
             </argument>
+        </arguments>
+    </type>
+    <type name="Avarda\Checkout3\Controller\Checkout\Index">
+        <plugin name="avarda_checkout3_update_delivery_address" type="Avarda\Checkout3\Plugin\Controller\Checkout\UpdateAvardaDeliveryAddress" />
+        <plugin name="avarda_checkout3_add_layout_handle" type="Avarda\Checkout3\Plugin\Controller\Checkout\UpdateCheckoutLayoutHandle" />
+    </type>
+    <type name="Avarda\Checkout3\Plugin\Controller\Checkout\UpdateAvardaDeliveryAddress">
+        <arguments>
+            <argument name="commandPool" xsi:type="object">AvardaCheckout3CommandPool</argument>
+            <argument name="paymentDataObjectFactory" xsi:type="object">Magento\Payment\Gateway\Data\PaymentDataObjectFactory</argument>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
         </arguments>
     </type>
 </config>

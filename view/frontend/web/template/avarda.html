@@ -3,7 +3,9 @@
 @package   Avarda_Checkout3
 -->
 <li id="avarda_checkout" data-bind="css: {'virtual': isVirtual()}">
+    <!-- ko if: getPaymentStepTitle() -->
     <div class="step-title" text="getPaymentStepTitle()" data-role="title"></div>
+    <!-- /ko -->
     <!-- ko if: showLogin() -->
         <!-- ko foreach: requirejs('uiRegistry').get('checkout').getRegion('login-form') -->
             <!-- ko template: getTemplate() --><!-- /ko -->

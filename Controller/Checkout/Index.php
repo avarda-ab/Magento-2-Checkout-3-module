@@ -110,13 +110,15 @@ class Index extends AbstractCheckout
 
         $paymentCode = '';
         try {
-            $paymentCode = $quote->getPayment()->getMethod();
+            $paymentCode = (string) $quote->getPayment()->getMethod();
         } catch (Exception $e) {
             // pass
         }
-        // Remove payment method if it's not avarda payment already
-        if ($paymentCode != '' && strpos($paymentCode, 'avarda_checkout3') === false) {
-            $quote->getPayment()->setMethod('avarda_checkout3_checkout')->save();
+        // Without an Avarda payment method the quote item/total sync to Avarda never runs,
+        // so shipping changes made in the Magento steps would not reach the purchase.
+        if (strpos($paymentCode, 'avarda_checkout3') === false) {
+            $quote->getPayment()->setMethod('avarda_checkout3_checkout');
+            $needsSave = true;
         }
 
         if ($needsSave) {

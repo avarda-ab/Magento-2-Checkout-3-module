@@ -1,0 +1,39 @@
+<?php
+
+/**
+ * @var $block \Magento\Framework\View\Element\Template
+ * @var $escaper \Magento\Framework\Escaper
+ * @var $secureRenderer \Magento\Framework\View\Helper\SecureHtmlRenderer
+ */
+
+// Avarda is the payment step here, so show only Magento's two default steps.
+$paymentStep = $block->getData('avardaPage');
+
+$shippingUrl = $block->getUrl('checkout', ['_secure' => true]);
+
+$script = <<<SCRIPT
+require([
+    'jquery'
+], function ($) {
+    "use strict";
+
+    $(document).ready(function () {
+        $('.opc-progress-bar-item').eq(0).on('click', function () {
+            window.location.href = '{$escaper->escapeJs($shippingUrl)}';
+        });
+    });
+});
+SCRIPT;
+
+?>
+
+<ul class="opc-progress-bar">
+    <li class="opc-progress-bar-item <?= $paymentStep ? '_complete' : '_active' ?>">
+        <span><?= $escaper->escapeHtml(__('Shipping')) ?></span>
+    </li>
+    <li class="opc-progress-bar-item <?= $paymentStep ? '_active' : '' ?>">
+        <span><?= $escaper->escapeHtml(__('Review & Payments')) ?></span>
+    </li>
+</ul>
+
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $script, false) ?>

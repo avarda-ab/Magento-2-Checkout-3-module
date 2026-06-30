@@ -25,6 +25,8 @@
     <preference for="Avarda\Checkout3\Gateway\Data\ItemDataObjectFactoryInterface" type="Avarda\Checkout3\Gateway\Data\ItemDataObjectFactory" />
     <preference for="Avarda\Checkout3\Gateway\Data\ItemDataObjectInterface" type="Avarda\Checkout3\Gateway\Data\ItemDataObject" />
 
+    <preference for="Magento\Sales\Model\CronJob\CleanExpiredOrders" type="Avarda\Checkout3\Preference\Magento\Sales\CronJobCleanExpiredOrders" />
+
     <!-- Avarda plugins -->
     <type name="Magento\Checkout\Controller\Index\Index">
         <plugin name="avarda_checkout3_redirect" type="Avarda\Checkout3\Plugin\Checkout\CheckoutIndex"/>
