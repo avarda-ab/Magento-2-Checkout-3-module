@@ -24,7 +24,7 @@ class CancelPaymentHandler implements HandlerInterface
     /**
      * @inheritdoc
      */
-    public function handle(array $handlingSubject, array $response = null)
+    public function handle(array $handlingSubject, ?array $response = null)
     {
         $paymentDO = SubjectReader::readPayment($handlingSubject);
         $payment = $paymentDO->getPayment();

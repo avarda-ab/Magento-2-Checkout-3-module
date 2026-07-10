@@ -55,7 +55,7 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
         $cartId,
         $email,
         PaymentInterface $paymentMethod,
-        AddressInterface $billingAddress = null
+        ?AddressInterface $billingAddress = null
     ) {
         if (isset($paymentMethod->getAdditionalData()['avarda'])) {
             $additionalData = json_decode($paymentMethod->getAdditionalData()['avarda'] ?? '', true);
