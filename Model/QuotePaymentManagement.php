@@ -13,6 +13,7 @@ use Avarda\Checkout3\Api\ItemStorageInterface;
 use Avarda\Checkout3\Api\PaymentQueueRepositoryInterface;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Helper\PaymentData;
+use Avarda\Checkout3\Helper\PaymentMethod;
 use Avarda\Checkout3\Helper\PurchaseState;
 use Exception;
 use Magento\Framework\Exception\AlreadyExistsException;
@@ -292,6 +293,17 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
             throw new PaymentException(__('Payment status is not Completed'));
         }
 
+        // A ZeroAmount purchase only completes for a fully-covered (zero) cart. If the
+        // order total is non-zero but Avarda reported ZeroAmount, the purchase does not
+        // actually cover the order, so refuse to accept it as paid.
+        if ($order->getBaseGrandTotal() > 0.0001
+            && $order->getPayment()->getMethod() === PaymentMethod::$codes[PaymentMethod::ZERO_AMOUNT]
+        ) {
+            throw new PaymentException(
+                __('Order total does not match the completed zero-amount Avarda purchase.')
+            );
+        }
+
         // Clean payment queue
         $purchaseData = $this->paymentDataHelper->getPurchaseData(
             $order->getPayment()
@@ -376,6 +388,14 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
 
         $this->commandPool->get($commandCode)
             ->execute($arguments);
+
+        // Remember the total last pushed to Avarda so a later divergence (cart changed
+        // after the purchase was synced or completed) can be caught before order placement.
+        if ($payment instanceof InfoInterface
+            && in_array($commandCode, ['avarda_initialize_payment', 'avarda_update_items'], true)
+        ) {
+            $payment->setAdditionalInformation(PaymentData::SYNCED_TOTAL, $arguments['amount']);
+        }
     }
 
     /**

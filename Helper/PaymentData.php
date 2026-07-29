@@ -9,6 +9,7 @@ namespace Avarda\Checkout3\Helper;
 use Avarda\Checkout3\Api\Data\PaymentDetailsInterface;
 use Magento\Payment\Model\InfoInterface;
 use Magento\Payment\Model\Method\Free;
+use Magento\Quote\Api\Data\CartInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 
 class PaymentData
@@ -17,6 +18,11 @@ class PaymentData
      * Payment additional information field name for state
      */
     const STATE = 'state';
+
+    /**
+     * Payment additional information field name for the total last synced to Avarda
+     */
+    const SYNCED_TOTAL = 'synced_total';
 
     /**
      * Get purchase from payment info
@@ -60,6 +66,45 @@ class PaymentData
         }
 
         return PurchaseState::OUTDATED;
+    }
+
+    /**
+     * Get the total last synced to Avarda from payment info
+     *
+     * @param InfoInterface $payment
+     * @return float|null
+     */
+    public function getSyncedTotal(InfoInterface $payment)
+    {
+        $additionalInformation = $payment->getAdditionalInformation();
+        if (is_array($additionalInformation) &&
+            array_key_exists(self::SYNCED_TOTAL, $additionalInformation) &&
+            $additionalInformation[self::SYNCED_TOTAL] !== null
+        ) {
+            return (float)$additionalInformation[self::SYNCED_TOTAL];
+        }
+
+        return null;
+    }
+
+    /**
+     * Check if the quote grand total no longer matches the amount last synced to Avarda
+     *
+     * @param CartInterface $quote
+     * @return bool
+     */
+    public function syncedTotalMismatches(CartInterface $quote)
+    {
+        $payment = $quote->getPayment();
+        $syncedTotal = $this->getSyncedTotal($payment);
+        if ($syncedTotal !== null) {
+            // Compare in the same (store) currency the amount was sent to Avarda in.
+            return abs($syncedTotal - (float)$quote->getGrandTotal()) >= 0.0001;
+        }
+
+        // Legacy quotes that predate synced_total: fall back to the zero-amount heuristic.
+        return $payment->getMethod() === PaymentMethod::$codes[PaymentMethod::ZERO_AMOUNT]
+            && $quote->getBaseGrandTotal() >= 0.0001;
     }
 
     /**

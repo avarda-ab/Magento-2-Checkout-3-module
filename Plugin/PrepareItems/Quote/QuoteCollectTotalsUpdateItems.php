@@ -75,9 +75,15 @@ class QuoteCollectTotalsUpdateItems
 
                 $state = $this->getState($subject);
                 if ($this->purchaseStateHelper->isComplete($state)) {
-                    return $result;
-                }
-                if (($renew = $this->purchaseStateHelper->isDead($state)) === false) {
+                    // A completed purchase holds a fixed amount at Avarda. If the cart total
+                    // no longer matches what was last synced (e.g. a fully gift-card-covered
+                    // cart auto-completed as ZeroAmount and then grew), reusing it would place
+                    // the order at the wrong amount, so renew it instead of returning early.
+                    if (!$this->paymentDataHelper->syncedTotalMismatches($subject)) {
+                        return $result;
+                    }
+                    $renew = true;
+                } elseif (($renew = $this->purchaseStateHelper->isDead($state)) === false) {
                     try {
                         $this->quotePaymentManagement->updateItems($subject);
                         if ($this->shouldResendPickupAddress($subject)) {

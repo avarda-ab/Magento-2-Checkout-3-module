@@ -239,6 +239,7 @@
         <arguments>
             <argument name="requestBuilder" xsi:type="object">AvardaCheckout3PurchaseOrderRequest</argument>
             <argument name="transferFactory" xsi:type="object">AvardaCheckout3PurchaseOrderTransferFactory</argument>
+            <argument name="validator" xsi:type="object">Avarda\Checkout3\Gateway\Validator\CaptureAmountValidator</argument>
         </arguments>
     </virtualType>
     <virtualType name="AvardaCheckout3PurchaseOrderRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">

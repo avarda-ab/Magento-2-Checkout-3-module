@@ -8,8 +8,12 @@ namespace Avarda\Checkout3\Plugin\Checkout;
 
 use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
 use Avarda\Checkout3\Api\Data\PaymentDetailsInterface;
+use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
+use Avarda\Checkout3\Helper\PaymentData;
+use Avarda\Checkout3\Helper\PurchaseState;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\PaymentException;
 use Magento\InventoryInStorePickupShippingApi\Model\Carrier\InStorePickup;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\CartInterface;
@@ -22,13 +26,22 @@ abstract class PlaceOrderPluginAbstract
 {
     protected AvardaOrderRepositoryInterface $avardaOrderRepository;
     protected AddressFactory $addressFactory;
+    protected QuotePaymentManagementInterface $quotePaymentManagement;
+    protected PaymentData $paymentDataHelper;
+    protected PurchaseState $purchaseStateHelper;
 
     public function __construct(
         AvardaOrderRepositoryInterface $avardaOrderRepository,
-        AddressFactory $addressFactory
+        AddressFactory $addressFactory,
+        QuotePaymentManagementInterface $quotePaymentManagement,
+        PaymentData $paymentDataHelper,
+        PurchaseState $purchaseStateHelper
     ) {
         $this->avardaOrderRepository = $avardaOrderRepository;
         $this->addressFactory = $addressFactory;
+        $this->quotePaymentManagement = $quotePaymentManagement;
+        $this->paymentDataHelper = $paymentDataHelper;
+        $this->purchaseStateHelper = $purchaseStateHelper;
     }
 
     /**
@@ -144,6 +157,25 @@ abstract class PlaceOrderPluginAbstract
         if ($purchaseId != $data['purchaseId']) {
             throw new LocalizedException(__('Validation error, please refresh page and try again'));
         }
+
+        $quote->setTotalsCollectedFlag(false);
+        $quote->collectTotals();
+
+        // A Completed purchase holds a fixed amount at Avarda, so it cannot be re-synced
+        // to a changed cart total (the ZeroAmount poisoning case). Renew it and refuse
+        // this placement before the updateItems below would overwrite synced_total and
+        // hide the mismatch.
+        $state = $this->paymentDataHelper->getState($quote->getPayment());
+        if ($this->purchaseStateHelper->isComplete($state)
+            && $this->paymentDataHelper->syncedTotalMismatches($quote)
+        ) {
+            $this->quotePaymentManagement->initializePurchase($quote);
+            throw new PaymentException(
+                __('Your order total has changed. Please refresh the page and complete your payment again.')
+            );
+        }
+
+        $this->quotePaymentManagement->updateItems($quote);
 
         return true;
     }
