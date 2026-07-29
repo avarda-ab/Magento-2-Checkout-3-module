@@ -12,7 +12,6 @@ use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PaymentMethod;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Payment;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -55,7 +54,9 @@ class PaymentDataTest extends TestCase
         $this->assertSame(23.95, $this->paymentData->getSyncedTotal($payment));
     }
 
-    #[DataProvider('missingValueProvider')]
+    /**
+     * @dataProvider missingValueProvider
+     */
     public function testGetSyncedTotalReturnsNullWhenValueMissing(array $additionalInformation): void
     {
         $payment = $this->createMock(Payment::class);
@@ -72,7 +73,9 @@ class PaymentDataTest extends TestCase
         ];
     }
 
-    #[DataProvider('mismatchesProvider')]
+    /**
+     * @dataProvider mismatchesProvider
+     */
     public function testSyncedTotalMismatches(
         array $additionalInformation,
         float $grandTotal,
