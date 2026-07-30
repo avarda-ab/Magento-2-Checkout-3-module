@@ -10,6 +10,8 @@ namespace Avarda\Checkout3\Test\Unit\Plugin\Checkout;
 
 use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
 use Avarda\Checkout3\Api\Data\PaymentDetailsInterface;
+use Avarda\Checkout3\Api\Data\PaymentQueueInterface;
+use Avarda\Checkout3\Api\PaymentQueueRepositoryInterface;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
@@ -32,6 +34,8 @@ class PlaceOrderPluginAbstractTest extends TestCase
 
     protected PurchaseState|MockObject $purchaseStateHelperMock;
 
+    protected PaymentQueueRepositoryInterface|MockObject $paymentQueueRepositoryMock;
+
     protected Quote|MockObject $quoteMock;
 
     protected function setUp(): void
@@ -39,6 +43,7 @@ class PlaceOrderPluginAbstractTest extends TestCase
         $this->quotePaymentManagementMock = $this->createMock(QuotePaymentManagementInterface::class);
         $this->paymentDataHelperMock = $this->createMock(PaymentData::class);
         $this->purchaseStateHelperMock = $this->createMock(PurchaseState::class);
+        $this->paymentQueueRepositoryMock = $this->createMock(PaymentQueueRepositoryInterface::class);
 
         $payment = $this->createMock(Payment::class);
         $payment->method('getAdditionalInformation')
@@ -57,7 +62,8 @@ class PlaceOrderPluginAbstractTest extends TestCase
             $this->createMock(AddressFactory::class),
             $this->quotePaymentManagementMock,
             $this->paymentDataHelperMock,
-            $this->purchaseStateHelperMock
+            $this->purchaseStateHelperMock,
+            $this->paymentQueueRepositoryMock
         ) extends PlaceOrderPluginAbstract {
         };
     }
@@ -107,6 +113,40 @@ class PlaceOrderPluginAbstractTest extends TestCase
             ->with($this->quoteMock);
 
         $this->assertTrue($this->plugin->validatePurchase($this->quoteMock, ['purchaseId' => 'purchase-1']));
+    }
+
+    public function testMismatchingPurchaseIdMappedToQuoteInQueueIsResynced(): void
+    {
+        $payment = $this->createMock(Payment::class);
+        $payment->method('getAdditionalInformation')
+            ->with(PaymentDetailsInterface::PURCHASE_DATA)
+            ->willReturn(['purchaseId' => 'purchase-1']);
+        $payment->expects($this->once())
+            ->method('setAdditionalInformation')
+            ->with(PaymentDetailsInterface::PURCHASE_DATA, ['purchaseId' => 'other-purchase', 'jwt' => 'queue-jwt']);
+        $payment->expects($this->once())->method('save');
+
+        $quote = $this->getMockBuilder(Quote::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getPayment', 'collectTotals', 'getId'])
+            ->addMethods(['setTotalsCollectedFlag'])
+            ->getMock();
+        $quote->method('getPayment')->willReturn($payment);
+        $quote->method('getId')->willReturn(11);
+
+        $paymentQueue = $this->createMock(PaymentQueueInterface::class);
+        $paymentQueue->method('getQuoteId')->willReturn(11);
+        $paymentQueue->method('getIsProcessed')->willReturn(false);
+        $paymentQueue->method('getJwt')->willReturn('queue-jwt');
+        $this->paymentQueueRepositoryMock->method('get')
+            ->with('other-purchase')
+            ->willReturn($paymentQueue);
+
+        $this->quotePaymentManagementMock->expects($this->once())
+            ->method('updateItems')
+            ->with($quote);
+
+        $this->assertTrue($this->plugin->validatePurchase($quote, ['purchaseId' => 'other-purchase']));
     }
 
     public function testTotalsAreRecollectedBeforeValidation(): void

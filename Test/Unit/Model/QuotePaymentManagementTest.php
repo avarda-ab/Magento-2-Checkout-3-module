@@ -15,6 +15,7 @@ use Avarda\Checkout3\Api\PaymentQueueRepositoryInterface;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PaymentMethod;
 use Avarda\Checkout3\Helper\PurchaseState;
+use Avarda\Checkout3\Model\QuoteLock;
 use Avarda\Checkout3\Model\QuotePaymentManagement;
 use Magento\Framework\Exception\PaymentException;
 use Magento\Framework\Message\ManagerInterface;
@@ -72,7 +73,8 @@ class QuotePaymentManagementTest extends TestCase
             $this->createMock(OrderResourceInterface::class),
             $this->createMock(OrderFactory::class),
             $this->createMock(AddressFactory::class),
-            $this->createMock(ManagerInterface::class)
+            $this->createMock(ManagerInterface::class),
+            $this->createMock(QuoteLock::class)
         );
     }
 
