@@ -68,6 +68,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     protected OrderFactory $orderFactory;
     protected AddressFactory $addressFactory;
     protected ManagerInterface $messageManager;
+    protected QuoteLock $quoteLock;
 
     public function __construct(
         ItemManagementInterface $itemManagement,
@@ -86,7 +87,8 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         OrderResourceInterface $orderResource,
         OrderFactory $orderFactory,
         AddressFactory $addressFactory,
-        ManagerInterface $messageManager
+        ManagerInterface $messageManager,
+        QuoteLock $quoteLock
     ) {
         $this->itemManagement = $itemManagement;
         $this->itemStorage = $itemStorage;
@@ -105,6 +107,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         $this->orderFactory = $orderFactory;
         $this->addressFactory = $addressFactory;
         $this->messageManager = $messageManager;
+        $this->quoteLock = $quoteLock;
     }
 
     /**
@@ -113,36 +116,45 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     public function getPurchaseData($cartId, $renew = false)
     {
         $quote = $this->getQuote($cartId);
-        $purchaseData = $this->paymentDataHelper->getPurchaseData(
-            $quote->getPayment()
-        );
+        $locked = $this->quoteLock->lock($quote->getId());
+        try {
+            // Re-read inside the lock so a concurrently initialized purchase is reused
+            $this->reloadPayment($quote);
+            $purchaseData = $this->paymentDataHelper->getPurchaseData(
+                $quote->getPayment()
+            );
 
-        // If purchaseData has 'renew' then something changed so that renew is necessary
-        if (isset($purchaseData['renew']) && $purchaseData['renew']) {
-            $renew = true;
-        }
-
-        // If no purchaseData, it means order is not initialized yet and initialization should be done
-        // Also if renew already requested the state update is unnecessary
-        if (!$renew && $purchaseData && count($purchaseData) > 0) {
-            $this->updateOnlyPaymentStatus($quote);
-            $paymentState = $this->paymentDataHelper->getState($quote->getPayment());
-            if (
-                $this->purchaseStateHelper->isComplete($paymentState) ||
-                $this->purchaseStateHelper->isDead($paymentState)
-            ) {
+            // If purchaseData has 'renew' then something changed so that renew is necessary
+            if (isset($purchaseData['renew']) && $purchaseData['renew']) {
                 $renew = true;
             }
-        }
 
-        if (!$purchaseData || $renew) {
-            // We have to manually collect totals to populate the item storage
-            $quote->collectTotals();
-            // Initialize order
-            $purchaseData = $this->initializePurchase($quote);
-        }
+            // If no purchaseData, it means order is not initialized yet and initialization should be done
+            // Also if renew already requested the state update is unnecessary
+            if (!$renew && $purchaseData && count($purchaseData) > 0) {
+                $this->updateOnlyPaymentStatus($quote);
+                $paymentState = $this->paymentDataHelper->getState($quote->getPayment());
+                if (
+                    $this->purchaseStateHelper->isComplete($paymentState) ||
+                    $this->purchaseStateHelper->isDead($paymentState)
+                ) {
+                    $renew = true;
+                }
+            }
 
-        return $purchaseData;
+            if (!$purchaseData || $renew) {
+                // We have to manually collect totals to populate the item storage
+                $quote->collectTotals();
+                // Initialize order
+                $purchaseData = $this->doInitializePurchase($quote);
+            }
+
+            return $purchaseData;
+        } finally {
+            if ($locked) {
+                $this->quoteLock->unlock($quote->getId());
+            }
+        }
     }
 
     /**
@@ -153,6 +165,34 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
      * @throws LocalizedException
      */
     public function initializePurchase(CartInterface $quote)
+    {
+        $locked = $this->quoteLock->lock($quote->getId());
+        try {
+            $purchaseData = $this->paymentDataHelper->getPurchaseData($quote->getPayment());
+            $knownPurchaseId = $purchaseData['purchaseId'] ?? null;
+
+            $this->reloadPayment($quote);
+            $freshData = $this->paymentDataHelper->getPurchaseData($quote->getPayment());
+            $freshPurchaseId = $freshData['purchaseId'] ?? null;
+            // A concurrent request initialized a new purchase while we waited for the lock
+            if ($freshPurchaseId && $freshPurchaseId !== $knownPurchaseId && empty($freshData['renew'])) {
+                return $freshData;
+            }
+
+            return $this->doInitializePurchase($quote);
+        } finally {
+            if ($locked) {
+                $this->quoteLock->unlock($quote->getId());
+            }
+        }
+    }
+
+    /**
+     * @param CartInterface|Quote $quote
+     * @return bool|string
+     * @throws LocalizedException
+     */
+    protected function doInitializePurchase(CartInterface $quote)
     {
         $quote->reserveOrderId();
 
@@ -171,13 +211,17 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         }
 
         /**
-         * Save the additional data to quote payment and retrieve purchase ID
+         * The initialize response was saved to the payment additional information
          * @see \Avarda\Checkout3\Gateway\Response\InitializePaymentHandler
          */
-        $quote->save();
         $purchaseData = $this->paymentDataHelper->getPurchaseData($quote->getPayment());
+        // The old purchase's state would read as dead until the next status update
+        $quote->getPayment()->setAdditionalInformation(
+            PaymentData::STATE,
+            PurchaseState::INITIALIZED
+        );
 
-        /** Save purchase ID link to quote ID in payment queue */
+        // The queue row must exist before the quote save so the save guard sees this purchase as newest
         $paymentQueue = $this->paymentQueueFactory->create();
         $paymentQueue->setPurchaseId($purchaseData['purchaseId']);
         $paymentQueue->setJwt($purchaseData['jwt']);
@@ -189,7 +233,21 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
             // Simple fix to not fail on already exists error
         }
 
+        $quote->save();
+
         return $purchaseData;
+    }
+
+    /**
+     * @param CartInterface|Quote $quote
+     * @return void
+     */
+    protected function reloadPayment(CartInterface $quote)
+    {
+        $payment = $quote->getPayment();
+        if ($payment->getId()) {
+            $payment->getResource()->load($payment, $payment->getId());
+        }
     }
 
     /**

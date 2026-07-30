@@ -50,6 +50,7 @@ define([
         },
         initializing: ko.observable(false),
         initializeTimeout: false,
+        pendingInit: false,
         forceRenew: ko.observable(false),
         purchaseId: ko.observable(''),
         isCustomerLoggedIn: customer.isLoggedIn,
@@ -315,6 +316,8 @@ define([
                             }]
                         }).modal('openModal');
                     avardaCheckoutInstance.beforeSubmitAbort();
+                    // Recovers the form by itself when the failure was an outdated purchase id
+                    self.initializeIframe();
                 }).done(function () {
                     history.pushState(null, document.title, options.redirectUrl);
                     avardaCheckoutInstance.beforeSubmitContinue();
@@ -360,6 +363,8 @@ define([
         initializeIframe: function (renew) {
             let self = this;
             if (self.initializing()) {
+                // Queue instead of dropping, so a purchase renewed meanwhile still gets fetched
+                self.pendingInit = self.pendingInit || !!renew;
                 return true;
             }
             let renewParam = (self.forceRenew() || renew) ? 1 : 0;
@@ -419,12 +424,23 @@ define([
                     avardaCheckout.refreshForm();
                 }
                 self.initializing(false);
+                self.runPendingInit();
             }).fail(function (response) {
                 errorProcessor.process(response);
                 self.initializing(false);
+                self.runPendingInit();
             });
 
             return true;
+        },
+
+        runPendingInit: function () {
+            let self = this;
+            if (self.pendingInit !== false) {
+                let renew = self.pendingInit;
+                self.pendingInit = false;
+                self.initializeIframe(renew ? 1 : 0);
+            }
         }
     });
 });

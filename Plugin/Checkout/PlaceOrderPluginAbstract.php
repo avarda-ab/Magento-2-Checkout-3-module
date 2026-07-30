@@ -8,11 +8,13 @@ namespace Avarda\Checkout3\Plugin\Checkout;
 
 use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
 use Avarda\Checkout3\Api\Data\PaymentDetailsInterface;
+use Avarda\Checkout3\Api\PaymentQueueRepositoryInterface;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\PaymentException;
 use Magento\InventoryInStorePickupShippingApi\Model\Carrier\InStorePickup;
 use Magento\Quote\Api\Data\AddressInterface;
@@ -29,19 +31,22 @@ abstract class PlaceOrderPluginAbstract
     protected QuotePaymentManagementInterface $quotePaymentManagement;
     protected PaymentData $paymentDataHelper;
     protected PurchaseState $purchaseStateHelper;
+    protected PaymentQueueRepositoryInterface $paymentQueueRepository;
 
     public function __construct(
         AvardaOrderRepositoryInterface $avardaOrderRepository,
         AddressFactory $addressFactory,
         QuotePaymentManagementInterface $quotePaymentManagement,
         PaymentData $paymentDataHelper,
-        PurchaseState $purchaseStateHelper
+        PurchaseState $purchaseStateHelper,
+        PaymentQueueRepositoryInterface $paymentQueueRepository
     ) {
         $this->avardaOrderRepository = $avardaOrderRepository;
         $this->addressFactory = $addressFactory;
         $this->quotePaymentManagement = $quotePaymentManagement;
         $this->paymentDataHelper = $paymentDataHelper;
         $this->purchaseStateHelper = $purchaseStateHelper;
+        $this->paymentQueueRepository = $paymentQueueRepository;
     }
 
     /**
@@ -155,7 +160,7 @@ abstract class PlaceOrderPluginAbstract
     {
         $purchaseId = $quote->getPayment()->getAdditionalInformation(PaymentDetailsInterface::PURCHASE_DATA)['purchaseId'] ?? '';
         if ($purchaseId != $data['purchaseId']) {
-            throw new LocalizedException(__('Validation error, please refresh page and try again'));
+            $this->resyncPurchase($quote, $data['purchaseId'] ?? '');
         }
 
         $quote->setTotalsCollectedFlag(false);
@@ -178,5 +183,44 @@ abstract class PlaceOrderPluginAbstract
         $this->quotePaymentManagement->updateItems($quote);
 
         return true;
+    }
+
+    /**
+     * Accepts the paid purchase when the payment queue maps it to this quote, because a
+     * concurrent initialization can leave the quote payment holding a different purchase
+     *
+     * @param $quote Quote|CartInterface
+     * @param $purchaseId string
+     * @throws LocalizedException
+     */
+    protected function resyncPurchase($quote, $purchaseId)
+    {
+        $paymentQueue = null;
+        if ($purchaseId) {
+            try {
+                $paymentQueue = $this->paymentQueueRepository->get($purchaseId);
+            } catch (NoSuchEntityException $e) {
+                $paymentQueue = null;
+            }
+        }
+
+        if ($paymentQueue === null
+            || (int)$paymentQueue->getQuoteId() !== (int)$quote->getId()
+            || $paymentQueue->getIsProcessed()
+        ) {
+            throw new LocalizedException(__('Validation error, please refresh page and try again'));
+        }
+
+        $payment = $quote->getPayment();
+        $purchaseData = $payment->getAdditionalInformation(PaymentDetailsInterface::PURCHASE_DATA) ?: [];
+        $purchaseData['purchaseId'] = $purchaseId;
+        if ($paymentQueue->getJwt()) {
+            $purchaseData['jwt'] = $paymentQueue->getJwt();
+        }
+        unset($purchaseData['renew']);
+        $payment->setAdditionalInformation(PaymentDetailsInterface::PURCHASE_DATA, $purchaseData);
+        // The paid purchase wins even over a newer one, so bypass the save guard
+        $payment->setData('avarda_purchase_resync', true);
+        $payment->save();
     }
 }

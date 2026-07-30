@@ -7,6 +7,7 @@
 namespace Avarda\Checkout3\Plugin\Checkout;
 
 use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
+use Avarda\Checkout3\Api\PaymentQueueRepositoryInterface;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
@@ -34,7 +35,8 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
         OrderRepositoryInterface $orderRepository,
         AddressFactory $addressFactory,
         QuotePaymentManagementInterface $quotePaymentManagement,
-        PurchaseState $purchaseStateHelper
+        PurchaseState $purchaseStateHelper,
+        PaymentQueueRepositoryInterface $paymentQueueRepository
     ) {
         $this->cartRepository = $cartRepository;
         $this->quoteIdMaskFactory = $quoteIdMaskFactory;
@@ -44,7 +46,8 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
             $addressFactory,
             $quotePaymentManagement,
             $paymentDataHelper,
-            $purchaseStateHelper
+            $purchaseStateHelper,
+            $paymentQueueRepository
         );
     }
 
