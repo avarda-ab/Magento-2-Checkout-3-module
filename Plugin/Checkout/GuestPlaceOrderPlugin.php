@@ -7,7 +7,10 @@
 namespace Avarda\Checkout3\Plugin\Checkout;
 
 use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
+use Avarda\Checkout3\Api\PaymentQueueRepositoryInterface;
+use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Helper\PaymentData;
+use Avarda\Checkout3\Helper\PurchaseState;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -22,7 +25,6 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
 {
     protected CartRepositoryInterface $cartRepository;
     protected QuoteIdMaskFactory $quoteIdMaskFactory;
-    protected PaymentData $paymentDataHelper;
     protected OrderRepositoryInterface $orderRepository;
 
     public function __construct(
@@ -31,13 +33,22 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
         AvardaOrderRepositoryInterface $avardaOrderRepository,
         PaymentData $paymentDataHelper,
         OrderRepositoryInterface $orderRepository,
-        AddressFactory $addressFactory
+        AddressFactory $addressFactory,
+        QuotePaymentManagementInterface $quotePaymentManagement,
+        PurchaseState $purchaseStateHelper,
+        PaymentQueueRepositoryInterface $paymentQueueRepository
     ) {
         $this->cartRepository = $cartRepository;
         $this->quoteIdMaskFactory = $quoteIdMaskFactory;
-        $this->paymentDataHelper = $paymentDataHelper;
         $this->orderRepository = $orderRepository;
-        parent::__construct($avardaOrderRepository, $addressFactory);
+        parent::__construct(
+            $avardaOrderRepository,
+            $addressFactory,
+            $quotePaymentManagement,
+            $paymentDataHelper,
+            $purchaseStateHelper,
+            $paymentQueueRepository
+        );
     }
 
     /**

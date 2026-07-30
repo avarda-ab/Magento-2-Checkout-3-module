@@ -101,7 +101,7 @@ class QuoteCollectTotalsPrepareItems
             $itemTotalCents += (int) round(sprintf('%.2F', $sub['amount']) * 100);
         }
 
-        $diffCents = (int) round($subject->getGrandTotal() * 100) - $itemTotalCents;
+        $diffCents = (int) round($this->getRoundingTargetTotal($subject) * 100) - $itemTotalCents;
         if ($diffCents === 0) {
             return;
         }
@@ -112,6 +112,14 @@ class QuoteCollectTotalsPrepareItems
         $this->itemStorage->addItem(
             $this->itemDataObjectFactory->create($itemAdapter, 1, $diffCents / 100, 0)
         );
+    }
+
+    /**
+     * Extension point for modules that intentionally leave rows out of the item storage.
+     */
+    public function getRoundingTargetTotal(CartInterface $subject): float
+    {
+        return (float) $subject->getGrandTotal();
     }
 
     /**

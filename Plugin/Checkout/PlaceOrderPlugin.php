@@ -7,7 +7,10 @@
 namespace Avarda\Checkout3\Plugin\Checkout;
 
 use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
+use Avarda\Checkout3\Api\PaymentQueueRepositoryInterface;
+use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Helper\PaymentData;
+use Avarda\Checkout3\Helper\PurchaseState;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -19,17 +22,25 @@ use Magento\Quote\Model\Quote\AddressFactory;
 class PlaceOrderPlugin extends PlaceOrderPluginAbstract
 {
     protected CartRepositoryInterface $cartRepository;
-    protected PaymentData $paymentDataHelper;
 
     public function __construct(
         CartRepositoryInterface $cartRepository,
         AvardaOrderRepositoryInterface $avardaOrderRepository,
         PaymentData $paymentDataHelper,
-        AddressFactory $addressFactory
+        AddressFactory $addressFactory,
+        QuotePaymentManagementInterface $quotePaymentManagement,
+        PurchaseState $purchaseStateHelper,
+        PaymentQueueRepositoryInterface $paymentQueueRepository
     ) {
         $this->cartRepository = $cartRepository;
-        $this->paymentDataHelper = $paymentDataHelper;
-        parent::__construct($avardaOrderRepository, $addressFactory);
+        parent::__construct(
+            $avardaOrderRepository,
+            $addressFactory,
+            $quotePaymentManagement,
+            $paymentDataHelper,
+            $purchaseStateHelper,
+            $paymentQueueRepository
+        );
     }
 
     /**

@@ -12,4 +12,7 @@
     <event name="admin_system_config_changed_section_payment">
         <observer name="avarda_checkout3_remove_flags" instance="Avarda\Checkout3\Observer\ConfigSaveObserver" />
     </event>
+    <event name="sales_quote_payment_save_before">
+        <observer name="avarda_checkout3_purchase_data_guard" instance="Avarda\Checkout3\Observer\QuotePaymentSaveObserver" />
+    </event>
 </config>
