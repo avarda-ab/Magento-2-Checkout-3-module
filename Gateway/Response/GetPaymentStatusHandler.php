@@ -53,6 +53,14 @@ class GetPaymentStatusHandler implements HandlerInterface
 
         $telephone = $response[$mode]['userInputs']['phone'];
         $email = $response[$mode]['userInputs']['email'];
+        $deliveryEmail = $response[$mode]['deliveryAddress']['email'] ?: $email;
+
+        // Avarda returns the email from its own customer register, which can be an outdated one.
+        if ($quote->getCustomerId() && $quote->getCustomerEmail()) {
+            $email = $quote->getCustomerEmail();
+            $deliveryEmail = $email;
+        }
+
         $quote->setCustomerEmail($email);
 
         $billingAddress = $this->addressFactory->create();
@@ -78,7 +86,7 @@ class GetPaymentStatusHandler implements HandlerInterface
         if ($response[$mode]['deliveryAddress']['firstName']) {
             $shippingAddress = $this->addressFactory->create();
             $shippingAddress->setTelephone($response[$mode]['deliveryAddress']['phone'] ?: $telephone);
-            $shippingAddress->setEmail($response[$mode]['deliveryAddress']['email'] ?: $email);
+            $shippingAddress->setEmail($deliveryEmail);
             $shippingAddress->setFirstname($response[$mode]['deliveryAddress']['firstName']);
             $shippingAddress->setLastname($response[$mode]['deliveryAddress']['lastName']);
             $street2 = $response[$mode]['deliveryAddress']['address2'];
