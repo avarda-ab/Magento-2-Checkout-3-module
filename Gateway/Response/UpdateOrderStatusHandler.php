@@ -48,6 +48,14 @@ class UpdateOrderStatusHandler implements HandlerInterface
         // Initially phone number is set as dummy so update it to correct one
         $telephone = $response[$mode]['userInputs']['phone'];
         $email = $response[$mode]['userInputs']['email'];
+        $deliveryEmail = $response[$mode]['deliveryAddress']['email'] ?: $email;
+
+        // Avarda returns the email from its own customer register, which can be an outdated one.
+        if ($order->getCustomerId() && $order->getCustomerEmail()) {
+            $email = $order->getCustomerEmail();
+            $deliveryEmail = $email;
+        }
+
         $billingAddress = $order->getBillingAddress();
         $billingAddress->setTelephone($telephone);
         $billingAddress->setEmail($email);
@@ -83,7 +91,7 @@ class UpdateOrderStatusHandler implements HandlerInterface
                     $response[$mode]['deliveryAddress']['address1'] .
                     (isset($street2) && $street2 ? "\n" . $street2 : '')
                 );
-                $shippingAddress->setEmail($response[$mode]['deliveryAddress']['email'] ?: $email);
+                $shippingAddress->setEmail($deliveryEmail);
                 $shippingAddress->setTelephone($response[$mode]['deliveryAddress']['phone'] ?: $telephone);
                 $shippingAddress->setPostcode($response[$mode]['deliveryAddress']['zip'] ?: $response[$mode]['invoicingAddress']['zip']);
                 $shippingAddress->setCity($response[$mode]['deliveryAddress']['city'] ?: $response[$mode]['invoicingAddress']['city']);
