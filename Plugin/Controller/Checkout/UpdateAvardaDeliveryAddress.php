@@ -36,6 +36,10 @@ class UpdateAvardaDeliveryAddress
         // Update Avarda order delivery address if coming from Magento onepage checkout
         if ($this->request->getParam('fromCheckout')) {
             $quote = $this->checkoutSession->getQuote();
+            if (!$quote->getId()) {
+                // Session quote has expired; a fresh quote has no payment to update
+                return $result;
+            }
             $payment = $quote->getPayment();
             $argument = [
                 'payment' => $this->paymentDataObjectFactory->create($payment),
