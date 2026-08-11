@@ -20,7 +20,7 @@ use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\View\Asset\Repository;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
-use Magento\Framework\View\Helper\Js;
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\QuoteIdMaskFactory;
 
@@ -39,7 +39,7 @@ class Checkout extends Template
     protected array $layoutProcessors;
     protected JwtToken $jwtTokenHelper;
     protected SerializerInterface $serializer;
-    protected Js $jsHelper;
+    protected SecureHtmlRenderer $secureRenderer;
 
     public function __construct(
         Context $context,
@@ -53,7 +53,7 @@ class Checkout extends Template
         LocaleResolver $localeResolver,
         JwtToken $jwtTokenHelper,
         SerializerInterface $serializerInterface,
-        Js $jsHelper,
+        SecureHtmlRenderer $secureRenderer,
         array $layoutProcessors = [],
         array $data = [],
     ) {
@@ -70,7 +70,7 @@ class Checkout extends Template
         $this->layoutProcessors = $layoutProcessors;
         $this->jwtTokenHelper = $jwtTokenHelper;
         $this->serializer = $serializerInterface;
-        $this->jsHelper = $jsHelper;
+        $this->secureRenderer = $secureRenderer;
 
         if ($productMetadata->getEdition() === 'Enterprise') {
             $this->jsLayout = array_merge_recursive([
@@ -294,14 +294,16 @@ class Checkout extends Template
     }
 
     /**
-     * Csp safe inline js
+     * No CDATA wrapper: HTML minifiers that collapse newlines or strip
+     * comments inside script tags would break the script content.
+     * SecureHtmlRenderer handles CSP nonce/hash whitelisting.
      *
-     * @param $scriptString
+     * @param string $scriptString
      * @return string
      */
     public function getInlineJs($scriptString)
     {
-        return $this->jsHelper->getScript($scriptString);
+        return $this->secureRenderer->renderTag('script', [], $scriptString, false);
     }
 
     /**
@@ -363,7 +365,7 @@ class Checkout extends Template
                 unset($prevKey);
             }
         }
-        $stylesJson = json_encode($styles);
+        $stylesJson = json_encode($styles, JSON_HEX_TAG);
         if (!$stylesJson) {
             $stylesJson = '[]';
         }

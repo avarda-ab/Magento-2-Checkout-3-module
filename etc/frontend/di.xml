@@ -43,4 +43,9 @@
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
         </arguments>
     </type>
+    <type name="Avarda\Checkout3\Block\Checkout">
+        <arguments>
+            <argument name="serializerInterface" xsi:type="object">Magento\Framework\Serialize\Serializer\JsonHexTag</argument>
+        </arguments>
+    </type>
 </config>
