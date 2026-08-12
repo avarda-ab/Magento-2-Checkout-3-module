@@ -35,6 +35,9 @@ class CaptureAmountValidatorTest extends TestCase
         $this->validator = new CaptureAmountValidator($this->resultFactoryMock);
     }
 
+    /**
+     * @dataProvider validationProvider
+     */
     #[DataProvider('validationProvider')]
     public function testValidate(string $methodCode, float $grandTotal, bool $expectedIsValid): void
     {

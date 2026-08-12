@@ -55,6 +55,9 @@ class PaymentDataTest extends TestCase
         $this->assertSame(23.95, $this->paymentData->getSyncedTotal($payment));
     }
 
+    /**
+     * @dataProvider missingValueProvider
+     */
     #[DataProvider('missingValueProvider')]
     public function testGetSyncedTotalReturnsNullWhenValueMissing(array $additionalInformation): void
     {
@@ -72,6 +75,9 @@ class PaymentDataTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider mismatchesProvider
+     */
     #[DataProvider('mismatchesProvider')]
     public function testSyncedTotalMismatches(
         array $additionalInformation,
