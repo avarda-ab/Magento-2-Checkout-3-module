@@ -16,6 +16,7 @@ use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
 use Avarda\Checkout3\Plugin\Checkout\PlaceOrderPluginAbstract;
+use Avarda\Checkout3\Test\Unit\QuoteStub;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\PaymentException;
 use Magento\Quote\Model\Quote;
@@ -50,10 +51,9 @@ class PlaceOrderPluginAbstractTest extends TestCase
             ->with(PaymentDetailsInterface::PURCHASE_DATA)
             ->willReturn(['purchaseId' => 'purchase-1']);
 
-        $this->quoteMock = $this->getMockBuilder(Quote::class)
+        $this->quoteMock = $this->getMockBuilder(QuoteStub::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getPayment', 'collectTotals'])
-            ->addMethods(['setTotalsCollectedFlag'])
+            ->onlyMethods(['getPayment', 'collectTotals', 'setTotalsCollectedFlag'])
             ->getMock();
         $this->quoteMock->method('getPayment')->willReturn($payment);
 
@@ -126,10 +126,9 @@ class PlaceOrderPluginAbstractTest extends TestCase
             ->with(PaymentDetailsInterface::PURCHASE_DATA, ['purchaseId' => 'other-purchase', 'jwt' => 'queue-jwt']);
         $payment->expects($this->once())->method('save');
 
-        $quote = $this->getMockBuilder(Quote::class)
+        $quote = $this->getMockBuilder(QuoteStub::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getPayment', 'collectTotals', 'getId'])
-            ->addMethods(['setTotalsCollectedFlag'])
+            ->onlyMethods(['getPayment', 'collectTotals', 'getId', 'setTotalsCollectedFlag'])
             ->getMock();
         $quote->method('getPayment')->willReturn($payment);
         $quote->method('getId')->willReturn(11);

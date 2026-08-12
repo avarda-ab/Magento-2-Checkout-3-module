@@ -10,8 +10,10 @@ namespace Avarda\Checkout3\Test\Unit\Helper;
 
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PaymentMethod;
+use Avarda\Checkout3\Test\Unit\QuoteStub;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Payment;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -34,10 +36,9 @@ class PaymentDataTest extends TestCase
         $payment->method('getAdditionalInformation')->willReturn($additionalInformation);
         $payment->method('getMethod')->willReturn($method);
 
-        $quote = $this->getMockBuilder(Quote::class)
+        $quote = $this->getMockBuilder(QuoteStub::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getPayment'])
-            ->addMethods(['getGrandTotal', 'getBaseGrandTotal'])
+            ->onlyMethods(['getPayment', 'getGrandTotal', 'getBaseGrandTotal'])
             ->getMock();
         $quote->method('getPayment')->willReturn($payment);
         $quote->method('getGrandTotal')->willReturn($grandTotal);
@@ -54,9 +55,7 @@ class PaymentDataTest extends TestCase
         $this->assertSame(23.95, $this->paymentData->getSyncedTotal($payment));
     }
 
-    /**
-     * @dataProvider missingValueProvider
-     */
+    #[DataProvider('missingValueProvider')]
     public function testGetSyncedTotalReturnsNullWhenValueMissing(array $additionalInformation): void
     {
         $payment = $this->createMock(Payment::class);
@@ -73,9 +72,7 @@ class PaymentDataTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider mismatchesProvider
-     */
+    #[DataProvider('mismatchesProvider')]
     public function testSyncedTotalMismatches(
         array $additionalInformation,
         float $grandTotal,

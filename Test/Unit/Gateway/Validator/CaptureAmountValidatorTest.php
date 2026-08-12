@@ -16,6 +16,7 @@ use Magento\Payment\Gateway\Validator\ResultInterface;
 use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
 use Magento\Payment\Model\InfoInterface;
 use Magento\Payment\Model\MethodInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -34,9 +35,7 @@ class CaptureAmountValidatorTest extends TestCase
         $this->validator = new CaptureAmountValidator($this->resultFactoryMock);
     }
 
-    /**
-     * @dataProvider validationProvider
-     */
+    #[DataProvider('validationProvider')]
     public function testValidate(string $methodCode, float $grandTotal, bool $expectedIsValid): void
     {
         $order = $this->createMock(OrderAdapterInterface::class);

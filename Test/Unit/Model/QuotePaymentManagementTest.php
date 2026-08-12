@@ -17,6 +17,7 @@ use Avarda\Checkout3\Helper\PaymentMethod;
 use Avarda\Checkout3\Helper\PurchaseState;
 use Avarda\Checkout3\Model\QuoteLock;
 use Avarda\Checkout3\Model\QuotePaymentManagement;
+use Avarda\Checkout3\Test\Unit\QuoteStub;
 use Magento\Framework\Exception\PaymentException;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
@@ -80,10 +81,9 @@ class QuotePaymentManagementTest extends TestCase
 
     protected function createQuote(Payment|MockObject $payment, float $grandTotal): Quote|MockObject
     {
-        $quote = $this->getMockBuilder(Quote::class)
+        $quote = $this->getMockBuilder(QuoteStub::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getPayment'])
-            ->addMethods(['getGrandTotal'])
+            ->onlyMethods(['getPayment', 'getGrandTotal'])
             ->getMock();
         $quote->method('getPayment')->willReturn($payment);
         $quote->method('getGrandTotal')->willReturn($grandTotal);
