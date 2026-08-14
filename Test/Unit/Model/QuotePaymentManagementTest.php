@@ -12,6 +12,7 @@ use Avarda\Checkout3\Api\Data\PaymentQueueInterfaceFactory;
 use Avarda\Checkout3\Api\ItemManagementInterface;
 use Avarda\Checkout3\Api\ItemStorageInterface;
 use Avarda\Checkout3\Api\PaymentQueueRepositoryInterface;
+use Avarda\Checkout3\Model\AlternativeApi;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PaymentMethod;
 use Avarda\Checkout3\Helper\PurchaseState;
@@ -62,6 +63,7 @@ class QuotePaymentManagementTest extends TestCase
             $this->createMock(ItemStorageInterface::class),
             $this->paymentDataHelperMock,
             $this->purchaseStateHelperMock,
+            $this->createMock(AlternativeApi::class),
             $this->commandPoolMock,
             $this->paymentDataObjectFactoryMock,
             $this->createMock(CartRepositoryInterface::class),

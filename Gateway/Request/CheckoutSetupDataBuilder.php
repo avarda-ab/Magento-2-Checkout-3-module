@@ -93,7 +93,7 @@ class CheckoutSetupDataBuilder implements BuilderInterface
     {
         $isVirtual = true;
         $countItems = 0;
-        foreach ($order->getItems() as $item) {
+        foreach ($order->getItems() ?? [] as $item) {
             /* @var $item Item */
             if ($item->isDeleted() || $item->getParentItemId()) {
                 continue;

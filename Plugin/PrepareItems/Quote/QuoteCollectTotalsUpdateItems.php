@@ -103,7 +103,10 @@ class QuoteCollectTotalsUpdateItems
                     }
                 }
             } catch (Exception $e) {
-                // Renewing on a transient failure would desync an already mounted checkout form
+                // Renew only on the permission error; on transient failures a renew would desync a mounted form
+                if (str_contains($e->getMessage(), 'lacks permission for the requested Purchase ID')) {
+                    $renew = true;
+                }
             } finally {
                 self::$collectTotalsFlag = false;
                 if ($locked) {

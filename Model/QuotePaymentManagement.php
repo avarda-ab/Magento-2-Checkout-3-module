@@ -54,6 +54,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     protected ItemStorageInterface $itemStorage;
     protected PaymentData $paymentDataHelper;
     protected PurchaseState $purchaseStateHelper;
+    protected AlternativeApi $alternativeApiHelper;
     protected CommandPoolInterface $commandPool;
     protected PaymentDataObjectFactoryInterface $paymentDataObjectFactory;
     protected CartRepositoryInterface $quoteRepository;
@@ -75,6 +76,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         ItemStorageInterface $itemStorage,
         PaymentData $paymentDataHelper,
         PurchaseState $purchaseStateHelper,
+        AlternativeApi $alternativeApiHelper,
         CommandPoolInterface $commandPool,
         PaymentDataObjectFactoryInterface $paymentDataObjectFactory,
         CartRepositoryInterface $quoteRepository,
@@ -94,6 +96,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         $this->itemStorage = $itemStorage;
         $this->paymentDataHelper = $paymentDataHelper;
         $this->purchaseStateHelper = $purchaseStateHelper;
+        $this->alternativeApiHelper = $alternativeApiHelper;
         $this->commandPool = $commandPool;
         $this->paymentDataObjectFactory = $paymentDataObjectFactory;
         $this->quoteRepository = $quoteRepository;
@@ -126,6 +129,14 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
 
             // If purchaseData has 'renew' then something changed so that renew is necessary
             if (isset($purchaseData['renew']) && $purchaseData['renew']) {
+                $renew = true;
+            }
+
+            // A purchase is only accessible with the credential scope it was created under
+            if (!$renew && isset($purchaseData['storeId'], $purchaseData['useAltApi'])
+                && ((int)$purchaseData['storeId'] !== (int)$quote->getStoreId()
+                    || (bool)$purchaseData['useAltApi'] !== $this->alternativeApiHelper->isUsedForQuote($quote))
+            ) {
                 $renew = true;
             }
 
@@ -215,6 +226,13 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
          * @see \Avarda\Checkout3\Gateway\Response\InitializePaymentHandler
          */
         $purchaseData = $this->paymentDataHelper->getPurchaseData($quote->getPayment());
+        // Stamp the credential scope so a later store view or alternative-API switch is detected
+        $purchaseData['storeId'] = (int)$quote->getStoreId();
+        $purchaseData['useAltApi'] = $this->alternativeApiHelper->isUsedForQuote($quote);
+        $quote->getPayment()->setAdditionalInformation(
+            PaymentDetailsInterface::PURCHASE_DATA,
+            $purchaseData
+        );
         // The old purchase's state would read as dead until the next status update
         $quote->getPayment()->setAdditionalInformation(
             PaymentData::STATE,
