@@ -91,16 +91,13 @@ class ReturnItemsDataBuilder implements BuilderInterface
         $orderItem = $item->getOrderItem();
         $taxPercent = $orderItem ? (float)$orderItem->getTaxPercent() : 0.0;
 
-        // Preserve fractional qty; whole numbers stay int for a clean payload.
-        $quantity = fmod($qty, 1.0) === 0.0 ? (int)$qty : $qty;
-
         return $this->line(
             (string)$item->getName(),
             (string)$item->getSku(),
             $amount,
             $taxAmount,
             $taxPercent,
-            $quantity
+            1
         );
     }
 

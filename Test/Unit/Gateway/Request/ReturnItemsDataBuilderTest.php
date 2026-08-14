@@ -6,12 +6,18 @@
 
 namespace Avarda\Checkout3\Test\Unit\Gateway\Request;
 
+use Avarda\Checkout3\Gateway\Data\ItemAdapterInterface;
+use Avarda\Checkout3\Gateway\Data\ItemDataObject;
+use Avarda\Checkout3\Gateway\Request\Item\AmountDataBuilder;
+use Avarda\Checkout3\Gateway\Request\Item\ProductDataBuilder;
+use Avarda\Checkout3\Gateway\Request\Item\TaxDataBuilder;
 use Avarda\Checkout3\Gateway\Request\ReturnItemsDataBuilder;
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\Creditmemo\Item as CreditmemoItem;
 use Magento\Sales\Model\Order\Item as OrderItem;
 use Magento\Sales\Model\Order\Payment;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ReturnItemsDataBuilderTest extends TestCase
@@ -24,8 +30,10 @@ class ReturnItemsDataBuilderTest extends TestCase
         $this->builder = new ReturnItemsDataBuilder();
     }
 
-    public function testWholeQuantityProducesIntQuantityAndExactSum(): void
+    public function testMultiQuantityLineSendsRowTotalWithQuantityOne(): void
     {
+        // Avarda multiplies amount by quantity, so a row-total amount must
+        // always go with quantity 1 or the return is rejected (error 508).
         $item = $this->item(2.0, 'Fusion Backpack', '24-MB02', 94.02, 23.98, 0.0, 0.0, 25.5);
         $items = $this->build($this->creditmemo([$item], 118.00));
 
@@ -35,18 +43,16 @@ class ReturnItemsDataBuilderTest extends TestCase
         $this->assertSame('118.00', $items[0]['amount']);
         $this->assertSame('23.98', $items[0]['taxAmount']);
         $this->assertSame('25.50', $items[0]['taxCode']);
-        $this->assertSame(2, $items[0]['quantity']);
+        $this->assertSame(1, $items[0]['quantity']);
         $this->assertSame('118.00', $this->sum($items));
     }
 
-    public function testDecimalQuantityIsPreserved(): void
+    public function testDecimalQuantityLineAlsoSendsQuantityOne(): void
     {
-        // Regression guard: 2.35 must NOT be rounded to 2.
         $item = $this->item(2.35, 'Decimal Qty Test', 'decimal-qty-test', 80.33, 20.48, 0.0, 0.0, 25.5);
         $items = $this->build($this->creditmemo([$item], 100.81));
 
-        $this->assertSame(2.35, $items[0]['quantity']);
-        $this->assertIsFloat($items[0]['quantity']);
+        $this->assertSame(1, $items[0]['quantity']);
         $this->assertSame('100.81', $items[0]['amount']);
         $this->assertSame('100.81', $this->sum($items));
     }
@@ -107,6 +113,165 @@ class ReturnItemsDataBuilderTest extends TestCase
         $this->assertSame('50.00', $items[0]['amount']);
         $this->assertSame('10.00', $items[0]['taxAmount']);
         $this->assertSame(1, $items[0]['quantity']);
+    }
+
+    /**
+     * Avarda computes each line as amount * quantity, so the payload total in
+     * Avarda's eyes is sum(amount * quantity) — that, not sum(amount), must
+     * equal the credit memo base grand total for every payload shape.
+     *
+     * @param array[] $itemSpecs [qty, rowTotal, tax, discount, discountTaxCompensation]
+     */
+    #[DataProvider('invariantScenarioProvider')]
+    public function testAvardaMultiplicationInvariantHolds(
+        array $itemSpecs,
+        float $grandTotal,
+        float $shippingInclTax = 0.0,
+        float $shippingAmount = 0.0,
+        float $shippingTax = 0.0,
+        float $adjPositive = 0.0,
+        float $adjNegative = 0.0
+    ): void {
+        $items = [];
+        foreach ($itemSpecs as $i => $spec) {
+            $items[] = $this->item($spec[0], 'Item ' . $i, 'SKU-' . $i, $spec[1], $spec[2], $spec[3], $spec[4], 25.5);
+        }
+        $cm = $this->creditmemo(
+            $items,
+            $grandTotal,
+            $shippingInclTax,
+            $shippingAmount,
+            $shippingTax,
+            $adjPositive,
+            $adjNegative
+        );
+
+        $sum = 0.0;
+        foreach ($this->build($cm) as $line) {
+            $sum += (float)$line['amount'] * $line['quantity'];
+        }
+
+        $this->assertSame(sprintf('%.2F', $grandTotal), sprintf('%.2F', $sum));
+    }
+
+    public static function invariantScenarioProvider(): array
+    {
+        return [
+            'whole qty 2' => [[[2.0, 94.02, 23.98, 0.0, 0.0]], 118.00],
+            'decimal qty' => [[[2.35, 80.33, 20.48, 0.0, 0.0]], 100.81],
+            'discounted qty 3' => [[[3.0, 141.03, 28.47, 15.00, 1.50]], 156.00],
+            'zero qty item skipped' => [[[0.0, 47.01, 11.99, 0.0, 0.0], [2.0, 94.02, 23.98, 0.0, 0.0]], 118.00],
+            'with shipping' => [[[1.0, 47.01, 11.99, 0.0, 0.0]], 63.90, 4.90, 3.91, 0.99],
+            'with adjustments' => [[[1.0, 47.01, 11.99, 0.0, 0.0]], 64.00, 0.0, 0.0, 0.0, 10.00, 5.00],
+            'reconciliation delta' => [[[1.0, 47.01, 11.99, 0.0, 0.0]], 55.00],
+            'kitchen sink' => [
+                [[2.0, 94.02, 23.98, 10.00, 1.00], [2.35, 80.33, 20.48, 0.0, 0.0]],
+                210.00, 4.90, 3.91, 0.99, 7.50, 2.50,
+            ],
+        ];
+    }
+
+    /**
+     * The purchase-side item composite (product + amount + tax builders) sends
+     * the full row total with no quantity key at all; return lines must keep
+     * the same convention (row total, quantity 1) or purchase and return
+     * disagree about what "amount" means.
+     */
+    public function testReturnLineUsesSameAmountConventionAsPurchaseLine(): void
+    {
+        $adapter = $this->createMock(ItemAdapterInterface::class);
+        $adapter->method('getName')->willReturn('Fusion Backpack');
+        $adapter->method('getSku')->willReturn('24-MB02');
+        $adapter->method('getTaxPercent')->willReturn(25.5);
+
+        $subject = (new ItemDataObject($adapter, 2.0, 118.00, 23.98))->getSubject();
+        $purchaseLine = array_merge(
+            (new ProductDataBuilder())->build($subject),
+            (new AmountDataBuilder())->build($subject),
+            (new TaxDataBuilder())->build($subject)
+        );
+
+        $item = $this->item(2.0, 'Fusion Backpack', '24-MB02', 94.02, 23.98, 0.0, 0.0, 25.5);
+        $returnLine = $this->build($this->creditmemo([$item], 118.00))[0];
+
+        $this->assertSame('118.00', $purchaseLine['Amount']);
+        $this->assertArrayNotHasKey('Quantity', $purchaseLine);
+        $this->assertArrayNotHasKey('quantity', $purchaseLine);
+        $this->assertSame($purchaseLine['Amount'], $returnLine['amount']);
+        $this->assertSame(1, $returnLine['quantity']);
+    }
+
+    public function testGoldenPayloadSimpleQtyTwoMemo(): void
+    {
+        $item = $this->item(2.0, 'Fusion Backpack', '24-MB02', 94.02, 23.98, 0.0, 0.0, 25.5);
+        $items = $this->build($this->creditmemo([$item], 118.00));
+
+        $expected = <<<'JSON'
+[
+    {
+        "description": "Fusion Backpack",
+        "notes": "24-MB02",
+        "amount": "118.00",
+        "taxCode": "25.50",
+        "taxAmount": "23.98",
+        "quantity": 1
+    }
+]
+JSON;
+        $this->assertSame($expected, json_encode($items, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    }
+
+    public function testGoldenPayloadFullMemoWithReconciliation(): void
+    {
+        $item = $this->item(2.0, 'Fusion Backpack', '24-MB02', 94.02, 23.98, 0.0, 0.0, 25.5);
+        $cm = $this->creditmemo([$item], 125.00, 4.90, 3.91, 0.99, 10.00, 5.00);
+        $items = $this->build($cm);
+
+        $expected = <<<'JSON'
+[
+    {
+        "description": "Fusion Backpack",
+        "notes": "24-MB02",
+        "amount": "118.00",
+        "taxCode": "25.50",
+        "taxAmount": "23.98",
+        "quantity": 1
+    },
+    {
+        "description": "Shipping",
+        "notes": "shipping",
+        "amount": "4.90",
+        "taxCode": "25.32",
+        "taxAmount": "0.99",
+        "quantity": 1
+    },
+    {
+        "description": "Adjustment refund",
+        "notes": "adjustment_refund",
+        "amount": "10.00",
+        "taxCode": "0.00",
+        "taxAmount": "0.00",
+        "quantity": 1
+    },
+    {
+        "description": "Adjustment fee",
+        "notes": "adjustment_fee",
+        "amount": "-5.00",
+        "taxCode": "0.00",
+        "taxAmount": "0.00",
+        "quantity": 1
+    },
+    {
+        "description": "Adjustment",
+        "notes": "adjustment",
+        "amount": "-2.90",
+        "taxCode": "0.00",
+        "taxAmount": "0.00",
+        "quantity": 1
+    }
+]
+JSON;
+        $this->assertSame($expected, json_encode($items, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
 
     private function build(Creditmemo $creditmemo): array
