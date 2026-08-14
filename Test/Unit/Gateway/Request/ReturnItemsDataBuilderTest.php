@@ -121,6 +121,7 @@ class ReturnItemsDataBuilderTest extends TestCase
      * equal the credit memo base grand total for every payload shape.
      *
      * @param array[] $itemSpecs [qty, rowTotal, tax, discount, discountTaxCompensation]
+     * @dataProvider invariantScenarioProvider
      */
     #[DataProvider('invariantScenarioProvider')]
     public function testAvardaMultiplicationInvariantHolds(
