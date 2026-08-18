@@ -104,7 +104,7 @@ class ReturnItemsDataBuilderTest extends TestCase
     public function testFallbackToSingleLineWhenNoItems(): void
     {
         $cm = $this->creditmemo([], 50.00);
-        $cm->method('getBaseTaxAmount')->willReturn(10.00);
+        $cm->method('getTaxAmount')->willReturn(10.00);
         $items = $this->build($cm);
 
         $this->assertCount(1, $items);
@@ -118,7 +118,7 @@ class ReturnItemsDataBuilderTest extends TestCase
     /**
      * Avarda computes each line as amount * quantity, so the payload total in
      * Avarda's eyes is sum(amount * quantity) — that, not sum(amount), must
-     * equal the credit memo base grand total for every payload shape.
+     * equal the credit memo grand total for every payload shape.
      *
      * @param array[] $itemSpecs [qty, rowTotal, tax, discount, discountTaxCompensation]
      * @dataProvider invariantScenarioProvider
@@ -309,17 +309,17 @@ JSON;
         $item = $this->getMockBuilder(CreditmemoItem::class)
             ->disableOriginalConstructor()
             ->onlyMethods([
-                'getQty', 'getName', 'getSku', 'getBaseRowTotal', 'getBaseTaxAmount',
-                'getBaseDiscountAmount', 'getBaseDiscountTaxCompensationAmount', 'getOrderItem',
+                'getQty', 'getName', 'getSku', 'getRowTotal', 'getTaxAmount',
+                'getDiscountAmount', 'getDiscountTaxCompensationAmount', 'getOrderItem',
             ])
             ->getMock();
         $item->method('getQty')->willReturn($qty);
         $item->method('getName')->willReturn($name);
         $item->method('getSku')->willReturn($sku);
-        $item->method('getBaseRowTotal')->willReturn($baseRowTotal);
-        $item->method('getBaseTaxAmount')->willReturn($baseTax);
-        $item->method('getBaseDiscountAmount')->willReturn($baseDiscount);
-        $item->method('getBaseDiscountTaxCompensationAmount')->willReturn($baseDtc);
+        $item->method('getRowTotal')->willReturn($baseRowTotal);
+        $item->method('getTaxAmount')->willReturn($baseTax);
+        $item->method('getDiscountAmount')->willReturn($baseDiscount);
+        $item->method('getDiscountTaxCompensationAmount')->willReturn($baseDtc);
         $item->method('getOrderItem')->willReturn($orderItem);
 
         return $item;
@@ -340,18 +340,18 @@ JSON;
         $cm = $this->getMockBuilder(Creditmemo::class)
             ->disableOriginalConstructor()
             ->onlyMethods([
-                'getAllItems', 'getBaseShippingInclTax', 'getBaseShippingAmount',
-                'getBaseShippingTaxAmount', 'getBaseAdjustmentPositive',
-                'getBaseAdjustmentNegative', 'getBaseGrandTotal', 'getBaseTaxAmount',
+                'getAllItems', 'getShippingInclTax', 'getShippingAmount',
+                'getShippingTaxAmount', 'getAdjustmentPositive',
+                'getAdjustmentNegative', 'getGrandTotal', 'getTaxAmount',
             ])
             ->getMock();
         $cm->method('getAllItems')->willReturn($items);
-        $cm->method('getBaseShippingInclTax')->willReturn($shippingInclTax);
-        $cm->method('getBaseShippingAmount')->willReturn($shippingAmount);
-        $cm->method('getBaseShippingTaxAmount')->willReturn($shippingTax);
-        $cm->method('getBaseAdjustmentPositive')->willReturn($adjPositive);
-        $cm->method('getBaseAdjustmentNegative')->willReturn($adjNegative);
-        $cm->method('getBaseGrandTotal')->willReturn($baseGrandTotal);
+        $cm->method('getShippingInclTax')->willReturn($shippingInclTax);
+        $cm->method('getShippingAmount')->willReturn($shippingAmount);
+        $cm->method('getShippingTaxAmount')->willReturn($shippingTax);
+        $cm->method('getAdjustmentPositive')->willReturn($adjPositive);
+        $cm->method('getAdjustmentNegative')->willReturn($adjNegative);
+        $cm->method('getGrandTotal')->willReturn($baseGrandTotal);
 
         return $cm;
     }
