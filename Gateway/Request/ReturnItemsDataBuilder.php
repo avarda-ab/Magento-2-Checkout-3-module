@@ -53,8 +53,8 @@ class ReturnItemsDataBuilder implements BuilderInterface
                     $this->line(
                         'Return',
                         'Return from Magento',
-                        (float)$creditMemo->getBaseGrandTotal(),
-                        (float)$creditMemo->getBaseTaxAmount(),
+                        (float)$creditMemo->getGrandTotal(),
+                        (float)$creditMemo->getTaxAmount(),
                         0.0,
                         1
                     ),
@@ -81,11 +81,11 @@ class ReturnItemsDataBuilder implements BuilderInterface
             return null;
         }
 
-        $taxAmount = (float)$item->getBaseTaxAmount()
-            + (float)$item->getBaseDiscountTaxCompensationAmount();
+        $taxAmount = (float)$item->getTaxAmount()
+            + (float)$item->getDiscountTaxCompensationAmount();
 
-        $amount = (float)$item->getBaseRowTotal()
-            - (float)$item->getBaseDiscountAmount()
+        $amount = (float)$item->getRowTotal()
+            - (float)$item->getDiscountAmount()
             + $taxAmount;
 
         $orderItem = $item->getOrderItem();
@@ -107,14 +107,14 @@ class ReturnItemsDataBuilder implements BuilderInterface
      */
     protected function buildShippingLine(Creditmemo $creditMemo)
     {
-        $shippingInclTax = (float)$creditMemo->getBaseShippingInclTax();
-        $shippingExclTax = (float)$creditMemo->getBaseShippingAmount();
+        $shippingInclTax = (float)$creditMemo->getShippingInclTax();
+        $shippingExclTax = (float)$creditMemo->getShippingAmount();
 
         if ($shippingInclTax <= 0.0 && $shippingExclTax <= 0.0) {
             return null;
         }
 
-        $taxAmount = (float)$creditMemo->getBaseShippingTaxAmount();
+        $taxAmount = (float)$creditMemo->getShippingTaxAmount();
         $amount = $shippingInclTax > 0.0 ? $shippingInclTax : $shippingExclTax + $taxAmount;
         $taxPercent = $shippingExclTax > 0.0 ? ($taxAmount / $shippingExclTax) * 100 : 0.0;
 
@@ -131,7 +131,7 @@ class ReturnItemsDataBuilder implements BuilderInterface
     {
         $lines = [];
 
-        $adjustmentRefund = (float)$creditMemo->getBaseAdjustmentPositive();
+        $adjustmentRefund = (float)$creditMemo->getAdjustmentPositive();
         if (abs($adjustmentRefund) >= 0.005) {
             $lines[] = $this->line(
                 'Adjustment refund',
@@ -143,7 +143,7 @@ class ReturnItemsDataBuilder implements BuilderInterface
             );
         }
 
-        $adjustmentFee = (float)$creditMemo->getBaseAdjustmentNegative();
+        $adjustmentFee = (float)$creditMemo->getAdjustmentNegative();
         if (abs($adjustmentFee) >= 0.005) {
             $lines[] = $this->line(
                 'Adjustment fee',
@@ -160,7 +160,7 @@ class ReturnItemsDataBuilder implements BuilderInterface
 
     /**
      * Shipping discount and rounding aren't on any line; this keeps the returned
-     * total equal to the credit memo base grand total Magento actually refunds.
+     * total equal to the credit memo grand total Magento actually refunds.
      *
      * @param Creditmemo $creditMemo
      * @param array $lines
@@ -173,7 +173,7 @@ class ReturnItemsDataBuilder implements BuilderInterface
             $sum += (float)$line['amount'];
         }
 
-        $delta = (float)$creditMemo->getBaseGrandTotal() - $sum;
+        $delta = (float)$creditMemo->getGrandTotal() - $sum;
         if (abs($delta) < 0.005) {
             return null;
         }
