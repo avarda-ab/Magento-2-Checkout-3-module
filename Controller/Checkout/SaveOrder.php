@@ -7,9 +7,11 @@
 namespace Avarda\Checkout3\Controller\Checkout;
 
 use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
+use Avarda\Checkout3\Api\OrphanPurchaseResolverInterface;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Controller\AbstractCheckout;
 use Avarda\Checkout3\Cron\CompletePendingPaymentOrdersCron;
+use Avarda\Checkout3\Exception\PurchaseLockedException;
 use Avarda\Checkout3\Gateway\Config\Config;
 use Avarda\Checkout3\Helper\PaymentData;
 use Exception;
@@ -32,6 +34,7 @@ class SaveOrder extends AbstractCheckout
     protected Session $checkoutSession;
     protected OrderFactory $orderFactory;
     protected OrderRepositoryInterface $orderRepository;
+    protected OrphanPurchaseResolverInterface $orphanPurchaseResolver;
 
     public function __construct(
         Context $context,
@@ -43,7 +46,8 @@ class SaveOrder extends AbstractCheckout
         PaymentData $paymentData,
         Session $checkoutSession,
         OrderFactory $orderFactory,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        OrphanPurchaseResolverInterface $orphanPurchaseResolver,
     ) {
         parent::__construct($context, $logger, $config);
         $this->quotePaymentManagement = $quotePaymentManagement;
@@ -53,6 +57,7 @@ class SaveOrder extends AbstractCheckout
         $this->checkoutSession = $checkoutSession;
         $this->orderFactory = $orderFactory;
         $this->orderRepository = $orderRepository;
+        $this->orphanPurchaseResolver = $orphanPurchaseResolver;
     }
 
     /**
@@ -72,13 +77,17 @@ class SaveOrder extends AbstractCheckout
             }
 
             $orderId = $this->avardaOrderRepository->getByPurchaseId($purchaseId);
-            if (!$orderId || !$orderId->getOrderId()) {
+            if ($orderId && $orderId->getOrderId()) {
+                $order = $this->orderRepository->get($orderId->getOrderId());
+            } else {
+                $order = $this->orphanPurchaseResolver->resolveByPurchaseId($purchaseId);
+            }
+            if (!$order) {
                 throw new Exception(
                     __('No order found for purchase ID "%purchase_id"', ['purchase_id' => $purchaseId])
                 );
             }
 
-            $order = $this->orderRepository->get($orderId->getOrderId());
             $this->quotePaymentManagement->updateOrderPaymentStatus($order);
 
             if (!$this->config->getConfigValue(CompletePendingPaymentOrdersCron::XML_PATH_ENABLED)) {
@@ -99,6 +108,9 @@ class SaveOrder extends AbstractCheckout
         } catch (PaymentException $e) {
             $message = $e->getMessage();
             $this->logger->critical($e);
+        } catch (PurchaseLockedException $e) {
+            $this->logger->warning($e->getMessage());
+            $message = __('Your payment is still being processed. Please check your order status in a moment.');
         } catch (Exception $e) {
             // log stacktrace to get why saving fails
             $this->logger->critical($e, $e->getTrace());

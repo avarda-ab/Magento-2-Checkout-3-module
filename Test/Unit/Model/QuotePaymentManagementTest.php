@@ -11,6 +11,7 @@ namespace Avarda\Checkout3\Test\Unit\Model;
 use Avarda\Checkout3\Api\Data\PaymentQueueInterfaceFactory;
 use Avarda\Checkout3\Api\ItemManagementInterface;
 use Avarda\Checkout3\Api\ItemStorageInterface;
+use Avarda\Checkout3\Api\OrphanPurchaseResolverInterface;
 use Avarda\Checkout3\Api\PaymentQueueRepositoryInterface;
 use Avarda\Checkout3\Model\AlternativeApi;
 use Avarda\Checkout3\Helper\PaymentData;
@@ -77,7 +78,8 @@ class QuotePaymentManagementTest extends TestCase
             $this->createMock(OrderFactory::class),
             $this->createMock(AddressFactory::class),
             $this->createMock(ManagerInterface::class),
-            $this->createMock(QuoteLock::class)
+            $this->createMock(QuoteLock::class),
+            $this->createMock(OrphanPurchaseResolverInterface::class),
         );
     }
 

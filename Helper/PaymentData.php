@@ -25,6 +25,12 @@ class PaymentData
     const SYNCED_TOTAL = 'synced_total';
 
     /**
+     * Payment additional information field names for the total and currency Avarda reports for the purchase
+     */
+    const PURCHASE_TOTAL = 'purchase_total';
+    const PURCHASE_CURRENCY = 'purchase_currency';
+
+    /**
      * Get purchase from payment info
      *
      * @param InfoInterface $payment
@@ -43,6 +49,15 @@ class PaymentData
         }
 
         return false;
+    }
+
+    public function getPurchaseId(InfoInterface $payment): ?string
+    {
+        $purchaseData = $this->getPurchaseData($payment);
+
+        return is_array($purchaseData) && !empty($purchaseData['purchaseId'])
+            ? (string)$purchaseData['purchaseId']
+            : null;
     }
 
     /**

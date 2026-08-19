@@ -10,6 +10,7 @@ use Avarda\Checkout3\Api\Data\PaymentDetailsInterface;
 use Avarda\Checkout3\Api\Data\PaymentQueueInterfaceFactory;
 use Avarda\Checkout3\Api\ItemManagementInterface;
 use Avarda\Checkout3\Api\ItemStorageInterface;
+use Avarda\Checkout3\Api\OrphanPurchaseResolverInterface;
 use Avarda\Checkout3\Api\PaymentQueueRepositoryInterface;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Helper\PaymentData;
@@ -70,6 +71,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     protected AddressFactory $addressFactory;
     protected ManagerInterface $messageManager;
     protected QuoteLock $quoteLock;
+    protected OrphanPurchaseResolverInterface $orphanPurchaseResolver;
 
     public function __construct(
         ItemManagementInterface $itemManagement,
@@ -90,7 +92,8 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         OrderFactory $orderFactory,
         AddressFactory $addressFactory,
         ManagerInterface $messageManager,
-        QuoteLock $quoteLock
+        QuoteLock $quoteLock,
+        OrphanPurchaseResolverInterface $orphanPurchaseResolver,
     ) {
         $this->itemManagement = $itemManagement;
         $this->itemStorage = $itemStorage;
@@ -111,6 +114,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         $this->addressFactory = $addressFactory;
         $this->messageManager = $messageManager;
         $this->quoteLock = $quoteLock;
+        $this->orphanPurchaseResolver = $orphanPurchaseResolver;
     }
 
     /**
@@ -205,7 +209,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
      */
     protected function doInitializePurchase(CartInterface $quote)
     {
-        $quote->reserveOrderId();
+        $this->reserveOrderId($quote);
 
         try {
             $this->executeCommand('avarda_initialize_payment', $quote);
@@ -254,6 +258,25 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         $quote->save();
 
         return $purchaseData;
+    }
+
+    /**
+     * A renewal on an already ordered quote keeps the placed order's increment id as the
+     * OrderReference sent to Avarda, instead of reserving a new id that matches no order.
+     *
+     * @param CartInterface|Quote $quote
+     */
+    protected function reserveOrderId(CartInterface $quote): void
+    {
+        if ($quote->getId() && !$quote->getIsActive()) {
+            $order = $this->orphanPurchaseResolver->findPendingOrderForQuote((int)$quote->getId());
+            if ($order !== null) {
+                $quote->setReservedOrderId($order->getIncrementId());
+                return;
+            }
+        }
+
+        $quote->reserveOrderId();
     }
 
     /**

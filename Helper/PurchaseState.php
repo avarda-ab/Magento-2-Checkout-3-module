@@ -66,6 +66,8 @@ class PurchaseState
         'RedirectedToTupas',
         'Completed',
         'TimedOut',
+        'Outdated',
+        'Canceled',
         'HandledByMerchant',
         'AwaitingCreditApproval',
         'Unknown',

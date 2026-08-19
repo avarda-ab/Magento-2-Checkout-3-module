@@ -21,6 +21,8 @@
     <preference for="Avarda\Checkout3\Api\PaymentCompleteInterface" type="Avarda\Checkout3\Model\PaymentComplete" />
     <preference for="Avarda\Checkout3\Api\AvardaOrderRepositoryInterface" type="Avarda\Checkout3\Model\AvardaOrderRepository" />
     <preference for="Avarda\Checkout3\Api\Data\AvardaOrderInterface" type="Avarda\Checkout3\Model\AvardaOrder" />
+    <preference for="Avarda\Checkout3\Api\OrphanPurchaseResolverInterface" type="Avarda\Checkout3\Model\OrphanPurchaseResolver" />
+    <preference for="Avarda\Checkout3\Api\PendingOrderCancellationGuardInterface" type="Avarda\Checkout3\Model\PendingOrderCancellationGuard" />
 
     <preference for="Avarda\Checkout3\Gateway\Data\ItemDataObjectFactoryInterface" type="Avarda\Checkout3\Gateway\Data\ItemDataObjectFactory" />
     <preference for="Avarda\Checkout3\Gateway\Data\ItemDataObjectInterface" type="Avarda\Checkout3\Gateway\Data\ItemDataObject" />
@@ -96,6 +98,7 @@
                 <item name="avarda_get_payment_status" xsi:type="string">AvardaCheckout3GetPaymentStatusCommand</item>
                 <item name="avarda_get_only_status" xsi:type="string">AvardaCheckout3GetOnlyPaymentCommand</item>
                 <item name="avarda_update_order_status" xsi:type="string">AvardaCheckout3UpdateOrderStatusCommand</item>
+                <item name="avarda_get_purchase_status" xsi:type="string">AvardaCheckout3GetPurchaseStatusCommand</item>
                 <item name="avarda_update_items" xsi:type="string">AvardaCheckout3UpdateItemsCommand</item>
                 <item name="avarda_get_jwt_token" xsi:type="string">AvardaCheckout3GetJwtTokenCommand</item>
                 <item name="initialize" xsi:type="string">AvardaCheckout3PendingPaymentCommand</item>
@@ -200,6 +203,23 @@
             <argument name="requestBuilder" xsi:type="object">AvardaCheckout3GetPaymentStatusRequest</argument>
             <argument name="transferFactory" xsi:type="object">AvardaCheckout3GetPaymentStatusTransferFactory</argument>
             <argument name="handler" xsi:type="object">Avarda\Checkout3\Gateway\Response\GetOnlyStatusHandler</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Get payment status and purchase total from avarda without touching order data -->
+    <virtualType name="AvardaCheckout3GetPurchaseStatusCommand" type="AvardaCheckout3Command">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">AvardaCheckout3GetPaymentStatusRequest</argument>
+            <argument name="transferFactory" xsi:type="object">AvardaCheckout3GetPaymentStatusTransferFactory</argument>
+            <argument name="handler" xsi:type="object">AvardaCheckout3GetPurchaseStatusHandler</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="AvardaCheckout3GetPurchaseStatusHandler" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="status" xsi:type="string">Avarda\Checkout3\Gateway\Response\GetOnlyStatusHandler</item>
+                <item name="total" xsi:type="string">Avarda\Checkout3\Gateway\Response\PurchaseTotalHandler</item>
+            </argument>
         </arguments>
     </virtualType>
 
@@ -378,6 +398,12 @@
         </arguments>
     </type>
     <type name="Avarda\Checkout3\Observer\OrderCancelObserver">
+        <arguments>
+            <argument name="commandPool" xsi:type="object">AvardaCheckout3CommandPool</argument>
+            <argument name="paymentDataObjectFactory" xsi:type="object">Magento\Payment\Gateway\Data\PaymentDataObjectFactory</argument>
+        </arguments>
+    </type>
+    <type name="Avarda\Checkout3\Model\OrphanPurchaseResolver">
         <arguments>
             <argument name="commandPool" xsi:type="object">AvardaCheckout3CommandPool</argument>
             <argument name="paymentDataObjectFactory" xsi:type="object">Magento\Payment\Gateway\Data\PaymentDataObjectFactory</argument>
