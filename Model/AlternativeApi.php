@@ -77,15 +77,23 @@ class AlternativeApi
                 return true;
             }
 
-            if (is_array($item->getChildren())) {
-                foreach ($item->getChildren() as $childItem) {
-                    if (in_array($childItem->getProductType(), $productTypes)) {
-                        return true;
-                    }
+            foreach ($this->getChildItems($item) as $childItem) {
+                if (in_array($childItem->getProductType(), $productTypes)) {
+                    return true;
                 }
             }
         }
 
         return false;
+    }
+
+    /**
+     * Quote items expose children as getChildren(), order items as getChildrenItems().
+     */
+    protected function getChildItems($item): array
+    {
+        $children = method_exists($item, 'getChildrenItems') ? $item->getChildrenItems() : $item->getChildren();
+
+        return is_array($children) ? $children : [];
     }
 }
