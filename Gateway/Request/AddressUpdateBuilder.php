@@ -40,7 +40,7 @@ class AddressUpdateBuilder implements BuilderInterface
         return [
             "differentDeliveryAddress" => $this->getDifferentDeliveryAddressValue($order, $quote),
             "deliveryAddress" => $this->hasStalePickupAddress($quote)
-                ? $this->b2cDataBuilder->emptyAddress()
+                ? $this->b2cDataBuilder->emptyAddress($this->b2cDataBuilder->getDefaultCountry($order))
                 : $this->b2cDataBuilder->getShippingAddress($order),
         ];
     }

@@ -20,7 +20,7 @@ class AddressBuilder
             $address1->getStreetLine1() != $address2->getStreetLine1() ||
             $address1->getStreetLine2() != $address2->getStreetLine2() ||
             $address1->getCity() != $address2->getCity() ||
-            $address1->getPostcode() != $address2->getPostcode() ||
+            $this->getPostcode($address1) != $this->getPostcode($address2) ||
             (
                 null !== $address1->getCountryId() &&
                 $address1->getCountryId() != $address2->getCountryId()
@@ -30,5 +30,16 @@ class AddressBuilder
         } else {
             return false;
         }
+    }
+
+    /**
+     * A wildcard postcode is a placeholder for country-only shipping and tax estimation,
+     * not real address data.
+     */
+    public function getPostcode(AddressAdapterInterface $address): string
+    {
+        $postcode = (string)$address->getPostcode();
+
+        return $postcode === '*' ? '' : $postcode;
     }
 }

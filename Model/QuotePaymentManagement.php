@@ -41,6 +41,7 @@ use Magento\Sales\Model\Order\Payment\Transaction;
 use Magento\Sales\Model\OrderFactory;
 use Magento\Sales\Model\ResourceModel\Order\Status\CollectionFactory;
 use Magento\Sales\Model\Spi\OrderResourceInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * QuotePaymentManagement
@@ -72,6 +73,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     protected ManagerInterface $messageManager;
     protected QuoteLock $quoteLock;
     protected OrphanPurchaseResolverInterface $orphanPurchaseResolver;
+    protected LoggerInterface $logger;
 
     public function __construct(
         ItemManagementInterface $itemManagement,
@@ -94,6 +96,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         ManagerInterface $messageManager,
         QuoteLock $quoteLock,
         OrphanPurchaseResolverInterface $orphanPurchaseResolver,
+        LoggerInterface $logger,
     ) {
         $this->itemManagement = $itemManagement;
         $this->itemStorage = $itemStorage;
@@ -115,6 +118,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         $this->messageManager = $messageManager;
         $this->quoteLock = $quoteLock;
         $this->orphanPurchaseResolver = $orphanPurchaseResolver;
+        $this->logger = $logger;
     }
 
     /**
@@ -214,6 +218,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         try {
             $this->executeCommand('avarda_initialize_payment', $quote);
         } catch (Exception $e) {
+            $this->logger->error($e);
             // If address has invalid data init might fail, so we try again without phone, city and postcode
             $emptyAddress = $this->addressFactory->create();
             $emptyAddress->setTelephone('');

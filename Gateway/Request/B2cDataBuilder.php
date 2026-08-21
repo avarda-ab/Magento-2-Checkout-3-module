@@ -67,9 +67,7 @@ class B2cDataBuilder implements BuilderInterface
             && $ext->getPickupLocationCode();
 
         if ($hasStalePickup) {
-            $emptyDeliveryAddress = $this->emptyAddress();
-            $emptyDeliveryAddress[self::COUNTRY] = $this->getDefaultCountry($order);
-            $deliveryAddress = $emptyDeliveryAddress;
+            $deliveryAddress = $this->emptyAddress($this->getDefaultCountry($order));
         } else {
             $deliveryAddress = $this->getShippingAddress($order);
         }
@@ -103,7 +101,7 @@ class B2cDataBuilder implements BuilderInterface
             self::LAST_NAME  => $address->getLastname(),
             self::STREET_1   => $address->getStreetLine1(),
             self::STREET_2   => $address->getStreetLine2(),
-            self::ZIP        => $address->getPostcode(),
+            self::ZIP        => $this->addressBuilder->getPostcode($address),
             self::CITY       => $address->getCity(),
             self::COUNTRY    => $address->getCountryId() ?: $this->getDefaultCountry($order),
         ];
@@ -124,9 +122,7 @@ class B2cDataBuilder implements BuilderInterface
         // If it's a virtual order, it doesn't have a shipping address or
         // If shipping address is same as billing address, return empty address
         if ($address === null || !$this->addressBuilder->isAddressDifferent($order->getBillingAddress(), $address)) {
-            $emptyAddress = $this->emptyAddress();
-            $emptyAddress[self::COUNTRY] = $this->getDefaultCountry($order);
-            return $emptyAddress;
+            return $this->emptyAddress($this->getDefaultCountry($order));
         }
 
         $addressData = [
@@ -134,7 +130,7 @@ class B2cDataBuilder implements BuilderInterface
             self::LAST_NAME  => $address->getLastname(),
             self::STREET_1   => $address->getStreetLine1(),
             self::STREET_2   => $address->getStreetLine2(),
-            self::ZIP        => $address->getPostcode(),
+            self::ZIP        => $this->addressBuilder->getPostcode($address),
             self::CITY       => $address->getCity(),
             self::COUNTRY    => $address->getCountryId() ?: $this->getDefaultCountry($order),
             self::PHONE      => $address->getTelephone(),
@@ -164,7 +160,7 @@ class B2cDataBuilder implements BuilderInterface
      * @param $order OrderAdapterInterface
      * @return string
      */
-    protected function getDefaultCountry($order)
+    public function getDefaultCountry($order)
     {
         return $this->config->getValue(
             'general/country/default',
@@ -201,7 +197,7 @@ class B2cDataBuilder implements BuilderInterface
             // Asterisk is not allowed in any address field, so if there is
             // then user is recognized and the address filled by avarda, and we should send an empty address
             if (str_contains($value ?: '', '*')) {
-                return $this->emptyAddress();
+                return $this->emptyAddress((string)($addressData[self::COUNTRY] ?? ''));
             }
         }
 
@@ -209,9 +205,11 @@ class B2cDataBuilder implements BuilderInterface
     }
 
     /**
+     * Avarda rejects the whole request when the country is empty.
+     *
      * @return string[]
      */
-    public function emptyAddress(): array
+    public function emptyAddress(string $country): array
     {
         return [
             self::FIRST_NAME => '',
@@ -220,7 +218,7 @@ class B2cDataBuilder implements BuilderInterface
             self::STREET_2   => '',
             self::ZIP        => '',
             self::CITY       => '',
-            self::COUNTRY    => '',
+            self::COUNTRY    => $country,
             self::PHONE      => '',
         ];
     }

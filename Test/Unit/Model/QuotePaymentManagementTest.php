@@ -39,6 +39,7 @@ use Magento\Sales\Model\ResourceModel\Order\Status\CollectionFactory;
 use Magento\Sales\Model\Spi\OrderResourceInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class QuotePaymentManagementTest extends TestCase
 {
@@ -80,6 +81,7 @@ class QuotePaymentManagementTest extends TestCase
             $this->createMock(ManagerInterface::class),
             $this->createMock(QuoteLock::class),
             $this->createMock(OrphanPurchaseResolverInterface::class),
+            $this->createMock(LoggerInterface::class),
         );
     }
 
