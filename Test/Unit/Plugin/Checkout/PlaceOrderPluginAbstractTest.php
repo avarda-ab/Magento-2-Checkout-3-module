@@ -15,6 +15,7 @@ use Avarda\Checkout3\Api\PaymentQueueRepositoryInterface;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
+use Avarda\Checkout3\Model\OrderPlacementState;
 use Avarda\Checkout3\Plugin\Checkout\PlaceOrderPluginAbstract;
 use Avarda\Checkout3\Test\Unit\QuoteStub;
 use Magento\Framework\Exception\LocalizedException;
@@ -24,6 +25,7 @@ use Magento\Quote\Model\Quote\AddressFactory;
 use Magento\Quote\Model\Quote\Payment;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class PlaceOrderPluginAbstractTest extends TestCase
 {
@@ -63,7 +65,9 @@ class PlaceOrderPluginAbstractTest extends TestCase
             $this->quotePaymentManagementMock,
             $this->paymentDataHelperMock,
             $this->purchaseStateHelperMock,
-            $this->paymentQueueRepositoryMock
+            $this->paymentQueueRepositoryMock,
+            new OrderPlacementState(),
+            $this->createMock(LoggerInterface::class),
         ) extends PlaceOrderPluginAbstract {
         };
     }
