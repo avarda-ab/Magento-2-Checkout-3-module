@@ -15,6 +15,7 @@ use Exception;
 use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\Quote\Address;
 use Magento\Quote\Model\Quote\Item;
 use Psr\Log\LoggerInterface;
 
@@ -180,6 +181,10 @@ class QuoteCollectTotalsPrepareItems
         }
 
         $shippingAddress = $subject->getShippingAddress();
+        if ($shippingAddress && $shippingAddress->getShippingInclTax() <= 0) {
+            $this->logMissingShippingRate($subject, $shippingAddress);
+        }
+
         if ($shippingAddress && $shippingAddress->getShippingInclTax() > 0) {
             $itemAdapter = $this->arrayDataItemAdapterFactory->create([
                 'data' => [
@@ -196,6 +201,31 @@ class QuoteCollectTotalsPrepareItems
 
             $this->itemStorage->addItem($itemDataObject);
         }
+    }
+
+    /**
+     * A shipping row dropped because its rate stopped resolving is otherwise indistinguishable from
+     * genuinely free delivery, and shows up only as a reduced amount at Avarda.
+     */
+    public function logMissingShippingRate(CartInterface $subject, Address $shippingAddress): void
+    {
+        $shippingMethod = $shippingAddress->getShippingMethod();
+        if (!$shippingMethod) {
+            return;
+        }
+
+        foreach ($shippingAddress->getAllShippingRates() as $rate) {
+            if ($rate->getCode() === $shippingMethod) {
+                return;
+            }
+        }
+
+        $this->logger->warning(sprintf(
+            'Avarda items omit shipping: quote %s has method %s but no matching rate, shipping total is %s',
+            (string)$subject->getId(),
+            (string)$shippingMethod,
+            (string)$shippingAddress->getShippingInclTax()
+        ));
     }
 
     /**

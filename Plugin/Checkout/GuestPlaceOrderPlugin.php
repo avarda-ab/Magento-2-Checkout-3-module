@@ -11,6 +11,7 @@ use Avarda\Checkout3\Api\PaymentQueueRepositoryInterface;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
+use Avarda\Checkout3\Model\OrderPlacementState;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -18,6 +19,7 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\PaymentInterface;
 use Magento\Quote\Model\Quote\AddressFactory;
+use Psr\Log\LoggerInterface;
 use Magento\Quote\Model\QuoteIdMaskFactory;
 use Magento\Sales\Api\OrderRepositoryInterface;
 
@@ -36,7 +38,9 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
         AddressFactory $addressFactory,
         QuotePaymentManagementInterface $quotePaymentManagement,
         PurchaseState $purchaseStateHelper,
-        PaymentQueueRepositoryInterface $paymentQueueRepository
+        PaymentQueueRepositoryInterface $paymentQueueRepository,
+        OrderPlacementState $orderPlacementState,
+        LoggerInterface $logger,
     ) {
         $this->cartRepository = $cartRepository;
         $this->quoteIdMaskFactory = $quoteIdMaskFactory;
@@ -47,7 +51,9 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
             $quotePaymentManagement,
             $paymentDataHelper,
             $purchaseStateHelper,
-            $paymentQueueRepository
+            $paymentQueueRepository,
+            $orderPlacementState,
+            $logger,
         );
     }
 
@@ -75,9 +81,14 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
 
             $this->validatePurchase($quote, $additionalData);
 
+            // Everything below re-collects totals from Avarda's address
+            $this->orderPlacementState->start();
+
             $this->setShippingAddress($quote, $additionalData);
             $billingAddress = $this->setBillingAddress($billingAddress, $additionalData);
             $email = $this->checkEmail($email, $additionalData);
+
+            $this->assertTotalMatchesPurchase($quote);
 
             return [$cartId, $email, $paymentMethod, $billingAddress];
         }
@@ -91,6 +102,8 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
      */
     public function afterSavePaymentInformationAndPlaceOrder($subject, $orderId)
     {
+        $this->orderPlacementState->stop();
+
         $order = $this->orderRepository->get($orderId);
         if ($this->paymentDataHelper->isAvardaPayment($order->getPayment())) {
             $this->saveOrderCreated($orderId, $order);

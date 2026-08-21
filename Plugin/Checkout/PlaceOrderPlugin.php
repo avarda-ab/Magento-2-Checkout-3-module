@@ -11,6 +11,7 @@ use Avarda\Checkout3\Api\PaymentQueueRepositoryInterface;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
+use Avarda\Checkout3\Model\OrderPlacementState;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -18,6 +19,7 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\PaymentInterface;
 use Magento\Quote\Model\Quote\AddressFactory;
+use Psr\Log\LoggerInterface;
 
 class PlaceOrderPlugin extends PlaceOrderPluginAbstract
 {
@@ -30,7 +32,9 @@ class PlaceOrderPlugin extends PlaceOrderPluginAbstract
         AddressFactory $addressFactory,
         QuotePaymentManagementInterface $quotePaymentManagement,
         PurchaseState $purchaseStateHelper,
-        PaymentQueueRepositoryInterface $paymentQueueRepository
+        PaymentQueueRepositoryInterface $paymentQueueRepository,
+        OrderPlacementState $orderPlacementState,
+        LoggerInterface $logger,
     ) {
         $this->cartRepository = $cartRepository;
         parent::__construct(
@@ -39,7 +43,9 @@ class PlaceOrderPlugin extends PlaceOrderPluginAbstract
             $quotePaymentManagement,
             $paymentDataHelper,
             $purchaseStateHelper,
-            $paymentQueueRepository
+            $paymentQueueRepository,
+            $orderPlacementState,
+            $logger,
         );
     }
 
@@ -64,8 +70,13 @@ class PlaceOrderPlugin extends PlaceOrderPluginAbstract
 
             $this->validatePurchase($quote, $additionalData);
 
+            // Everything below re-collects totals from Avarda's address
+            $this->orderPlacementState->start();
+
             $this->setShippingAddress($quote, $additionalData);
             $billingAddress = $this->setBillingAddress($billingAddress, $additionalData);
+
+            $this->assertTotalMatchesPurchase($quote);
 
             return [$cartId, $paymentMethod, $billingAddress];
         }
@@ -81,6 +92,8 @@ class PlaceOrderPlugin extends PlaceOrderPluginAbstract
      */
     public function afterSavePaymentInformationAndPlaceOrder($subject, $orderId, $cartId)
     {
+        $this->orderPlacementState->stop();
+
         $quote = $this->cartRepository->get($cartId);
         if ($this->paymentDataHelper->isAvardaPayment($quote->getPayment())) {
             $this->saveOrderCreated($orderId, $quote);

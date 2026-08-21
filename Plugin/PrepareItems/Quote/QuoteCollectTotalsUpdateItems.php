@@ -10,6 +10,7 @@ use Avarda\Checkout3\Api\Data\PaymentDetailsInterface;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
+use Avarda\Checkout3\Model\OrderPlacementState;
 use Avarda\Checkout3\Model\QuoteLock;
 use Exception;
 use Magento\Framework\App\Request\Http;
@@ -21,6 +22,7 @@ use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Payment\Model\InfoInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote;
+use Psr\Log\LoggerInterface;
 
 class QuoteCollectTotalsUpdateItems
 {
@@ -31,6 +33,8 @@ class QuoteCollectTotalsUpdateItems
     protected ConfigInterface $config;
     protected GetPickupLocationCodeByQuoteAddressId $getPickupLocationCodeByQuoteAddressId;
     protected QuoteLock $quoteLock;
+    protected OrderPlacementState $orderPlacementState;
+    protected LoggerInterface $logger;
 
     static bool $collectTotalsFlag = false;
 
@@ -42,6 +46,8 @@ class QuoteCollectTotalsUpdateItems
         ConfigInterface $config,
         GetPickupLocationCodeByQuoteAddressId $getPickupLocationCodeByQuoteAddressId,
         QuoteLock $quoteLock,
+        OrderPlacementState $orderPlacementState,
+        LoggerInterface $logger,
     ) {
         $this->quotePaymentManagement = $quotePaymentManagement;
         $this->paymentDataHelper = $paymentDataHelper;
@@ -50,6 +56,8 @@ class QuoteCollectTotalsUpdateItems
         $this->config = $config;
         $this->getPickupLocationCodeByQuoteAddressId = $getPickupLocationCodeByQuoteAddressId;
         $this->quoteLock = $quoteLock;
+        $this->orderPlacementState = $orderPlacementState;
+        $this->logger = $logger;
     }
 
     /**
@@ -64,6 +72,11 @@ class QuoteCollectTotalsUpdateItems
     public function afterCollectTotals(CartInterface $subject, CartInterface $result)
     {
         if (!$this->config->isActive()) {
+            return $result;
+        }
+
+        // Order placement re-collects totals from Avarda's address, and the amount is already confirmed
+        if ($this->orderPlacementState->isPlacingOrder()) {
             return $result;
         }
 
@@ -123,7 +136,8 @@ class QuoteCollectTotalsUpdateItems
     }
 
     /**
-     * One retry handles Avarda rejecting a collision with another scope, such as the customer's own form session
+     * One retry handles Avarda rejecting a collision with another scope, such as the customer's own form session.
+     * The converter drops the response status, so the retry cannot be narrowed to that collision yet.
      *
      * @throws WebapiException
      */
@@ -132,6 +146,10 @@ class QuoteCollectTotalsUpdateItems
         try {
             $this->quotePaymentManagement->updateItems($subject);
         } catch (WebapiException $e) {
+            $this->logger->warning(
+                'Avarda updateItems rejected, retrying once: ' . $e->getMessage(),
+                ['quote_id' => $subject->getId()]
+            );
             $this->quotePaymentManagement->updateItems($subject);
         }
     }

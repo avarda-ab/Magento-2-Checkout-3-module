@@ -12,6 +12,7 @@ use Avarda\Checkout3\Api\PaymentQueueRepositoryInterface;
 use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
+use Avarda\Checkout3\Model\OrderPlacementState;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -23,6 +24,7 @@ use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\AddressFactory;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
+use Psr\Log\LoggerInterface;
 
 abstract class PlaceOrderPluginAbstract
 {
@@ -32,6 +34,8 @@ abstract class PlaceOrderPluginAbstract
     protected PaymentData $paymentDataHelper;
     protected PurchaseState $purchaseStateHelper;
     protected PaymentQueueRepositoryInterface $paymentQueueRepository;
+    protected OrderPlacementState $orderPlacementState;
+    protected LoggerInterface $logger;
 
     public function __construct(
         AvardaOrderRepositoryInterface $avardaOrderRepository,
@@ -39,7 +43,9 @@ abstract class PlaceOrderPluginAbstract
         QuotePaymentManagementInterface $quotePaymentManagement,
         PaymentData $paymentDataHelper,
         PurchaseState $purchaseStateHelper,
-        PaymentQueueRepositoryInterface $paymentQueueRepository
+        PaymentQueueRepositoryInterface $paymentQueueRepository,
+        OrderPlacementState $orderPlacementState,
+        LoggerInterface $logger,
     ) {
         $this->avardaOrderRepository = $avardaOrderRepository;
         $this->addressFactory = $addressFactory;
@@ -47,6 +53,8 @@ abstract class PlaceOrderPluginAbstract
         $this->paymentDataHelper = $paymentDataHelper;
         $this->purchaseStateHelper = $purchaseStateHelper;
         $this->paymentQueueRepository = $paymentQueueRepository;
+        $this->orderPlacementState = $orderPlacementState;
+        $this->logger = $logger;
     }
 
     /**
@@ -75,7 +83,9 @@ abstract class PlaceOrderPluginAbstract
             $shippingAddress->setLastname($deliverySource['lastName']);
         }
 
-        if (!$isInStorePickup) {
+        // Rewriting the address re-collects rates, and a pickup rate belongs to the pickup point rather
+        // than to this address, so it stops resolving and the shipping total drops to zero
+        if (!$isInStorePickup && !$this->isSameDeliveryAddress($shippingAddress, $deliverySource)) {
             $shippingAddress->setStreet([$deliverySource['address1'], $deliverySource['address2']]);
             $shippingAddress->setCity($deliverySource['city']);
             $shippingAddress->setPostcode($deliverySource['zip']);
@@ -87,6 +97,62 @@ abstract class PlaceOrderPluginAbstract
         // After order is paid it will be updated by status update
         $shippingAddress->setTelephone('010123123');
         $quote->setShippingAddress($shippingAddress);
+    }
+
+    /**
+     * Avarda charges the amount the customer already confirmed, so a total moved by the address
+     * applied above must not reach an order.
+     *
+     * @param CartInterface|Quote $quote
+     * @throws PaymentException
+     */
+    public function assertTotalMatchesPurchase($quote): void
+    {
+        // Collecting totals can re-sync and overwrite the stored amount
+        $syncedTotal = $this->paymentDataHelper->getSyncedTotal($quote->getPayment());
+
+        $quote->setTotalsCollectedFlag(false);
+        $quote->collectTotals();
+
+        if ($syncedTotal === null || abs($syncedTotal - (float)$quote->getGrandTotal()) < 0.0001) {
+            return;
+        }
+
+        $this->logger->critical(sprintf(
+            'Avarda place order refused: quote %s total %s does not match the amount synced to Avarda %s',
+            (string)$quote->getId(),
+            (string)$quote->getGrandTotal(),
+            (string)$syncedTotal
+        ));
+
+        throw new PaymentException(
+            __('Your order total has changed. Please refresh the page and complete your payment again.')
+        );
+    }
+
+    public function isSameDeliveryAddress(AddressInterface $shippingAddress, array $deliverySource): bool
+    {
+        $street = $shippingAddress->getStreet();
+        $current = [
+            (string)($street[0] ?? ''),
+            (string)($street[1] ?? ''),
+            (string)$shippingAddress->getCity(),
+            (string)$shippingAddress->getPostcode(),
+            (string)$shippingAddress->getCountryId(),
+        ];
+        $incoming = [
+            (string)($deliverySource['address1'] ?? ''),
+            (string)($deliverySource['address2'] ?? ''),
+            (string)($deliverySource['city'] ?? ''),
+            (string)($deliverySource['zip'] ?? ''),
+            (string)($deliverySource['country'] ?? ''),
+        ];
+
+        $normalize = function ($value) {
+            return mb_strtolower(trim(preg_replace('/\s+/u', ' ', $value)));
+        };
+
+        return array_map($normalize, $current) === array_map($normalize, $incoming);
     }
 
     /**
