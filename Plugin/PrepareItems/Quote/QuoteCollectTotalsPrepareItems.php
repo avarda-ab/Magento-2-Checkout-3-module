@@ -204,20 +204,13 @@ class QuoteCollectTotalsPrepareItems
     }
 
     /**
-     * A shipping row dropped because its rate stopped resolving is otherwise indistinguishable from
-     * genuinely free delivery, and shows up only as a reduced amount at Avarda.
+     * A shipping row dropped because its rate stopped resolving looks like free delivery at Avarda.
      */
     public function logMissingShippingRate(CartInterface $subject, Address $shippingAddress): void
     {
         $shippingMethod = $shippingAddress->getShippingMethod();
-        if (!$shippingMethod) {
+        if (!$shippingMethod || $this->paymentDataHelper->hasStoredRate($shippingAddress)) {
             return;
-        }
-
-        foreach ($shippingAddress->getAllShippingRates() as $rate) {
-            if ($rate->getCode() === $shippingMethod) {
-                return;
-            }
         }
 
         $this->logger->warning(sprintf(

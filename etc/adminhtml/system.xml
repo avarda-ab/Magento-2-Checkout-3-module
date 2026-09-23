@@ -239,7 +239,7 @@ buttons.primary.fontSize='15'</pre>]]></comment>
                     <field id="content" translate="label" type="textarea" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Apple Certificate</label>
                         <frontend_model>Avarda\Checkout3\Model\Config\Backend\CspUrlCheck</frontend_model>
-                        <comment><![CDATA[This will then be available on yourdomain.com/.well-known/apple-developer-merchantid-domain-association.txt]]></comment>
+                        <comment><![CDATA[This will then be available on yourdomain.com/.well-known/apple-developer-merchantid-domain-association and yourdomain.com/.well-known/apple-developer-merchantid-domain-association.txt]]></comment>
                         <depends>
                             <field id="*/*/*/active">1</field>
                         </depends>

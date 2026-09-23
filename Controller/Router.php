@@ -16,7 +16,10 @@ class Router implements RouterInterface
     protected const MODULE_NAME = 'avarda3';
     protected const CONTROLLER_NAME = 'certificate';
     protected const ACTION_NAME = 'index';
-    protected const PATH = '/.well-known/apple-developer-merchantid-domain-association.txt';
+    protected const PATHS = [
+        '/.well-known/apple-developer-merchantid-domain-association',
+        '/.well-known/apple-developer-merchantid-domain-association.txt',
+    ];
 
     protected ActionFactory $actionFactory;
     protected ScopeConfigInterface $scopeConfig;
@@ -44,7 +47,7 @@ class Router implements RouterInterface
             return null;
         }
 
-        if ($request->getRequestUri() != self::PATH) {
+        if (!in_array($request->getRequestUri(), self::PATHS, true)) {
             return null;
         }
 

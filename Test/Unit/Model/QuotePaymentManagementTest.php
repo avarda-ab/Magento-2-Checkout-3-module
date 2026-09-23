@@ -155,4 +155,37 @@ class QuotePaymentManagementTest extends TestCase
 
         $this->quotePaymentManagement->updateDeliveryAddress($quote);
     }
+
+    public function testUpdatePurchaseStatusDoesNotRecordSyncedTotal(): void
+    {
+        $this->paymentDataHelperMock->method('isAvardaPayment')->willReturn(true);
+
+        $payment = $this->createMock(Payment::class);
+        $payment->expects($this->never())->method('setAdditionalInformation');
+
+        $quote = $this->createQuote($payment, 23.95);
+
+        $this->paymentDataObjectFactoryMock->method('create')
+            ->with($payment)
+            ->willReturn($this->createMock(PaymentDataObjectInterface::class));
+
+        $command = $this->createMock(CommandInterface::class);
+        $command->expects($this->once())->method('execute');
+        $this->commandPoolMock->method('get')
+            ->with('avarda_get_purchase_status')
+            ->willReturn($command);
+
+        $this->quotePaymentManagement->updatePurchaseStatus($quote);
+    }
+
+    public function testUpdatePurchaseStatusRejectsQuoteWithoutAvardaPayment(): void
+    {
+        $this->paymentDataHelperMock->method('isAvardaPayment')->willReturn(false);
+        $this->commandPoolMock->expects($this->never())->method('get');
+
+        $this->expectException(PaymentException::class);
+        $this->quotePaymentManagement->updatePurchaseStatus(
+            $this->createQuote($this->createMock(Payment::class), 23.95)
+        );
+    }
 }

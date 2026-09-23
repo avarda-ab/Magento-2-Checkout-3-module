@@ -12,6 +12,7 @@ use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
 use Avarda\Checkout3\Model\OrderPlacementState;
+use Exception;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -68,15 +69,18 @@ class PlaceOrderPlugin extends PlaceOrderPluginAbstract
             $additionalData = json_decode($paymentMethod->getAdditionalData()['avarda'] ?? '', true);
             $quote = $this->cartRepository->getActive($cartId);
 
-            $this->validatePurchase($quote, $additionalData);
+            // The after-plugin never runs when placement is refused here, and the state is a shared instance
+            try {
+                $this->validatePurchase($quote, $additionalData);
 
-            // Everything below re-collects totals from Avarda's address
-            $this->orderPlacementState->start();
+                $this->setShippingAddress($quote, $additionalData);
+                $billingAddress = $this->setBillingAddress($billingAddress, $additionalData);
 
-            $this->setShippingAddress($quote, $additionalData);
-            $billingAddress = $this->setBillingAddress($billingAddress, $additionalData);
-
-            $this->assertTotalMatchesPurchase($quote);
+                $this->assertTotalMatchesPurchase($quote);
+            } catch (Exception $e) {
+                $this->orderPlacementState->stop();
+                throw $e;
+            }
 
             return [$cartId, $paymentMethod, $billingAddress];
         }

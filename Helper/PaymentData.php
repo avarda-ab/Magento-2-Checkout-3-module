@@ -10,6 +10,7 @@ use Avarda\Checkout3\Api\Data\PaymentDetailsInterface;
 use Magento\Payment\Model\InfoInterface;
 use Magento\Payment\Model\Method\Free;
 use Magento\Quote\Api\Data\CartInterface;
+use Magento\Quote\Model\Quote\Address;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 
 class PaymentData
@@ -91,15 +92,59 @@ class PaymentData
      */
     public function getSyncedTotal(InfoInterface $payment)
     {
+        return $this->getFloat($payment, self::SYNCED_TOTAL);
+    }
+
+    public function getPurchaseTotal(InfoInterface $payment): ?float
+    {
+        return $this->getFloat($payment, self::PURCHASE_TOTAL);
+    }
+
+    /**
+     * The purchase total is transient probe data that must not stick to a saved payment.
+     */
+    public function forgetPurchaseTotal(InfoInterface $payment): void
+    {
         $additionalInformation = $payment->getAdditionalInformation();
-        if (is_array($additionalInformation) &&
-            array_key_exists(self::SYNCED_TOTAL, $additionalInformation) &&
-            $additionalInformation[self::SYNCED_TOTAL] !== null
-        ) {
-            return (float)$additionalInformation[self::SYNCED_TOTAL];
+        if (!is_array($additionalInformation)) {
+            return;
         }
 
-        return null;
+        unset(
+            $additionalInformation[self::PURCHASE_TOTAL],
+            $additionalInformation[self::PURCHASE_CURRENCY]
+        );
+        $payment->setAdditionalInformation($additionalInformation);
+    }
+
+    /**
+     * Compares the amounts as cents.
+     *
+     * The rounding row makes the purchase equal the grand total in cents, while the grand total
+     * itself can carry sub-cent digits.
+     */
+    public function isSameAmount(float $purchaseTotal, float $grandTotal): bool
+    {
+        return (int)round($purchaseTotal * 100) === (int)round($grandTotal * 100);
+    }
+
+    /**
+     * Whether the selected shipping method still has a stored rate; false when no method is selected.
+     */
+    public function hasStoredRate(Address $address): bool
+    {
+        $shippingMethod = (string)$address->getShippingMethod();
+        if ($shippingMethod === '') {
+            return false;
+        }
+
+        foreach ($address->getAllShippingRates() as $rate) {
+            if ($rate->getCode() === $shippingMethod) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -166,5 +211,18 @@ class PaymentData
             mt_rand(0, 65535),
             mt_rand(0, 65535)
         );
+    }
+
+    protected function getFloat(InfoInterface $payment, string $key): ?float
+    {
+        $additionalInformation = $payment->getAdditionalInformation();
+        if (is_array($additionalInformation) &&
+            array_key_exists($key, $additionalInformation) &&
+            $additionalInformation[$key] !== null
+        ) {
+            return (float)$additionalInformation[$key];
+        }
+
+        return null;
     }
 }
