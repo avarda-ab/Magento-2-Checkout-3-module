@@ -37,7 +37,6 @@ use Psr\Log\LoggerInterface;
 class OrphanPurchaseResolver implements OrphanPurchaseResolverInterface
 {
     const LOCK_TIMEOUT = 3;
-    const AMOUNT_TOLERANCE = 0.01;
 
     protected PaymentQueueRepositoryInterface $paymentQueueRepository;
     protected PaymentQueueCollectionFactory $paymentQueueCollectionFactory;
@@ -219,12 +218,8 @@ class OrphanPurchaseResolver implements OrphanPurchaseResolverInterface
                 return OrphanPurchaseResolverInterface::RESULT_NEWER_PENDING;
             }
 
-            $additionalInformation = $probe->getAdditionalInformation();
-            unset(
-                $additionalInformation[PaymentData::PURCHASE_TOTAL],
-                $additionalInformation[PaymentData::PURCHASE_CURRENCY]
-            );
-            $payment->setAdditionalInformation($additionalInformation);
+            $this->paymentDataHelper->forgetPurchaseTotal($probe);
+            $payment->setAdditionalInformation($probe->getAdditionalInformation());
             $payment->setMethod($probe->getMethod());
             $this->orderPaymentRepository->save($payment);
 
@@ -311,7 +306,7 @@ class OrphanPurchaseResolver implements OrphanPurchaseResolverInterface
         $orderCurrency = $order->getOrderCurrencyCode();
 
         $matches = $total !== null
-            && abs((float)$total - (float)$order->getGrandTotal()) <= self::AMOUNT_TOLERANCE
+            && $this->paymentDataHelper->isSameAmount((float)$total, (float)$order->getGrandTotal())
             && $currency && $orderCurrency
             && strcasecmp((string)$currency, (string)$orderCurrency) === 0;
 

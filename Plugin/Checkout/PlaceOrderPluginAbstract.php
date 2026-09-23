@@ -13,6 +13,7 @@ use Avarda\Checkout3\Api\QuotePaymentManagementInterface;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
 use Avarda\Checkout3\Model\OrderPlacementState;
+use Exception;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -100,8 +101,7 @@ abstract class PlaceOrderPluginAbstract
     }
 
     /**
-     * Avarda charges the amount the customer already confirmed, so a total moved by the address
-     * applied above must not reach an order.
+     * Avarda charges the amount the customer confirmed, so a total moved by the address must not reach an order.
      *
      * @param CartInterface|Quote $quote
      * @throws PaymentException
@@ -229,6 +229,13 @@ abstract class PlaceOrderPluginAbstract
             $this->resyncPurchase($quote, $data['purchaseId'] ?? '');
         }
 
+        // The customer has confirmed the amount Avarda shows, so nothing collected from here on may be
+        // synced there by the totals plugin; the quote is compared against that amount instead
+        $this->orderPlacementState->start();
+
+        $purchaseTotal = $this->fetchPurchaseTotal($quote);
+        $this->restoreMissingShippingRate($quote);
+
         $quote->setTotalsCollectedFlag(false);
         $quote->collectTotals();
 
@@ -246,14 +253,88 @@ abstract class PlaceOrderPluginAbstract
             );
         }
 
+        // A quote that moved since the customer confirmed the amount (for example a shipping row that
+        // stopped resolving) must not be re-synced downwards by the updateItems below
+        if ($purchaseTotal !== null
+            && !$this->paymentDataHelper->isSameAmount($purchaseTotal, (float)$quote->getGrandTotal())
+        ) {
+            $this->logger->critical(sprintf(
+                'Avarda place order refused: quote %s total %s does not match the purchase total at Avarda %s',
+                (string)$quote->getId(),
+                (string)$quote->getGrandTotal(),
+                (string)$purchaseTotal
+            ));
+
+            throw new PaymentException(
+                __('Your order total has changed. Please refresh the page and complete your payment again.')
+            );
+        }
+
         $this->quotePaymentManagement->updateItems($quote);
 
         return true;
     }
 
     /**
-     * Accepts the paid purchase when the payment queue maps it to this quote, because a
-     * concurrent initialization can leave the quote payment holding a different purchase
+     * A failed status call must not break the placement by itself, so the total is null then.
+     *
+     * @param CartInterface|Quote $quote
+     */
+    public function fetchPurchaseTotal($quote): ?float
+    {
+        try {
+            $this->quotePaymentManagement->updatePurchaseStatus($quote);
+        } catch (Exception $e) {
+            $this->logger->error(sprintf(
+                'Avarda place order: purchase status of quote %s could not be fetched: %s',
+                (string)$quote->getId(),
+                $e->getMessage()
+            ));
+
+            return null;
+        }
+
+        $payment = $quote->getPayment();
+        $purchaseTotal = $this->paymentDataHelper->getPurchaseTotal($payment);
+        $this->paymentDataHelper->forgetPurchaseTotal($payment);
+
+        return $purchaseTotal;
+    }
+
+    /**
+     * Without the stored rate the selected method collects to zero shipping.
+     *
+     * In-store pickup is skipped because its rate is provided by InStorePickup independent of the
+     * address and core re-collects it during placement anyway, so the check would only produce a
+     * spurious warning.
+     *
+     * @param CartInterface|Quote $quote
+     */
+    public function restoreMissingShippingRate($quote): void
+    {
+        if ($quote->isVirtual()) {
+            return;
+        }
+
+        $shippingAddress = $quote->getShippingAddress();
+        $shippingMethod = (string)$shippingAddress->getShippingMethod();
+        if ($shippingMethod === ''
+            || $shippingMethod === InStorePickup::DELIVERY_METHOD
+            || $this->paymentDataHelper->hasStoredRate($shippingAddress)
+        ) {
+            return;
+        }
+
+        $this->logger->warning(sprintf(
+            'Avarda place order: quote %s shipping method %s has no stored rate, re-collecting rates',
+            (string)$quote->getId(),
+            $shippingMethod
+        ));
+        $shippingAddress->setCollectShippingRates(true);
+    }
+
+    /**
+     * A concurrent initialization can leave the quote payment holding a different purchase.
      *
      * @param $quote Quote|CartInterface
      * @param $purchaseId string

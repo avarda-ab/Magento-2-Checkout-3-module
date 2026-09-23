@@ -80,6 +80,12 @@ class QuoteCollectTotalsUpdateItems
             return $result;
         }
 
+        // An inactive quote already has its order placed, so the amount at Avarda is final until the
+        // payment completes. Only an explicit flag counts: a quote not saved yet has none.
+        if ($subject->getIsActive() !== null && !$subject->getIsActive()) {
+            return $result;
+        }
+
         $payment = $subject->getPayment();
         if (!self::$collectTotalsFlag &&
             $subject->getItemsCount() > 0 &&
