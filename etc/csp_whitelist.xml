@@ -22,6 +22,7 @@
         <policy id="font-src">
             <values>
                 <value id="avarda-subdomains" type="host">*.avarda.com</value>
+                <value id="avarda-checkout-apple-pay" type="host">applepay.cdn-apple.com</value>
             </values>
         </policy>
         <policy id="img-src">
