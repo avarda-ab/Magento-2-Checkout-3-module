@@ -8,6 +8,9 @@ declare(strict_types=1);
 
 namespace Avarda\Checkout3\Test\Unit\Plugin\Checkout;
 
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Lock\LockManagerInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Avarda\Checkout3\Api\AvardaOrderRepositoryInterface;
 use Avarda\Checkout3\Api\Data\PaymentDetailsInterface;
 use Avarda\Checkout3\Api\Data\PaymentQueueInterface;
@@ -76,6 +79,9 @@ class PlaceOrderPluginAbstractTest extends TestCase
             $this->paymentQueueRepositoryMock,
             $this->orderPlacementState,
             $this->loggerMock,
+            $this->createConfiguredMock(LockManagerInterface::class, ['lock' => true]),
+            $this->createMock(OrderRepositoryInterface::class),
+            $this->createMock(SearchCriteriaBuilder::class),
         ) extends PlaceOrderPluginAbstract {
         };
     }
