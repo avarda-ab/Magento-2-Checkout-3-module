@@ -38,6 +38,7 @@
                 <value id="avarda-subdomains" type="host">*.avarda.com</value>
                 <value id="avarda-checkout-google-pay" type="host">pay.google.com</value>
                 <value id="avarda-checkout-samsung-pay" type="host">spay.samsung.com</value>
+                <value id="avarda-checkout-apple-pay" type="host">applepay.cdn-apple.com</value>
             </values>
         </policy>
     </policies>
