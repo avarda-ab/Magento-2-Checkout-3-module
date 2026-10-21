@@ -9,11 +9,11 @@ declare(strict_types=1);
 namespace Avarda\Checkout3\Test\Unit\Plugin\Checkout;
 
 use Avarda\Checkout3\Plugin\Checkout\ShippingAddressDataPlugin;
+use Avarda\Checkout3\Test\Unit\AddressExtensionStub;
 use Avarda\Checkout3\Test\Unit\AddressStub;
 use Magento\Checkout\Api\Data\ShippingInformationInterface;
 use Magento\Checkout\Model\ShippingInformationManagement;
 use Magento\Quote\Api\CartRepositoryInterface;
-use Magento\Quote\Api\Data\AddressExtension;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Model\Quote;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -115,9 +115,9 @@ class ShippingAddressDataPluginTest extends TestCase
         );
     }
 
-    protected function createExtension(?string $pickupLocationCode): AddressExtension|MockObject
+    protected function createExtension(?string $pickupLocationCode): AddressExtensionStub|MockObject
     {
-        $extension = $this->getMockBuilder(AddressExtension::class)
+        $extension = $this->getMockBuilder(AddressExtensionStub::class)
             ->onlyMethods(['getPickupLocationCode', 'setPickupLocationCode'])
             ->getMock();
         $extension->method('getPickupLocationCode')->willReturn($pickupLocationCode);
@@ -128,7 +128,7 @@ class ShippingAddressDataPluginTest extends TestCase
     protected function createPayloadAddress(
         string $street,
         string $postcode,
-        AddressExtension $extension,
+        AddressExtensionStub $extension,
     ): AddressInterface|MockObject {
         $address = $this->createMock(AddressInterface::class);
         $address->method('getStreet')->willReturn([$street]);
