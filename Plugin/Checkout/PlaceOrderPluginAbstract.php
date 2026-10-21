@@ -14,21 +14,26 @@ use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
 use Avarda\Checkout3\Model\OrderPlacementState;
 use Exception;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\PaymentException;
+use Magento\Framework\Lock\LockManagerInterface;
 use Magento\InventoryInStorePickupShippingApi\Model\Carrier\InStorePickup;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\AddressFactory;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Psr\Log\LoggerInterface;
 
 abstract class PlaceOrderPluginAbstract
 {
+    const PLACEMENT_LOCK_WAIT_SECONDS = 10;
+
     protected AvardaOrderRepositoryInterface $avardaOrderRepository;
     protected AddressFactory $addressFactory;
     protected QuotePaymentManagementInterface $quotePaymentManagement;
@@ -37,6 +42,9 @@ abstract class PlaceOrderPluginAbstract
     protected PaymentQueueRepositoryInterface $paymentQueueRepository;
     protected OrderPlacementState $orderPlacementState;
     protected LoggerInterface $logger;
+    protected LockManagerInterface $lockManager;
+    protected OrderRepositoryInterface $orderRepository;
+    protected SearchCriteriaBuilder $searchCriteriaBuilder;
 
     public function __construct(
         AvardaOrderRepositoryInterface $avardaOrderRepository,
@@ -47,6 +55,9 @@ abstract class PlaceOrderPluginAbstract
         PaymentQueueRepositoryInterface $paymentQueueRepository,
         OrderPlacementState $orderPlacementState,
         LoggerInterface $logger,
+        LockManagerInterface $lockManager,
+        OrderRepositoryInterface $orderRepository,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
     ) {
         $this->avardaOrderRepository = $avardaOrderRepository;
         $this->addressFactory = $addressFactory;
@@ -56,6 +67,67 @@ abstract class PlaceOrderPluginAbstract
         $this->paymentQueueRepository = $paymentQueueRepository;
         $this->orderPlacementState = $orderPlacementState;
         $this->logger = $logger;
+        $this->lockManager = $lockManager;
+        $this->orderRepository = $orderRepository;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+    }
+
+    /**
+     * A placement that failed after saving its order leaves the quote active, so the retry on the same
+     * purchase returns that order instead of creating a second one the same payment would complete.
+     *
+     * @return int|string
+     * @throws PaymentException
+     */
+    protected function placeOrderOnce(CartInterface $quote, callable $place)
+    {
+        $purchaseId = $this->paymentDataHelper->getPurchaseId($quote->getPayment());
+        if ($purchaseId === null) {
+            return $place();
+        }
+
+        if (!$this->lockManager->lock($purchaseId, self::PLACEMENT_LOCK_WAIT_SECONDS)) {
+            $this->orderPlacementState->stop();
+            throw new PaymentException(
+                __('Your payment is still being processed. Please check your order status in a moment.')
+            );
+        }
+
+        try {
+            $placedOrder = $this->findPlacedOrder($quote, $purchaseId);
+            if ($placedOrder === null) {
+                return $place();
+            }
+
+            $this->logger->warning(sprintf(
+                'Avarda placement on quote %s reused order %s already placed for purchase %s',
+                (string)$quote->getId(),
+                $placedOrder->getIncrementId(),
+                $purchaseId
+            ));
+            $this->quotePaymentManagement->setQuoteIsActive($quote->getId(), false);
+
+            return $placedOrder->getEntityId();
+        } finally {
+            $this->lockManager->unlock($purchaseId);
+        }
+    }
+
+    protected function findPlacedOrder(CartInterface $quote, string $purchaseId): ?OrderInterface
+    {
+        $searchCriteria = $this->searchCriteriaBuilder
+            ->addFilter(OrderInterface::QUOTE_ID, (int)$quote->getId())
+            ->create();
+
+        foreach ($this->orderRepository->getList($searchCriteria)->getItems() as $order) {
+            if ($order->getState() !== Order::STATE_CANCELED
+                && $this->paymentDataHelper->getPurchaseId($order->getPayment()) === $purchaseId
+            ) {
+                return $order;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -197,6 +269,10 @@ abstract class PlaceOrderPluginAbstract
     public function saveOrderCreated($orderId, $order)
     {
         $purchaseId = $order->getPayment()->getAdditionalInformation(PaymentDetailsInterface::PURCHASE_DATA)['purchaseId'];
+        // A retry that reused an already placed order may find its mapping in place
+        if ((int)$this->avardaOrderRepository->getByPurchaseId($purchaseId)->getOrderId() === (int)$orderId) {
+            return;
+        }
         $this->avardaOrderRepository->save($purchaseId, $orderId);
     }
 

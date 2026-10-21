@@ -13,9 +13,11 @@ use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
 use Avarda\Checkout3\Model\OrderPlacementState;
 use Exception;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Lock\LockManagerInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\PaymentInterface;
@@ -28,7 +30,6 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
 {
     protected CartRepositoryInterface $cartRepository;
     protected QuoteIdMaskFactory $quoteIdMaskFactory;
-    protected OrderRepositoryInterface $orderRepository;
 
     public function __construct(
         CartRepositoryInterface $cartRepository,
@@ -42,10 +43,11 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
         PaymentQueueRepositoryInterface $paymentQueueRepository,
         OrderPlacementState $orderPlacementState,
         LoggerInterface $logger,
+        LockManagerInterface $lockManager,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
     ) {
         $this->cartRepository = $cartRepository;
         $this->quoteIdMaskFactory = $quoteIdMaskFactory;
-        $this->orderRepository = $orderRepository;
         parent::__construct(
             $avardaOrderRepository,
             $addressFactory,
@@ -55,6 +57,9 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
             $paymentQueueRepository,
             $orderPlacementState,
             $logger,
+            $lockManager,
+            $orderRepository,
+            $searchCriteriaBuilder,
         );
     }
 
@@ -96,6 +101,30 @@ class GuestPlaceOrderPlugin extends PlaceOrderPluginAbstract
 
             return [$cartId, $email, $paymentMethod, $billingAddress];
         }
+    }
+
+    /**
+     * @return int|string
+     * @throws LocalizedException
+     */
+    public function aroundSavePaymentInformationAndPlaceOrder(
+        $subject,
+        callable $proceed,
+        $cartId,
+        $email,
+        PaymentInterface $paymentMethod,
+        ?AddressInterface $billingAddress = null,
+    ) {
+        $place = function () use ($proceed, $cartId, $email, $paymentMethod, $billingAddress) {
+            return $proceed($cartId, $email, $paymentMethod, $billingAddress);
+        };
+        if (!isset($paymentMethod->getAdditionalData()['avarda'])) {
+            return $place();
+        }
+
+        $quoteIdMask = $this->quoteIdMaskFactory->create()->load($cartId, 'masked_id');
+
+        return $this->placeOrderOnce($this->cartRepository->get($quoteIdMask->getQuoteId()), $place);
     }
 
     /**

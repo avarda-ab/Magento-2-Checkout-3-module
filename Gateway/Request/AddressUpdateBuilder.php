@@ -37,10 +37,14 @@ class AddressUpdateBuilder implements BuilderInterface
         $order = $paymentDO->getOrder();
         $quote = $paymentDO->getPayment()->getQuote();
 
+        $differentDeliveryAddress = $this->getDifferentDeliveryAddressValue($order, $quote);
+
+        // The pickup flag is already cleared when this runs, and Avarda keeps the previous delivery address
+        // when it receives a blank one, so an unchecked delivery address is overwritten with the billing address.
         return [
-            "differentDeliveryAddress" => $this->getDifferentDeliveryAddressValue($order, $quote),
-            "deliveryAddress" => $this->hasStalePickupAddress($quote)
-                ? $this->b2cDataBuilder->emptyAddress($this->b2cDataBuilder->getDefaultCountry($order))
+            "differentDeliveryAddress" => $differentDeliveryAddress,
+            "deliveryAddress" => $differentDeliveryAddress === AvardaCheckBoxTypeValues::VALUE_UNCHECKED
+                ? $this->b2cDataBuilder->getStalePickupReplacementAddress($order)
                 : $this->b2cDataBuilder->getShippingAddress($order),
         ];
     }
@@ -56,7 +60,9 @@ class AddressUpdateBuilder implements BuilderInterface
         if ($this->hasStalePickupAddress($quote)) {
             return AvardaCheckBoxTypeValues::VALUE_UNCHECKED;
         }
-        if ($this->addressBuilder->isAddressDifferent($order->getBillingAddress(), $order->getShippingAddress())) {
+        if ($order->getShippingAddress()?->getStreetLine1()
+            && $this->addressBuilder->isAddressDifferent($order->getBillingAddress(), $order->getShippingAddress())
+        ) {
             return AvardaCheckBoxTypeValues::VALUE_CHECKED;
         }
         return AvardaCheckBoxTypeValues::VALUE_UNCHECKED;

@@ -67,7 +67,7 @@ class B2cDataBuilder implements BuilderInterface
             && $ext->getPickupLocationCode();
 
         if ($hasStalePickup) {
-            $deliveryAddress = $this->emptyAddress($this->getDefaultCountry($order));
+            $deliveryAddress = $this->getStalePickupReplacementAddress($order);
         } else {
             $deliveryAddress = $this->getShippingAddress($order);
         }
@@ -121,7 +121,10 @@ class B2cDataBuilder implements BuilderInterface
         $address = $order->getShippingAddress();
         // If it's a virtual order, it doesn't have a shipping address or
         // If shipping address is same as billing address, return empty address
-        if ($address === null || !$this->addressBuilder->isAddressDifferent($order->getBillingAddress(), $address)) {
+        if ($address === null
+            || !$address->getStreetLine1()
+            || !$this->addressBuilder->isAddressDifferent($order->getBillingAddress(), $address)
+        ) {
             return $this->emptyAddress($this->getDefaultCountry($order));
         }
 
@@ -137,6 +140,29 @@ class B2cDataBuilder implements BuilderInterface
         ];
 
         return $this->checkAddressData($addressData);
+    }
+
+    /**
+     * Avarda ignores a blank delivery address and keeps the previous one, so a leftover pickup store
+     * address has to be overwritten with the billing address instead.
+     */
+    public function getStalePickupReplacementAddress(OrderAdapterInterface $order): array
+    {
+        $billing = $order->getBillingAddress();
+        if ($billing === null || !$billing->getStreetLine1()) {
+            return $this->emptyAddress($this->getDefaultCountry($order));
+        }
+
+        return $this->checkAddressData([
+            self::FIRST_NAME => $billing->getFirstname(),
+            self::LAST_NAME  => $billing->getLastname(),
+            self::STREET_1   => $billing->getStreetLine1(),
+            self::STREET_2   => $billing->getStreetLine2(),
+            self::ZIP        => $this->addressBuilder->getPostcode($billing),
+            self::CITY       => $billing->getCity(),
+            self::COUNTRY    => $billing->getCountryId() ?: $this->getDefaultCountry($order),
+            self::PHONE      => '',
+        ]);
     }
 
     protected function getCustomerToken()

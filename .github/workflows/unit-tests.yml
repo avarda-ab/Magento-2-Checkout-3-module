@@ -39,6 +39,8 @@ jobs:
           MAGENTO_VERSION: '2.4.7-p10'
           MODULE_NAME: Avarda_Checkout3
           COMPOSER_NAME: avarda/checkout3
+          # Magento 2.4.7 requires league/flysystem ^2.4, which Composer blocks for a security advisory
+          COMPOSER_NO_BLOCKING: '1'
 
   unit-php83:
     name: Unit tests (PHP 8.3, Magento 2.4.8-p5)

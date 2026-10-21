@@ -13,13 +13,16 @@ use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PurchaseState;
 use Avarda\Checkout3\Model\OrderPlacementState;
 use Exception;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Lock\LockManagerInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\PaymentInterface;
 use Magento\Quote\Model\Quote\AddressFactory;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
 class PlaceOrderPlugin extends PlaceOrderPluginAbstract
@@ -36,6 +39,9 @@ class PlaceOrderPlugin extends PlaceOrderPluginAbstract
         PaymentQueueRepositoryInterface $paymentQueueRepository,
         OrderPlacementState $orderPlacementState,
         LoggerInterface $logger,
+        LockManagerInterface $lockManager,
+        OrderRepositoryInterface $orderRepository,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
     ) {
         $this->cartRepository = $cartRepository;
         parent::__construct(
@@ -47,6 +53,9 @@ class PlaceOrderPlugin extends PlaceOrderPluginAbstract
             $paymentQueueRepository,
             $orderPlacementState,
             $logger,
+            $lockManager,
+            $orderRepository,
+            $searchCriteriaBuilder,
         );
     }
 
@@ -84,6 +93,27 @@ class PlaceOrderPlugin extends PlaceOrderPluginAbstract
 
             return [$cartId, $paymentMethod, $billingAddress];
         }
+    }
+
+    /**
+     * @return int|string
+     * @throws LocalizedException
+     */
+    public function aroundSavePaymentInformationAndPlaceOrder(
+        $subject,
+        callable $proceed,
+        $cartId,
+        PaymentInterface $paymentMethod,
+        ?AddressInterface $billingAddress = null,
+    ) {
+        $place = function () use ($proceed, $cartId, $paymentMethod, $billingAddress) {
+            return $proceed($cartId, $paymentMethod, $billingAddress);
+        };
+        if (!isset($paymentMethod->getAdditionalData()['avarda'])) {
+            return $place();
+        }
+
+        return $this->placeOrderOnce($this->cartRepository->get($cartId), $place);
     }
 
     /**

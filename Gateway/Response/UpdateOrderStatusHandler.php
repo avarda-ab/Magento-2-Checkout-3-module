@@ -9,6 +9,7 @@ namespace Avarda\Checkout3\Gateway\Response;
 use Avarda\Checkout3\Helper\AvardaCheckBoxTypeValues;
 use Avarda\Checkout3\Helper\PaymentData;
 use Avarda\Checkout3\Helper\PaymentMethod;
+use Avarda\Checkout3\Helper\PurchaseState;
 use Magento\Newsletter\Model\SubscriberFactory;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
@@ -21,15 +22,18 @@ class UpdateOrderStatusHandler implements HandlerInterface
     protected OrderRepositoryInterface $orderRepository;
     protected PaymentMethod $methodHelper;
     protected SubscriberFactory $subscriberFactory;
+    protected PurchaseState $purchaseStateHelper;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         PaymentMethod $paymentMethod,
-        SubscriberFactory $subscriberFactory
+        SubscriberFactory $subscriberFactory,
+        PurchaseState $purchaseStateHelper,
     ) {
         $this->orderRepository = $orderRepository;
         $this->methodHelper = $paymentMethod;
         $this->subscriberFactory = $subscriberFactory;
+        $this->purchaseStateHelper = $purchaseStateHelper;
     }
 
     /**
@@ -44,6 +48,15 @@ class UpdateOrderStatusHandler implements HandlerInterface
         /** @var Order|OrderInterface $order */
         $order = $this->orderRepository->get($entityId);
         $mode = $response['mode'] == 'B2B' ? 'b2B' : 'b2C';
+        $state = $response[$mode]['step']['current'];
+
+        // A purchase abandoned before completion (for example TimedOut) has empty customer inputs, and
+        // writing them would blank the order addresses and fail the save with an invalid email
+        if (!$this->purchaseStateHelper->isComplete($state) && !$this->purchaseStateHelper->isWaiting($state)) {
+            $order->getPayment()->setAdditionalInformation(PaymentData::STATE, $state);
+            $this->orderRepository->save($order);
+            return;
+        }
 
         // Initially phone number is set as dummy so update it to correct one
         $telephone = $response[$mode]['userInputs']['phone'];
