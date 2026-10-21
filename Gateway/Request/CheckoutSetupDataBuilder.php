@@ -115,7 +115,9 @@ class CheckoutSetupDataBuilder implements BuilderInterface
             return AvardaCheckBoxTypeValues::VALUE_HIDDEN;
         } elseif ($this->hasStalePickupAddress($quote)) {
             return AvardaCheckBoxTypeValues::VALUE_UNCHECKED;
-        } elseif ($this->addressBuilder->isAddressDifferent($order->getBillingAddress(), $order->getShippingAddress())) {
+        } elseif ($order->getShippingAddress()?->getStreetLine1()
+            && $this->addressBuilder->isAddressDifferent($order->getBillingAddress(), $order->getShippingAddress())
+        ) {
             return AvardaCheckBoxTypeValues::VALUE_CHECKED;
         } else {
             return AvardaCheckBoxTypeValues::VALUE_UNCHECKED;
