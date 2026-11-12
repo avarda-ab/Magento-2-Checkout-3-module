@@ -42,6 +42,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const KEY_ALTERNATIVE_CLIENT_ID = 'payment/avarda_checkout3_checkout/alternative_client_id';
     const KEY_ALTERNATIVE_CLIENT_SECRET = 'payment/avarda_checkout3_checkout/alternative_client_secret';
     const KEY_ALTERNATIVE_PRODUCT_TYPES = 'payment/avarda_checkout3_checkout/alternative_product_types';
+    const KEY_ALTERNATIVE_MINIMUM_TOTAL = 'payment/avarda_checkout3_checkout/alternative_minimum_total';
 
     const URL_TEST = 'https://stage.checkout-api.avarda.com/';
     const URL_PRODUCTION = 'https://checkout-api.avarda.com/';
@@ -166,6 +167,13 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function getAlternativeProductTypes()
     {
         return $this->getConfigValue(self::KEY_ALTERNATIVE_PRODUCT_TYPES);
+    }
+
+    public function getAlternativeMinimumTotal(): ?float
+    {
+        $value = $this->getConfigValue(self::KEY_ALTERNATIVE_MINIMUM_TOTAL);
+
+        return is_numeric($value) ? (float)$value : null;
     }
 
     public function getAlternativeClientId()

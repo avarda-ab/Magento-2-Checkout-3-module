@@ -54,9 +54,10 @@ Next,Next
 "Client ID","Client ID"
 "Client Secret","Client Secret"
 "Alternative Api Configuration","Alternative Api Configuration"
-"Alternative api credentials for selected product types. If a selected product type is in the customer's cart then checkout will use the alternative api credentials","Alternative api credentials for selected product types. If a selected product type is in the customer's cart then checkout will use the alternative api credentials"
+"Alternative api credentials for selected product types and/or carts above a minimum total. If both are set, both must match","Alternative api credentials for selected product types and/or carts above a minimum total. If both are set, both must match"
 "Product Type","Product Type"
 "If a selected product type is in the customer's cart then checkout will use the alternative api credentials","If a selected product type is in the customer's cart then checkout will use the alternative api credentials"
+"Minimum Order Total","Minimum Order Total"
 "Redirect Onepage to Avarda Checkout","Redirect Onepage to Avarda Checkout"
 Title,Title
 Instructions,Instructions

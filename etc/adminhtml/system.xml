@@ -42,7 +42,7 @@
                     </field>
                     <group id="alternative" translate="label comment" sortOrder="35" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Alternative Api Configuration</label>
-                        <comment>Alternative api credentials for selected product types. If a selected product type is in the customer's cart then checkout will use the alternative api credentials</comment>
+                        <comment>Alternative api credentials for selected product types and/or carts above a minimum total. If both are set, both must match</comment>
                         <field id="client_id" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                             <label>Client ID</label>
                             <config_path>payment/avarda_checkout3_checkout/alternative_client_id</config_path>
@@ -57,6 +57,11 @@
                             <source_model>Magento\Catalog\Model\Product\Type</source_model>
                             <config_path>payment/avarda_checkout3_checkout/alternative_product_types</config_path>
                             <comment>If a selected product type is in the customer's cart then checkout will use the alternative api credentials</comment>
+                        </field>
+                        <field id="minimum_total" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Minimum Order Total</label>
+                            <validate>validate-number validate-zero-or-greater</validate>
+                            <config_path>payment/avarda_checkout3_checkout/alternative_minimum_total</config_path>
                         </field>
                     </group>
                     <field id="onepage_redirect_active" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
