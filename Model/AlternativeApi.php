@@ -30,8 +30,7 @@ class AlternativeApi
 
     public function isUsedForOrder(OrderAdapterInterface $order): bool
     {
-        $productTypes = $this->getProductTypes();
-        if (!$productTypes) {
+        if (!$this->isConfigured()) {
             return false;
         }
 
@@ -45,7 +44,7 @@ class AlternativeApi
             $items = $quote->getItemsCollection()->getItems();
         }
 
-        return $this->hasMatchingItem($items ?: [], $productTypes);
+        return $this->isUsedForItems($items ?: []);
     }
 
     /**
@@ -53,12 +52,43 @@ class AlternativeApi
      */
     public function isUsedForQuote(CartInterface $quote): bool
     {
-        $productTypes = $this->getProductTypes();
-        if (!$productTypes) {
+        if (!$this->isConfigured()) {
             return false;
         }
 
-        return $this->hasMatchingItem($quote->getItemsCollection()->getItems(), $productTypes);
+        return $this->isUsedForItems($quote->getItemsCollection()->getItems());
+    }
+
+    protected function isConfigured(): bool
+    {
+        return $this->getProductTypes() || $this->config->getAlternativeMinimumTotal() !== null;
+    }
+
+    protected function isUsedForItems(array $items): bool
+    {
+        $productTypes = $this->getProductTypes();
+        if ($productTypes && !$this->hasMatchingItem($items, $productTypes)) {
+            return false;
+        }
+
+        $minimumTotal = $this->config->getAlternativeMinimumTotal();
+
+        return $minimumTotal === null || $this->getItemsTotal($items) > $minimumTotal;
+    }
+
+    // Excludes shipping so changing the shipping method won't switch credentials
+    protected function getItemsTotal(array $items): float
+    {
+        $total = 0.0;
+        foreach ($items as $item) {
+            if ($item->isDeleted() || $item->getParentItem() || $item->getParentItemId()) {
+                continue;
+            }
+
+            $total += (float)$item->getBaseRowTotalInclTax() - (float)$item->getBaseDiscountAmount();
+        }
+
+        return $total;
     }
 
     protected function getProductTypes(): array
