@@ -47,6 +47,17 @@ class AlternativeApi
         return $this->isUsedForItems($items ?: []);
     }
 
+    // Orders with no recorded credentials are older than the minimum total rule, so only product types chose theirs
+    public function isUsedForUnstampedOrder(OrderAdapterInterface $order): bool
+    {
+        $productTypes = $this->getProductTypes();
+        if (!$productTypes) {
+            return false;
+        }
+
+        return $this->hasMatchingItem($order->getItems() ?: [], $productTypes);
+    }
+
     /**
      * @param CartInterface|Quote $quote
      */
