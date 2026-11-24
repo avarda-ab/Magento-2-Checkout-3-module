@@ -42,15 +42,15 @@ use Magento\Sales\Model\OrderFactory;
 use Magento\Sales\Model\ResourceModel\Order\Status\CollectionFactory;
 use Magento\Sales\Model\Spi\OrderResourceInterface;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 /**
- * QuotePaymentManagement
  * @see QuotePaymentManagementInterface
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class QuotePaymentManagement implements QuotePaymentManagementInterface
 {
-    const ERROR_QUOTE_MISSING_PURCHASE = 'Cart ID %cart_id does not have an active Avarda payment.';
+    public const ERROR_QUOTE_MISSING_PURCHASE = 'Cart ID %cart_id does not have an active Avarda payment.';
 
     protected ItemManagementInterface $itemManagement;
     protected ItemStorageInterface $itemStorage;
@@ -135,7 +135,6 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
                 $quote->getPayment()
             );
 
-            // If purchaseData has 'renew' then something changed so that renew is necessary
             if (isset($purchaseData['renew']) && $purchaseData['renew']) {
                 $renew = true;
             }
@@ -148,15 +147,10 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
                 $renew = true;
             }
 
-            // If no purchaseData, it means order is not initialized yet and initialization should be done
-            // Also if renew already requested the state update is unnecessary
             if (!$renew && $purchaseData && count($purchaseData) > 0) {
                 $this->updateOnlyPaymentStatus($quote);
                 $paymentState = $this->paymentDataHelper->getState($quote->getPayment());
-                if (
-                    $this->purchaseStateHelper->isComplete($paymentState) ||
-                    $this->purchaseStateHelper->isDead($paymentState)
-                ) {
+                if ($this->isRenewRequired($quote, $purchaseData, $paymentState)) {
                     $renew = true;
                 }
             }
@@ -164,7 +158,6 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
             if (!$purchaseData || $renew) {
                 // We have to manually collect totals to populate the item storage
                 $quote->collectTotals();
-                // Initialize order
                 $purchaseData = $this->doInitializePurchase($quote);
             }
 
@@ -179,8 +172,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     /**
      * {@inheritdoc}
      *
-     * @param CartInterface $quote
-     * @return bool|string
+     * @return array
      * @throws LocalizedException
      */
     public function initializePurchase(CartInterface $quote)
@@ -207,27 +199,30 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     }
 
     /**
+     * Other modules plug in here to renew a purchase that changes made in Magento have made outdated.
+     */
+    public function isRenewRequired(CartInterface $quote, array $purchaseData, string $paymentState): bool
+    {
+        return $this->purchaseStateHelper->isComplete($paymentState)
+            || $this->purchaseStateHelper->isDead($paymentState);
+    }
+
+    /**
      * @param CartInterface|Quote $quote
-     * @return bool|string
+     * @return array
      * @throws LocalizedException
      */
     protected function doInitializePurchase(CartInterface $quote)
     {
+        $addressesCleared = false;
         $this->reserveOrderId($quote);
 
         try {
             $this->executeCommand('avarda_initialize_payment', $quote);
         } catch (Exception $e) {
             $this->logger->error($e);
-            // If address has invalid data init might fail, so we try again without phone, city and postcode
-            $emptyAddress = $this->addressFactory->create();
-            $emptyAddress->setTelephone('');
-            $emptyAddress->setCity('');
-            $emptyAddress->setPostcode('');
-            $quote->setBillingAddress($emptyAddress);
-            $quote->setShippingAddress($emptyAddress);
-            $this->executeCommand('avarda_initialize_payment', $quote);
-            $this->messageManager->addWarningMessage(__('Address data was invalid, so it was cleared. Please check your saved address.'));
+            $this->initializeWithClearedAddress($quote, $e);
+            $addressesCleared = true;
         }
 
         /**
@@ -248,7 +243,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
             PurchaseState::INITIALIZED
         );
 
-        // The queue row must exist before the quote save so the save guard sees this purchase as newest
+        // The queue row must exist before the payment save so the save guard sees this purchase as newest
         $paymentQueue = $this->paymentQueueFactory->create();
         $paymentQueue->setPurchaseId($purchaseData['purchaseId']);
         $paymentQueue->setJwt($purchaseData['jwt']);
@@ -257,12 +252,62 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         try {
             $this->paymentQueueRepository->save($paymentQueue);
         } catch (AlreadyExistsException $e) {
-            // Simple fix to not fail on already exists error
+            // A concurrent initialization may already have queued the same purchase
         }
 
-        $quote->save();
+        if ($addressesCleared) {
+            $quote->save();
+        } else {
+            $this->savePurchase($quote);
+        }
 
         return $purchaseData;
+    }
+
+    /**
+     * Invalid address data can make the initialization fail, so it is retried without the phone, city and
+     * postcode. Other modules plug in here when their checkout must keep the address the customer entered,
+     * and the failure is passed so they can tell an address Avarda rejected from an outage.
+     *
+     * @param CartInterface|Quote $quote
+     * @throws NotFoundException
+     * @throws CommandException
+     */
+    public function initializeWithClearedAddress(CartInterface $quote, ?Throwable $previous = null): void
+    {
+        $emptyAddress = $this->addressFactory->create();
+        $emptyAddress->setTelephone('');
+        $emptyAddress->setCity('');
+        $emptyAddress->setPostcode('');
+        $quote->setBillingAddress($emptyAddress);
+        $quote->setShippingAddress($emptyAddress);
+        $this->executeCommand('avarda_initialize_payment', $quote);
+        $this->messageManager->addWarningMessage(
+            __('Address data was invalid, so it was cleared. Please check your saved address.')
+        );
+    }
+
+    /**
+     * Saving the whole quote would overwrite an address that a concurrent shipping save stored meanwhile.
+     *
+     * @param CartInterface|Quote $quote
+     * @throws Exception
+     */
+    public function savePurchase(CartInterface $quote): void
+    {
+        $quote->getPayment()->save();
+
+        if (!$quote->dataHasChangedFor('reserved_order_id')) {
+            return;
+        }
+
+        // Saving a reloaded quote for this one column would re-save its items and dispatch its save events
+        $resource = $quote->getResource();
+        $resource->getConnection()->update(
+            $resource->getMainTable(),
+            ['reserved_order_id' => $quote->getReservedOrderId()],
+            [$resource->getIdFieldName() . ' = ?' => (int)$quote->getId()]
+        );
     }
 
     /**
@@ -393,7 +438,7 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     }
 
     /**
-     * @param $order OrderInterface|Order
+     * @param OrderInterface|Order $order
      * @return void
      * @throws PaymentException
      * @throws LocalizedException
@@ -417,7 +462,6 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
             );
         }
 
-        // Clean payment queue
         $purchaseData = $this->paymentDataHelper->getPurchaseData(
             $order->getPayment()
         );
@@ -427,7 +471,6 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
             $this->paymentQueueRepository->save($paymentQueue);
         }
 
-        // Change order status
         /** @var AbstractMethod $method */
         $method = $order->getPayment()->getMethodInstance();
         $newStatus = $method->getConfigData('order_status');
@@ -467,9 +510,12 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
         }
 
         $payment = $this->getQuote($paymentQueue->getQuoteId())->getPayment();
-        if (!$this->paymentDataHelper->getPurchaseData($payment) || $this->paymentDataHelper->getPurchaseData($payment)['purchaseId'] !== $purchaseId) {
+        if (!$this->paymentDataHelper->getPurchaseData($payment)
+            || $this->paymentDataHelper->getPurchaseData($payment)['purchaseId'] !== $purchaseId
+        ) {
             // sometimes initialization is done multiple times and sometimes wrong one is left for quote payment
-            // when customer is going to pay and so the validation fails. This is mostly fixed, but just to make sure this is left here
+            // when customer is going to pay and so the validation fails. This is mostly fixed,
+            // but just to make sure this is left here
             $purchaseData = $payment->getAdditionalInformation(PaymentDetailsInterface::PURCHASE_DATA);
             $purchaseData['purchaseId'] = $purchaseId;
             $payment->setAdditionalInformation(PaymentDetailsInterface::PURCHASE_DATA, $purchaseData);
@@ -480,8 +526,6 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     }
 
     /**
-     * Execute command for request to Avarda API based on quote.
-     *
      * @param string $commandCode
      * @param CartInterface|Quote|OrderInterface $quote
      * @return void
@@ -512,8 +556,6 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     }
 
     /**
-     * Get quote by cart/quote ID
-     *
      * @param int $cartId
      * @return CartInterface|Quote
      * @throws NoSuchEntityException
@@ -521,7 +563,6 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     public function getQuote($cartId)
     {
         if (!isset($this->quote) || $this->quote->getId() !== $cartId) {
-            /** @var CartInterface|Quote $quote */
             $this->quote = $this->quoteRepository->get($cartId);
         }
 
@@ -529,8 +570,6 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     }
 
     /**
-     * Check if quote has a valid Avarda payment.
-     *
      * @param CartInterface|Quote $quote
      * @return void
      * @throws PaymentException
@@ -545,9 +584,8 @@ class QuotePaymentManagement implements QuotePaymentManagementInterface
     }
 
     /**
-     * Get state for status
-     * @param $status
-     * @return string
+     * @param string|null $status
+     * @return string|null
      */
     private function getState($status)
     {

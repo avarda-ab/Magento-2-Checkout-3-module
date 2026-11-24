@@ -6,11 +6,7 @@
 
 namespace Avarda\Checkout3\Api;
 
-use Avarda\Checkout3\Api\Data\ItemDetailsListInterface;
-use Magento\Framework\Exception\PaymentException;
 use Magento\Quote\Api\Data\CartInterface;
-use Magento\Quote\Model\Quote;
-use Magento\Sales\Api\Data\OrderInterface;
 
 /**
  * Interface for managing Avarda payment information
@@ -20,19 +16,19 @@ use Magento\Sales\Api\Data\OrderInterface;
 interface QuotePaymentManagementInterface
 {
     /**
-     * Get purchase ID for quote
+     * Get the data of the cart's Avarda purchase, initializing a new purchase when needed
      *
      * @param string|int $cartId
      * @param bool $renew
-     * @return string
+     * @return array
      */
     public function getPurchaseData($cartId, bool $renew = false);
 
     /**
-     * Make Avarda InitializePurchase call and return purchase ID
+     * Make Avarda InitializePurchase call and return the data of the new purchase
      *
-     * @param CartInterface|Quote $quote
-     * @return string
+     * @param \Magento\Quote\Api\Data\CartInterface|\Magento\Quote\Model\Quote $quote
+     * @return array
      */
     public function initializePurchase(CartInterface $quote);
 
@@ -40,14 +36,14 @@ interface QuotePaymentManagementInterface
      * Get quote items additional information not provided by Magento
      *
      * @param string|int $cartId
-     * @return ItemDetailsListInterface
+     * @return \Avarda\Checkout3\Api\Data\ItemDetailsListInterface
      */
     public function getItemDetailsList($cartId);
 
     /**
-     * Make Avarda UpdateItems call and return purchase ID
+     * Make Avarda UpdateItems call
      *
-     * @param CartInterface|Quote $quote
+     * @param \Magento\Quote\Api\Data\CartInterface|\Magento\Quote\Model\Quote $quote
      * @return void
      */
     public function updateItems(CartInterface $quote);
@@ -55,7 +51,7 @@ interface QuotePaymentManagementInterface
     /**
      * Push current delivery address visibility to Avarda
      *
-     * @param CartInterface|Quote $quote
+     * @param \Magento\Quote\Api\Data\CartInterface|\Magento\Quote\Model\Quote $quote
      * @return void
      */
     public function updateDeliveryAddress(CartInterface $quote);
@@ -74,7 +70,7 @@ interface QuotePaymentManagementInterface
     /**
      * Update order (quote) from Avarda
      *
-     * @param CartInterface|string|int $cartId
+     * @param \Magento\Quote\Api\Data\CartInterface|string|int $cartId
      * @return void
      */
     public function updatePaymentStatus($cartId);
@@ -82,7 +78,7 @@ interface QuotePaymentManagementInterface
     /**
      * Update order (quote) payment status from Avarda.
      *
-     * @param CartInterface|string|int $quote
+     * @param \Magento\Quote\Api\Data\CartInterface|string|int $quote
      * @return void
      */
     public function updateOnlyPaymentStatus($quote);
@@ -90,7 +86,7 @@ interface QuotePaymentManagementInterface
     /**
      * Update quote payment status and the total Avarda holds for the purchase.
      *
-     * @param CartInterface|Quote $quote
+     * @param \Magento\Quote\Api\Data\CartInterface|\Magento\Quote\Model\Quote $quote
      * @return void
      */
     public function updatePurchaseStatus(CartInterface $quote);
@@ -98,7 +94,7 @@ interface QuotePaymentManagementInterface
     /**
      * Update order payment status and info from Avarda.
      *
-     * @param OrderInterface $order
+     * @param \Magento\Sales\Api\Data\OrderInterface $order
      * @return void
      */
     public function updateOrderPaymentStatus($order);
@@ -106,7 +102,7 @@ interface QuotePaymentManagementInterface
     /**
      * Update order payment status from Avarda.
      *
-     * @param OrderInterface $order
+     * @param \Magento\Sales\Api\Data\OrderInterface $order
      * @return void
      */
     public function updateOnlyOrderPaymentStatus($order);
@@ -116,7 +112,7 @@ interface QuotePaymentManagementInterface
      *
      * @param string $purchaseId
      * @return int
-     * @throws PaymentException
+     * @throws \Magento\Framework\Exception\PaymentException
      */
     public function getQuoteIdByPurchaseId($purchaseId);
 }
